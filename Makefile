@@ -11,6 +11,7 @@ init:
 
 frontend:
 	cp .env frontend/.env
+	cd frontend && npm run build
 
 backend:
 	mkdir -p $(target_directory)
@@ -18,10 +19,12 @@ backend:
 
 start:
 	sudo docker start mp1_db
-	./$(target_directory)/backend
+	./$(target_directory)/backend &
+	cd frontend && npm run dev &
 
 stop:
 	sudo docker stop mp1_db
+	cd frontend && npm run stop
 
 clean:
 	rm -r $(target_directory)
