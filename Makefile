@@ -1,19 +1,27 @@
+target_directory := bin
+
+.PHONY: all backend frontend clean
+
+all: backend frontend
+
 init:
+	touch .env
 	sudo docker pull postgres
 	sudo docker create -it --name mp1_db --env-file .env --expose 5432 postgres
-	touch .env
 
-build:
-	mkdir -p bin
-	go build -o bin
-	ln -s .env bin
+frontend:
+	cp .env frontend/.env
+
+backend:
+	mkdir -p $(target_directory)
+	cd backend && go build -o ../$(target_directory)/backend
 
 start:
 	sudo docker start mp1_db
-	./bin/mp1
+	./$(target_directory)/backend
 
 stop:
 	sudo docker stop mp1_db
 
 clean:
-	rm -r bin
+	rm -r $(target_directory)
