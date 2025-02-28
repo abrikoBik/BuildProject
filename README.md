@@ -6,9 +6,19 @@ $ make init
 ```
 Далее в новый файл `.env` добавить переменные `POSTGRES_USER` и `POSTGRES_PASSWORD`
 
-## Сборка бэкенда
+## Сборка проекта
 ```shell
-$ make build
+$ make
+```
+
+### Сборка бэкенда
+```shell
+$ make backend
+```
+
+### Сборка фронтенда
+```
+$ make frontend
 ```
 
 ## Запуск бэкенда и базы данных

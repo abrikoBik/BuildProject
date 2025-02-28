@@ -1,6 +1,13 @@
-frontend/node_modules/
-frontend/.env
-
 bin/
-
 .env
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
