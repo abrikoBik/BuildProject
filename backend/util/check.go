@@ -2,8 +2,10 @@ package util
 
 import "log"
 
-func Check(err error) {
-	if err != nil {
-		log.Fatalln(err)
+func Check(errors ...error) {
+	for _, err := range errors {
+		if err != nil {
+			log.Fatalln(err)
+		}
 	}
 }
