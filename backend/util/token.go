@@ -3,6 +3,7 @@ package util
 import (
 	// "mp1/db"
 
+	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -21,8 +22,8 @@ func GenerateJWT(name string, password []byte, key string) (string, error) {
 	now := time.Now()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
 		"iss":  JWTIssuer,
-		"iat":  now,
-		"exp":  now.Add(time.Hour * 24 * 7 * 5), // 5 weeks
+		"iat":  jwt.NewNumericDate(now),
+		"exp":  jwt.NewNumericDate(now.Add(time.Hour * 24 * 7 * 5)), // 5 weeks
 		"sub":  name,
 		"hash": hash,
 	})
@@ -34,7 +35,7 @@ func GenerateJWT(name string, password []byte, key string) (string, error) {
 }
 
 // Validates a JWT based on current time.
-func ValidateJWT(token string, key string) (bool, error) {
+func ValidateJWT(token string, key string) bool {
 	parsed, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		return []byte(key), nil
 	},
@@ -42,8 +43,6 @@ func ValidateJWT(token string, key string) (bool, error) {
 		jwt.WithIssuedAt(),
 		jwt.WithExpirationRequired(),
 	)
-	if err != nil {
-		return false, err
-	}
-	return parsed.Valid, nil
+	log.Println(err)
+	return parsed.Valid
 }

@@ -7,6 +7,7 @@ import (
 	"mp1/db"
 	"mp1/util"
 	"net/http"
+	"os"
 
 	"gorm.io/gorm"
 )
@@ -68,6 +69,10 @@ func userInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// sanity checks
+	if !util.ValidateJWT(session.Token, os.Getenv("JWT_KEY")) {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 	var dbSession db.Session
 	result := Database.Where("token = ?", session.Token).Take(&dbSession)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {

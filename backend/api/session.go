@@ -85,6 +85,11 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// sanity checks
+	if !util.ValidateJWT(session.Token, os.Getenv("JWT_KEY")) {
+		w.WriteHeader(http.StatusUnauthorized)
+		util.Log("api", "invalid token")
+		return
+	}
 	var dbSession db.Session
 	result := Database.Where("token = ?", session.Token).Take(&dbSession)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
