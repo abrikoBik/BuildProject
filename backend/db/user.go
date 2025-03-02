@@ -16,7 +16,7 @@ type User struct {
 	Role     string `json:"role" gorm:"default:user;not null"`
 
 	// Only used in a JSON object.
-	Password string `json:"password" gorm:'-'`
+	Password string `json:"password" gorm:"-"`
 }
 
 // Simplified User object for use in session creation/verification.
