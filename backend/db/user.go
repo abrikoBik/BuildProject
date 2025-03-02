@@ -20,5 +20,5 @@ type UserOut struct {
 	Name     string `json:"name"`
 	FullName string `json:"fullName"`
 	Role     string `json:"role"`
-	ID       uint32 `json:"id"`
+	ID       uint   `json:"id"`
 }

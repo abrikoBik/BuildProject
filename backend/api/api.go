@@ -16,6 +16,7 @@ func Init(port int) *http.Server {
 	http.HandleFunc("/register", register)
 	http.HandleFunc("/login", login)
 	http.HandleFunc("/logout", logout)
+	http.HandleFunc("/userInfo", userInfo)
 	go server.ListenAndServe()
 	return server
 }
