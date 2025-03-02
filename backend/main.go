@@ -20,7 +20,7 @@ func main() {
 	// connecting to the database
 	database, err := db.Open("localhost", 5432, "mp1")
 	db.Database = database
-	util.Check(err, db.Migrate(db.User{}))
+	util.Check(err, db.Migrate(db.User{}, db.Session{}))
 	util.Log("db", "connected to database")
 
 	// starting the api

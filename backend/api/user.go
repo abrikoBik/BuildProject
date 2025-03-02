@@ -2,14 +2,19 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"mp1/db"
 	"mp1/util"
 	"net/http"
+	"os"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	"gorm.io/gorm"
 )
 
 // Creates a new database entry for user.
-// Request body must be JSON.
 func createUser(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var user db.User
@@ -19,11 +24,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(err.Error()))
 		return
 	}
-	if user.Name == "" || user.Email == "" || user.PasswordHash == "" || user.Role == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("invalid json request"))
-		return
-	}
+
 	result := Database.Create(&user)
 	if result.Error != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -31,6 +32,60 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(result.Error.Error()))
 		return
 	}
-	util.Log("api", fmt.Sprintf("createUser: %d rows affected", result.RowsAffected))
+	util.Log("api", fmt.Sprintf("/createUser: %d row(s) affected", result.RowsAffected))
 	w.WriteHeader(http.StatusCreated)
+}
+
+// Creates a new database entry for session.
+func createSession(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	var user db.SessionUser
+	if err := decoder.Decode(&user); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("could not unmarshal json: "))
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	// sanity checks
+	var dbUser db.User
+	result := Database.Where("name = ?", user.Name).Take(&dbUser)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("could not find user"))
+		return
+	}
+	if dbUser.Hash != user.Hash {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
+		"iss":  "mp1-auth",
+		"sub":  user.Name,
+		"hash": user.Hash,
+		"salt": user.Salt,
+	})
+	tokenStr, err := token.SignedString([]byte(os.Getenv("JWT_KEY")))
+	if err != nil {
+		util.Log("api", fmt.Sprintf("/createSession: %s", err.Error()))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	session := db.Session{
+		Name:      user.Name,
+		Token:     tokenStr,
+		ExpiresAt: time.Now().Add(time.Hour * 24 * 7 * 5), // 5 weeks
+	}
+	result = Database.Create(&session)
+	if result.Error != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("error creating session: "))
+		w.Write([]byte(result.Error.Error()))
+		return
+	}
+	util.Log("api", fmt.Sprintf("/createSession: %d row(s) affected", result.RowsAffected))
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte(tokenStr))
 }

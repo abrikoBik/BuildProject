@@ -4,7 +4,7 @@
 ```shell
 $ make init
 ```
-Далее в новый файл `.env` добавить переменные `POSTGRES_USER` и `POSTGRES_PASSWORD`
+Далее в новый файл `.env` добавить переменные `POSTGRES_USER`, `POSTGRES_PASSWORD` и `JWT_KEY`
 
 ## Сборка проекта
 ```shell

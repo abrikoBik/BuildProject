@@ -14,6 +14,7 @@ func Init(port int) *http.Server {
 	server := &http.Server{Addr: fmt.Sprintf(":%d", port)}
 	http.HandleFunc("/health", getHealth)
 	http.HandleFunc("/createUser", createUser)
+	http.HandleFunc("/createSession", createSession)
 	go server.ListenAndServe()
 	return server
 }
