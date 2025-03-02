@@ -16,6 +16,7 @@ import (
 )
 
 // Creates a new database entry for session.
+// Endpoint: /login
 func createSession(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var user db.SessionUser
@@ -88,6 +89,7 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 }
 
 // Removes the database entry for a session.
+// Endpoint: /logout
 func invalidateSession(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var session db.Session

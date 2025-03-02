@@ -9,6 +9,7 @@ import (
 )
 
 // Creates a new database entry for user.
+// Endpoint: /register
 func createUser(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var (
