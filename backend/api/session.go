@@ -21,8 +21,6 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 	var user db.SessionUser
 	if err := decoder.Decode(&user); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("could not unmarshal json: "))
-		w.Write([]byte(err.Error()))
 		return
 	}
 
@@ -30,8 +28,7 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 	var dbUser db.User
 	result := Database.Where("name = ?", user.Name).Take(&dbUser)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("could not find user"))
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 	hash := util.GenerateHash([]byte(user.Password), dbUser.Salt)
@@ -40,15 +37,24 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userSalt, err := util.RandomBytes(16)
+	if err != nil {
+		util.Log("api", fmt.Sprintf("/createSession: %s", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("hash error"))
+		return
+	}
+	userHash := util.GenerateHash([]byte(user.Password), userSalt)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
 		"iss":  "mp1-auth",
 		"sub":  user.Name,
-		"hash": dbUser.Hash,
+		"hash": userHash,
 	})
 	tokenStr, err := token.SignedString([]byte(os.Getenv("JWT_KEY")))
 	if err != nil {
 		util.Log("api", fmt.Sprintf("/createSession: %s", err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("error creating token"))
 		return
 	}
 
@@ -59,9 +65,9 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 	}
 	result = Database.Create(&session)
 	if result.Error != nil {
+		util.Log("api", fmt.Sprintf("/createSession: %s", result.Error.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("error creating session: "))
-		w.Write([]byte(result.Error.Error()))
+		w.Write([]byte("error creating session"))
 		return
 	}
 	util.Log("api", fmt.Sprintf("/createSession: %d row(s) affected", result.RowsAffected))
