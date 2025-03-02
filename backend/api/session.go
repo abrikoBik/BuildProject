@@ -37,7 +37,7 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userSalt, err := util.RandomBytes(16)
+	userSalt, err := util.RandomBytes(64)
 	if err != nil {
 		util.Log("api", fmt.Sprintf("/createSession: %s", err))
 		w.WriteHeader(http.StatusInternalServerError)

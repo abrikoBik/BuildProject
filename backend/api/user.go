@@ -22,7 +22,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user.Salt, err = util.RandomBytes(16)
+	user.Salt, err = util.RandomBytes(128)
 	if err != nil {
 		util.Log("api", fmt.Sprintf("/createUser: %s", err))
 		w.WriteHeader(http.StatusInternalServerError)
