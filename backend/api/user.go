@@ -18,7 +18,6 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	if err := decoder.Decode(&user); err != nil {
 		util.Log("api", fmt.Sprintf("/createUser: %s", err))
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("could not unmarshal json"))
 		return
 	}
 
