@@ -16,7 +16,6 @@ import (
 )
 
 // Creates a new database entry for session.
-// Endpoint: /login
 func login(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -94,7 +93,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 }
 
 // Removes the database entry for a session.
-// Endpoint: /logout
 func logout(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "DELETE" {
 		w.WriteHeader(http.StatusMethodNotAllowed)

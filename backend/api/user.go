@@ -9,7 +9,6 @@ import (
 )
 
 // Creates a new database entry for user.
-// Endpoint: /register
 func register(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
