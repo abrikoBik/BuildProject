@@ -11,19 +11,31 @@ import (
 // Creates a new database entry for user.
 func createUser(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
-	var user db.User
+	var (
+		user db.User
+		err  error
+	)
 	if err := decoder.Decode(&user); err != nil {
+		util.Log("api", fmt.Sprintf("/createUser: %s", err))
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("could not unmarshal json: "))
-		w.Write([]byte(err.Error()))
+		w.Write([]byte("could not unmarshal json"))
 		return
 	}
 
+	user.Salt, err = util.RandomBytes(16)
+	if err != nil {
+		util.Log("api", fmt.Sprintf("/createUser: %s", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("hash error"))
+		return
+	}
+	user.Hash = util.GenerateHash([]byte(user.Password), user.Salt)
+	user.Password = ""
 	result := Database.Create(&user)
 	if result.Error != nil {
+		util.Log("api", fmt.Sprintf("/createUser: %s", result.Error.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("error creating user: "))
-		w.Write([]byte(result.Error.Error()))
+		w.Write([]byte("error creating user"))
 		return
 	}
 	util.Log("api", fmt.Sprintf("/createUser: %d row(s) affected", result.RowsAffected))

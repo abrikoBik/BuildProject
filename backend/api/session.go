@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -33,7 +34,8 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("could not find user"))
 		return
 	}
-	if dbUser.Hash != user.Hash {
+	hash := util.GenerateHash([]byte(user.Password), dbUser.Salt)
+	if bytes.Compare(dbUser.Hash, hash) != 0 {
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
@@ -41,8 +43,7 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
 		"iss":  "mp1-auth",
 		"sub":  user.Name,
-		"hash": user.Hash,
-		"salt": user.Salt,
+		"hash": dbUser.Hash,
 	})
 	tokenStr, err := token.SignedString([]byte(os.Getenv("JWT_KEY")))
 	if err != nil {

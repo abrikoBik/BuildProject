@@ -11,15 +11,16 @@ type User struct {
 	// TODO: decide whether name should be a phone number or an email address
 	Name     string `json:"name" gorm:"unique;not null"`
 	FullName string `json:"fullName" gorm:"not null"`
-	Hash     string `json:"hash" gorm:"not null"`
+	Password string `json:"password" gorm:-`
+	Hash     []byte `gorm:"not null"`
+	Salt     []byte `gorm:"not null"`
 	Role     string `json:"role" gorm:"default:user;not null"`
 }
 
 // Simplified User object for use in session creation/verification.
 type SessionUser struct {
-	Name string `json:"name"`
-	Hash string `json:"hash"`
-	Salt string `json:"salt"`
+	Name     string `json:"name"`
+	Password string `json:"password"`
 }
 
 type Session struct {
