@@ -18,6 +18,11 @@ import (
 // Creates a new database entry for session.
 // Endpoint: /login
 func login(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
 	decoder := json.NewDecoder(r.Body)
 	var user db.SessionUser
 	if err := decoder.Decode(&user); err != nil {
@@ -91,6 +96,11 @@ func login(w http.ResponseWriter, r *http.Request) {
 // Removes the database entry for a session.
 // Endpoint: /logout
 func logout(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "DELETE" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
 	decoder := json.NewDecoder(r.Body)
 	var session db.Session
 	if err := decoder.Decode(&session); err != nil {
