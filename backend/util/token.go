@@ -1,9 +1,6 @@
 package util
 
 import (
-	// "mp1/db"
-
-	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"

@@ -15,11 +15,6 @@ import (
 
 // Creates a new database entry for session.
 func login(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
 	decoder := json.NewDecoder(r.Body)
 	var user db.SessionUser
 	if err := decoder.Decode(&user); err != nil {
@@ -72,11 +67,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 // Removes the database entry for a session.
 func logout(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "DELETE" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
 	decoder := json.NewDecoder(r.Body)
 	var session db.Session
 	if err := decoder.Decode(&session); err != nil {
@@ -85,11 +75,6 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// sanity checks
-	if !util.ValidateJWT(session.Token, os.Getenv("JWT_KEY")) {
-		w.WriteHeader(http.StatusUnauthorized)
-		util.Log("api", "invalid token")
-		return
-	}
 	var dbSession db.Session
 	result := Database.Where("token = ?", session.Token).Take(&dbSession)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {

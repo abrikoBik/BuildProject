@@ -7,18 +7,13 @@ import (
 	"mp1/db"
 	"mp1/util"
 	"net/http"
-	"os"
+	"strings"
 
 	"gorm.io/gorm"
 )
 
 // Creates a new database entry for user.
 func register(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
 	decoder := json.NewDecoder(r.Body)
 	var (
 		user db.User
@@ -56,25 +51,10 @@ func register(w http.ResponseWriter, r *http.Request) {
 }
 
 func userInfo(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
-	decoder := json.NewDecoder(r.Body)
-	var session db.Session
-	if err := decoder.Decode(&session); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
+	token := strings.Split(r.Header["Authorization"][0], " ")[1]
 	// sanity checks
-	if !util.ValidateJWT(session.Token, os.Getenv("JWT_KEY")) {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
 	var dbSession db.Session
-	result := Database.Where("token = ?", session.Token).Take(&dbSession)
+	result := Database.Where("token = ?", token).Take(&dbSession)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
