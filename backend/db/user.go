@@ -4,8 +4,9 @@ import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
-	Name         string `json:"name"`
-	Email        string `json:"email"`
-	PasswordHash string `json:"passwordHash"`
-	Role         string `json:"role"`
+	// TODO: decide whether name should be a phone number or an email address
+	Name     string `json:"name" gorm:"unique;not null"`
+	FullName string `json:"fullName" gorm:"not null"`
+	Hash     string `json:"hash" gorm:"not null"`
+	Role     string `json:"role" gorm:"default:user;not null"`
 }
