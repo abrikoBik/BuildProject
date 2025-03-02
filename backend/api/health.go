@@ -7,6 +7,6 @@ import (
 
 // Sends back code 200 on request.
 func getHealth(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(200)
+	w.WriteHeader(http.StatusOK)
 	util.Log("api", "/health 200")
 }
