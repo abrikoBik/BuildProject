@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"mp1/api/middleware"
 	"mp1/db"
 	"mp1/util"
 	"net/http"
@@ -67,22 +68,16 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 // Removes the database entry for a session.
 func logout(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-	var session db.Session
-	if err := decoder.Decode(&session); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
+	token := r.Context().Value(middleware.TokenKey).(string)
 	// sanity checks
 	var dbSession db.Session
-	result := Database.Where("token = ?", session.Token).Take(&dbSession)
+	result := Database.Where("token = ?", token).Take(&dbSession)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	result = Database.Where("token = ?", session.Token).Delete(&dbSession)
+	result = Database.Where("token = ?", token).Delete(&dbSession)
 	if result.Error != nil {
 		util.Log("api", fmt.Sprintf("/logout: %s", result.Error.Error()))
 		w.WriteHeader(http.StatusInternalServerError)

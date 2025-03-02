@@ -1,11 +1,14 @@
 package middleware
 
 import (
+	"context"
 	"mp1/util"
 	"net/http"
 	"os"
 	"strings"
 )
+
+const TokenKey = "JWT"
 
 func ValidateToken(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -18,6 +21,7 @@ func ValidateToken(next http.Handler) http.Handler {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		next.ServeHTTP(w, r)
+		ctx := context.WithValue(r.Context(), TokenKey, token[1])
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

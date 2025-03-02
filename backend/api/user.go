@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"mp1/api/middleware"
 	"mp1/db"
 	"mp1/util"
 	"net/http"
-	"strings"
 
 	"gorm.io/gorm"
 )
@@ -51,7 +51,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 }
 
 func userInfo(w http.ResponseWriter, r *http.Request) {
-	token := strings.Split(r.Header["Authorization"][0], " ")[1]
+	token := r.Context().Value(middleware.TokenKey).(string)
 	// sanity checks
 	var dbSession db.Session
 	result := Database.Where("token = ?", token).Take(&dbSession)
