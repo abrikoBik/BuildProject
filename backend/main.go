@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"mp1/api"
 	"mp1/db"
 	"mp1/util"
@@ -25,13 +24,10 @@ func main() {
 
 	// starting the api
 	api.Database = database
-	apiServer := api.Init(3000)
-	util.Log("api", "server started")
+	util.Check(api.Init(3000))
 
 	// listening for SIGINT and SIGTERM (graceful shutdown)
 	<-exitChan
-	apiServer.Shutdown(context.Background())
-	util.Log("api", "server shutdown")
 	sqlDB, err := database.DB()
 	util.Check(err, sqlDB.Close())
 }

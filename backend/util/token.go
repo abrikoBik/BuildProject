@@ -1,10 +1,12 @@
 package util
 
 import (
-	// "mp1/db"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
+
+var JWTIssuer string = "mp1-auth"
 
 // Generates a JWT token with name and password in Claims.
 // Also generates a 64 byte large salt.
@@ -14,8 +16,11 @@ func GenerateJWT(name string, password []byte, key string) (string, error) {
 		return "", err
 	}
 	hash, err := GenerateHash([]byte(password), salt)
+	now := time.Now()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
-		"iss":  "mp1-auth",
+		"iss":  JWTIssuer,
+		"iat":  jwt.NewNumericDate(now),
+		"exp":  jwt.NewNumericDate(now.Add(time.Hour * 24 * 7 * 5)), // 5 weeks
 		"sub":  name,
 		"hash": hash,
 	})
@@ -24,4 +29,16 @@ func GenerateJWT(name string, password []byte, key string) (string, error) {
 		return "", err
 	}
 	return tokenStr, nil
+}
+
+// Validates a JWT based on current time.
+func ValidateJWT(token string, key string) bool {
+	parsed, _ := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		return []byte(key), nil
+	},
+		jwt.WithIssuer(JWTIssuer),
+		jwt.WithIssuedAt(),
+		jwt.WithExpirationRequired(),
+	)
+	return parsed.Valid
 }

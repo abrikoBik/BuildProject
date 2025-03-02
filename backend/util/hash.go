@@ -18,13 +18,13 @@ func RandomBytes(n int) ([]byte, error) {
 }
 
 // Generates a hash using salt.
-// Default options: 1 iteration, 64MB, 4 threads, 32 key length.
-// Also tries to prevent timing attacks.
+// Default options: 1 iteration, 64MB, 4 threads, 128 key length.
+// Also tries to prevent timing attacks (sleeps for 0-50ms).
 func GenerateHash(password []byte, salt []byte) ([]byte, error) {
-	toSleep, err := rand.Int(rand.Reader, big.NewInt(100))
+	toSleep, err := rand.Int(rand.Reader, big.NewInt(50))
 	if err != nil {
 		return nil, err
 	}
-	time.Sleep(time.Millisecond * time.Duration(toSleep.Add(toSleep, big.NewInt(50)).Int64()))
-	return argon2.IDKey(password, salt, 1, 64*1024, 4, 32), nil
+	time.Sleep(time.Millisecond * time.Duration(toSleep.Int64()))
+	return argon2.IDKey(password, salt, 1, 64*1024, 4, 128), nil
 }
