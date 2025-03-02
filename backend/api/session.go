@@ -86,3 +86,31 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(tokenStr))
 }
+
+// Removes the database entry for a session.
+func invalidateSession(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	var session db.Session
+	if err := decoder.Decode(&session); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// sanity checks
+	var dbSession db.Session
+	result := Database.Where("token = ?", session.Token).Take(&dbSession)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	result = Database.Where("token = ?", session.Token).Delete(&dbSession)
+	if result.Error != nil {
+		util.Log("api", fmt.Sprintf("/invalidateSession: %s", result.Error.Error()))
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("error invalidating session"))
+		return
+	}
+	util.Log("api", fmt.Sprintf("/invalidateSession: %d row(s) affected", result.RowsAffected))
+	w.WriteHeader(http.StatusOK)
+}

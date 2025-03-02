@@ -15,6 +15,7 @@ func Init(port int) *http.Server {
 	http.HandleFunc("/health", getHealth)
 	http.HandleFunc("/createUser", createUser)
 	http.HandleFunc("/createSession", createSession)
+	http.HandleFunc("/invalidateSession", invalidateSession)
 	go server.ListenAndServe()
 	return server
 }
