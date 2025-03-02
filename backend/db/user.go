@@ -1,10 +1,6 @@
 package db
 
-import (
-	"time"
-
-	"gorm.io/gorm"
-)
+import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
@@ -19,15 +15,10 @@ type User struct {
 	Password string `json:"password" gorm:"-"`
 }
 
-// Simplified User object for use in session creation/verification.
-type SessionUser struct {
+// User object for /userInfo endpoint.
+type UserOut struct {
 	Name     string `json:"name"`
-	Password string `json:"password"`
-}
-
-type Session struct {
-	gorm.Model
-	Name      string    `json:"name" gorm:"not null"`
-	Token     string    `json:"token" gorm:"not null"`
-	ExpiresAt time.Time `json:"expiresAt" gorm:"not null"`
+	FullName string `json:"fullName"`
+	Role     string `json:"role"`
+	ID       uint32 `json:"id"`
 }
