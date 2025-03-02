@@ -29,7 +29,13 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("hash error"))
 		return
 	}
-	user.Hash = util.GenerateHash([]byte(user.Password), user.Salt)
+	user.Hash, err = util.GenerateHash([]byte(user.Password), user.Salt)
+	if err != nil {
+		util.Log("api", fmt.Sprintf("/createUser: %s", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("hash error"))
+		return
+	}
 	user.Password = ""
 	result := Database.Create(&user)
 	if result.Error != nil {

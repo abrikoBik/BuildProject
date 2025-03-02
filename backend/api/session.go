@@ -31,7 +31,13 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	hash := util.GenerateHash([]byte(user.Password), dbUser.Salt)
+	hash, err := util.GenerateHash([]byte(user.Password), dbUser.Salt)
+	if err != nil {
+		util.Log("api", fmt.Sprintf("/createSession: %s", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("hash error"))
+		return
+	}
 	if bytes.Compare(dbUser.Hash, hash) != 0 {
 		w.WriteHeader(http.StatusForbidden)
 		return
@@ -44,7 +50,13 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("hash error"))
 		return
 	}
-	userHash := util.GenerateHash([]byte(user.Password), userSalt)
+	userHash, err := util.GenerateHash([]byte(user.Password), userSalt)
+	if err != nil {
+		util.Log("api", fmt.Sprintf("/createSession: %s", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("hash error"))
+		return
+	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
 		"iss":  "mp1-auth",
 		"sub":  user.Name,
