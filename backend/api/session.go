@@ -11,7 +11,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
 )
 
@@ -48,26 +47,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userSalt, err := util.RandomBytes(64)
-	if err != nil {
-		util.Log("api", fmt.Sprintf("/login: %s", err))
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("hash error"))
-		return
-	}
-	userHash, err := util.GenerateHash([]byte(user.Password), userSalt)
-	if err != nil {
-		util.Log("api", fmt.Sprintf("/login: %s", err))
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("hash error"))
-		return
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
-		"iss":  "mp1-auth",
-		"sub":  user.Name,
-		"hash": userHash,
-	})
-	tokenStr, err := token.SignedString([]byte(os.Getenv("JWT_KEY")))
+	token, err := util.GenerateJWT(user.Name, []byte(user.Password), os.Getenv("JWT_KEY"))
 	if err != nil {
 		util.Log("api", fmt.Sprintf("/login: %s", err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
@@ -77,7 +57,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	session := db.Session{
 		Name:      user.Name,
-		Token:     tokenStr,
+		Token:     token,
 		ExpiresAt: time.Now().Add(time.Hour * 24 * 7 * 5), // 5 weeks
 	}
 	result = Database.Create(&session)
@@ -89,7 +69,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 	util.Log("api", fmt.Sprintf("/login: %d row(s) affected", result.RowsAffected))
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(tokenStr))
+	w.Write([]byte(token))
 }
 
 // Removes the database entry for a session.
