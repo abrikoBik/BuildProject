@@ -36,13 +36,12 @@ func GenerateJWT(name string, password []byte, key string) (string, error) {
 
 // Validates a JWT based on current time.
 func ValidateJWT(token string, key string) bool {
-	parsed, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+	parsed, _ := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		return []byte(key), nil
 	},
 		jwt.WithIssuer(JWTIssuer),
 		jwt.WithIssuedAt(),
 		jwt.WithExpirationRequired(),
 	)
-	log.Println(err)
 	return parsed.Valid
 }
