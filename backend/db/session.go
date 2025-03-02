@@ -1,10 +1,6 @@
 package db
 
-import (
-	"time"
-
-	"gorm.io/gorm"
-)
+import "gorm.io/gorm"
 
 // Simplified User object for use in session creation/verification.
 type SessionUser struct {
@@ -14,7 +10,6 @@ type SessionUser struct {
 
 type Session struct {
 	gorm.Model
-	Name      string    `json:"name" gorm:"not null"`
-	Token     string    `json:"token" gorm:"not null"`
-	ExpiresAt time.Time `json:"expiresAt" gorm:"not null"`
+	Name  string `json:"name" gorm:"not null"`
+	Token string `json:"token" gorm:"not null"`
 }

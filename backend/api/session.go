@@ -9,7 +9,6 @@ import (
 	"mp1/util"
 	"net/http"
 	"os"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -56,9 +55,8 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	session := db.Session{
-		Name:      user.Name,
-		Token:     token,
-		ExpiresAt: time.Now().Add(time.Hour * 24 * 7 * 5), // 5 weeks
+		Name:  user.Name,
+		Token: token,
 	}
 	result = Database.Create(&session)
 	if result.Error != nil {

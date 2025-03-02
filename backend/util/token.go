@@ -3,6 +3,8 @@ package util
 import (
 	// "mp1/db"
 
+	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -14,8 +16,11 @@ func GenerateJWT(name string, password []byte, key string) (string, error) {
 		return "", err
 	}
 	hash, err := GenerateHash([]byte(password), salt)
+	now := time.Now()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
 		"iss":  "mp1-auth",
+		"iat":  now,
+		"exp":  now.Add(time.Hour * 24 * 7 * 5), // 5 weeks
 		"sub":  name,
 		"hash": hash,
 	})
