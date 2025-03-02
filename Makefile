@@ -7,7 +7,7 @@ all: backend frontend
 init:
 	touch .env
 	sudo docker pull postgres
-	sudo docker create -it --name mp1_db --env-file .env --expose 5432 postgres
+	sudo docker create -it --name mp1_db --env-file .env --publish 127.0.0.1:5432:5432 postgres
 
 frontend:
 	cp .env frontend/.env
@@ -15,11 +15,11 @@ frontend:
 
 backend:
 	mkdir -p $(target_directory)
-	cd backend && go build -o ../$(target_directory)/backend
+	cd backend && go build -o ../$(target_directory)/mp1_backend
 
 start:
 	sudo docker start mp1_db
-	./$(target_directory)/backend &
+	./$(target_directory)/mp1_backend &
 	cd frontend && npm run dev &
 
 stop:
