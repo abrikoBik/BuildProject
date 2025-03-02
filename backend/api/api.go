@@ -12,10 +12,10 @@ var Database *gorm.DB
 
 func Init(port int) *http.Server {
 	server := &http.Server{Addr: fmt.Sprintf(":%d", port)}
-	http.HandleFunc("/health", getHealth)
-	http.HandleFunc("/register", createUser)
-	http.HandleFunc("/login", createSession)
-	http.HandleFunc("/logout", invalidateSession)
+	http.HandleFunc("/health", health)
+	http.HandleFunc("/register", register)
+	http.HandleFunc("/login", login)
+	http.HandleFunc("/logout", logout)
 	go server.ListenAndServe()
 	return server
 }

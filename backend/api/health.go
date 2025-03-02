@@ -1,13 +1,8 @@
 package api
 
-import (
-	"mp1/util"
-	"net/http"
-)
+import "net/http"
 
 // Sends back code 200 on request.
-// Endpoint: /health
-func getHealth(w http.ResponseWriter, r *http.Request) {
+func health(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	util.Log("api", "/health 200")
 }

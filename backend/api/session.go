@@ -17,7 +17,7 @@ import (
 
 // Creates a new database entry for session.
 // Endpoint: /login
-func createSession(w http.ResponseWriter, r *http.Request) {
+func login(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var user db.SessionUser
 	if err := decoder.Decode(&user); err != nil {
@@ -34,7 +34,7 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 	}
 	hash, err := util.GenerateHash([]byte(user.Password), dbUser.Salt)
 	if err != nil {
-		util.Log("api", fmt.Sprintf("/createSession: %s", err))
+		util.Log("api", fmt.Sprintf("/login: %s", err))
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("hash error"))
 		return
@@ -46,14 +46,14 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 
 	userSalt, err := util.RandomBytes(64)
 	if err != nil {
-		util.Log("api", fmt.Sprintf("/createSession: %s", err))
+		util.Log("api", fmt.Sprintf("/login: %s", err))
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("hash error"))
 		return
 	}
 	userHash, err := util.GenerateHash([]byte(user.Password), userSalt)
 	if err != nil {
-		util.Log("api", fmt.Sprintf("/createSession: %s", err))
+		util.Log("api", fmt.Sprintf("/login: %s", err))
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("hash error"))
 		return
@@ -65,7 +65,7 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 	})
 	tokenStr, err := token.SignedString([]byte(os.Getenv("JWT_KEY")))
 	if err != nil {
-		util.Log("api", fmt.Sprintf("/createSession: %s", err.Error()))
+		util.Log("api", fmt.Sprintf("/login: %s", err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("error creating token"))
 		return
@@ -78,19 +78,19 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 	}
 	result = Database.Create(&session)
 	if result.Error != nil {
-		util.Log("api", fmt.Sprintf("/createSession: %s", result.Error.Error()))
+		util.Log("api", fmt.Sprintf("/login: %s", result.Error.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("error creating session"))
 		return
 	}
-	util.Log("api", fmt.Sprintf("/createSession: %d row(s) affected", result.RowsAffected))
+	util.Log("api", fmt.Sprintf("/login: %d row(s) affected", result.RowsAffected))
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(tokenStr))
 }
 
 // Removes the database entry for a session.
 // Endpoint: /logout
-func invalidateSession(w http.ResponseWriter, r *http.Request) {
+func logout(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var session db.Session
 	if err := decoder.Decode(&session); err != nil {
@@ -108,11 +108,11 @@ func invalidateSession(w http.ResponseWriter, r *http.Request) {
 
 	result = Database.Where("token = ?", session.Token).Delete(&dbSession)
 	if result.Error != nil {
-		util.Log("api", fmt.Sprintf("/invalidateSession: %s", result.Error.Error()))
+		util.Log("api", fmt.Sprintf("/logout: %s", result.Error.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("error invalidating session"))
 		return
 	}
-	util.Log("api", fmt.Sprintf("/invalidateSession: %d row(s) affected", result.RowsAffected))
+	util.Log("api", fmt.Sprintf("/logout: %d row(s) affected", result.RowsAffected))
 	w.WriteHeader(http.StatusOK)
 }
