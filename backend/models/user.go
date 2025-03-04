@@ -1,10 +1,9 @@
-package db
+package models
 
 import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
-	// TODO: decide whether name should be a phone number or an email address
 	Name     string `json:"name" gorm:"unique;not null"`
 	FullName string `json:"fullName" gorm:"not null"`
 	Hash     []byte `gorm:"not null"`
@@ -15,7 +14,6 @@ type User struct {
 	Password string `json:"password" gorm:"-"`
 }
 
-// User object for /userInfo endpoint.
 type UserOut struct {
 	Name     string `json:"name"`
 	FullName string `json:"fullName"`

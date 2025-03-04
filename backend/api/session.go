@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"mp1/api/middleware"
-	"mp1/db"
+	"mp1/models"
 	"mp1/util"
 	"net/http"
 	"os"
@@ -17,14 +17,14 @@ import (
 // Creates a new database entry for session.
 func login(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
-	var user db.SessionUser
+	var user models.SessionUser
 	if err := decoder.Decode(&user); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	// sanity checks
-	var dbUser db.User
+	var dbUser models.User
 	result := Database.Where("name = ?", user.Name).Take(&dbUser)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		w.WriteHeader(http.StatusNotFound)
@@ -50,7 +50,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	session := db.Session{
+	session := models.Session{
 		Name:  user.Name,
 		Token: token,
 	}
@@ -70,7 +70,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 func logout(w http.ResponseWriter, r *http.Request) {
 	token := r.Context().Value(middleware.TokenKey).(string)
 	// sanity checks
-	var dbSession db.Session
+	var dbSession models.Session
 	result := Database.Where("token = ?", token).Take(&dbSession)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		w.WriteHeader(http.StatusNotFound)
