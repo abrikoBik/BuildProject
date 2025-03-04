@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"mp1/api/middleware"
-	"mp1/db"
+	"mp1/models"
 	"mp1/util"
 	"net/http"
 
@@ -16,7 +16,7 @@ import (
 func register(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var (
-		user db.User
+		user models.User
 		err  error
 	)
 	if err := decoder.Decode(&user); err != nil {
@@ -53,14 +53,14 @@ func register(w http.ResponseWriter, r *http.Request) {
 func userInfo(w http.ResponseWriter, r *http.Request) {
 	token := r.Context().Value(middleware.TokenKey).(string)
 	// sanity checks
-	var dbSession db.Session
+	var dbSession models.Session
 	result := Database.Where("token = ?", token).Take(&dbSession)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
-	var user db.User
+	var user models.User
 	result = Database.Where("name = ?", dbSession.Name).Take(&user)
 	if result.Error != nil {
 		util.Log("api", fmt.Sprintf("/userInfo: %s", result.Error.Error()))
@@ -68,7 +68,7 @@ func userInfo(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("error finding user"))
 		return
 	}
-	toMarshal := db.UserOut{
+	toMarshal := models.UserOut{
 		Name:     user.Name,
 		FullName: user.FullName,
 		Role:     user.Role,
