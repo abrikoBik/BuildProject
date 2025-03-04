@@ -1,5 +1,76 @@
 @import "tailwindcss";
 
+html {
+    background-color: #EBE8F0;
+}
+
 * {
     font-family: Inter;
+    color: #342A36;
+}
+
+/* Palette background colors */
+
+.bg-palette-color1 {
+    background-color: #EBE8F0;
+}
+
+.bg-palette-color2 {
+    background-color: #E4DFED;
+}
+
+.bg-palette-color3 {
+    background-color: #D6CCDC;
+}
+
+.bg-palette-color4 {
+    background-color: #C598E0;
+}
+
+.bg-palette-color5 {
+    background-color: #342A36;
+}
+
+/* Palette text colors */
+
+.text-palette-color1 {
+    color: #EBE8F0;
+}
+
+.text-palette-color2 {
+    color: #E4DFED;
+}
+
+.text-palette-color3 {
+    color: #D6CCDC;
+}
+
+.text-palette-color4 {
+    color: #C598E0;
+}
+
+.text-palette-color5 {
+    color: #342A36;
+}
+
+/* Palette border colors */
+
+.border-palette-color1 {
+    border-color: #EBE8F0;
+}
+
+.border-palette-color2 {
+    border-color: #E4DFED;
+}
+
+.border-palette-color3 {
+    border-color: #D6CCDC;
+}
+
+.border-palette-color4 {
+    border-color: #C598E0;
+}
+
+.border-palette-color5 {
+    border-color: #342A36;
 }
