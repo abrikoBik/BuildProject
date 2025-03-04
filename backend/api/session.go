@@ -51,8 +51,8 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	session := models.Session{
-		Name:  user.Name,
-		Token: token,
+		UserID: dbUser.ID,
+		Token:  token,
 	}
 	result = Database.Create(&session)
 	if result.Error != nil {

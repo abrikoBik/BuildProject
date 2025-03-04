@@ -61,7 +61,7 @@ func userInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user models.User
-	result = Database.Where("name = ?", dbSession.Name).Take(&user)
+	result = Database.Where("id = ?", dbSession.UserID).Take(&user)
 	if result.Error != nil {
 		util.Log("api", fmt.Sprintf("/userInfo: %s", result.Error.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
@@ -71,7 +71,6 @@ func userInfo(w http.ResponseWriter, r *http.Request) {
 	toMarshal := models.UserOut{
 		Name:     user.Name,
 		FullName: user.FullName,
-		Role:     user.Role,
 		ID:       user.ID,
 	}
 	marshalled, err := json.Marshal(toMarshal)

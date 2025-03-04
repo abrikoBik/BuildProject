@@ -4,8 +4,8 @@ import "gorm.io/gorm"
 
 type Session struct {
 	gorm.Model
-	Name  string `json:"name" gorm:"not null"`
-	Token string `json:"token" gorm:"not null"`
+	Token  string `json:"token" gorm:"not null"`
+	UserID uint   `json:"userID" gorm:"not null"`
 }
 
 // Simplified User object for use in session creation/verification.
