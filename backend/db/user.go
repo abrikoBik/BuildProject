@@ -1,6 +1,19 @@
 package db
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
+
+type Worker struct {
+	gorm.Model
+	Users []User `json:"users"`
+}
+
+type Task struct {
+	gorm.Model
+	Start uint `json:"start" gorm:"not null"`
+	End   uint `json:"end" gorm:"not null"`
+}
 
 type User struct {
 	gorm.Model

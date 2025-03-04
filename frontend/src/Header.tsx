@@ -10,14 +10,13 @@ export const Header = () =>
                 
                 <section className="flex flex-row space-x-4 flex-grow justify-center">
                     <div className="hover:cursor-pointer">Главная</div>
-                    <div className="hover:cursor-pointer">Продукты</div>
                     <div className="hover:cursor-pointer">Отзывы</div>
                     <div className="hover:cursor-pointer">О нас</div>
                 </section>
 
                 <section className="flex flex-row space-x-4 flex-shrink-0">
                     <Link to="/login" className="p-1 px-3 rounded-sm bg-gray-200 hover:cursor-pointer">Вход</Link>
-                    <Link to="/register" className="p-1 px-3 rounded-sm bg-blue-600 hover:cursor-pointer">Регистрация</Link>
+                    <Link to="/register" className="p-1 px-3 rounded-sm bg-[#C598E0] hover:cursor-pointer">Регистрация</Link>
                 </section>
             </div>
         </header>

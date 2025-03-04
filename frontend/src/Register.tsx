@@ -36,7 +36,7 @@ export const Register = () =>
                         <option>Подрядчик</option>
                         <option>Заказчик</option>
                     </select>
-                    <a href="/login" className="my-1 mx-25 p-1 px-3 rounded-sm bg-blue-200 hover:cursor-pointer">Регистрация</a>
+                    <a href="/login" className="my-1 mx-25 p-1 px-3 rounded-sm bg-[#C598E0] hover:cursor-pointer">Регистрация</a>
                     <div className="m-5 flex flex-row justify-center">
                         <div className="mx-5 my-3 bg-gray-200 w-full h-[2px]"></div>
                         <div>или</div>
