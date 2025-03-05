@@ -6,6 +6,8 @@ import (
 	"mp1/util"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
+	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 	"gorm.io/gorm"
 )
 
@@ -13,18 +15,19 @@ import (
 var Database *gorm.DB
 
 func Init(port int) error {
-	mux := http.NewServeMux()
+	router := chi.NewRouter()
+	router.Use(chiMiddleware.Logger)
+	router.Use(chiMiddleware.RequestID)
+	router.Use(chiMiddleware.Recoverer)
+	router.Use(chiMiddleware.Heartbeat("/health"))
 
-	mux.HandleFunc("/health", health)
-	mux.HandleFunc("POST /register", register)
-	mux.HandleFunc("POST /login", login)
+	router.Post("/register", register)
+	router.Post("/login", login)
 
-	logoutHandler := http.HandlerFunc(logout)
-	mux.Handle("DELETE /logout", middleware.ValidateToken(logoutHandler))
-	userInfoHandler := http.HandlerFunc(userInfo)
-	mux.Handle("GET /userInfo", middleware.ValidateToken(userInfoHandler))
+	router.With(middleware.ValidateToken).Get("/userInfo", userInfo)
+	router.With(middleware.ValidateToken).Post("/logout", logout)
 
 	util.Log("api", "starting server")
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port), mux)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", port), router)
 	return err
 }
