@@ -68,11 +68,8 @@ func userInfo(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("error finding user"))
 		return
 	}
-	toMarshal := models.UserOut{
-		Name:     user.Name,
-		FullName: user.FullName,
-		ID:       user.ID,
-	}
+	var toMarshal models.UserJSON
+	toMarshal.Copy(user)
 	marshalled, err := json.Marshal(toMarshal)
 	if err != nil {
 		util.Log("api", fmt.Sprintf("/userInfo: %s", err))

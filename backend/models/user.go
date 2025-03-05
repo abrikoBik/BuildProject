@@ -16,10 +16,18 @@ type User struct {
 	Password string `json:"password" gorm:"-"`
 }
 
-type UserOut struct {
+type UserJSON struct {
 	Name        string `json:"name"`
 	FullName    string `json:"fullName"`
 	Email       string `json:"email"`
 	PhoneNumber uint   `json:"phoneNumber"`
 	ID          uint   `json:"id"`
+}
+
+func (u *UserJSON) Copy(user User) {
+	u.Name = user.Name
+	u.FullName = user.FullName
+	u.Email = user.Email
+	u.PhoneNumber = user.PhoneNumber
+	u.ID = user.ID
 }
