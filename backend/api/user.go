@@ -16,37 +16,40 @@ import (
 func register(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var (
-		user models.User
-		err  error
+		userIn models.UserJSONIn
+		err    error
 	)
-	if err := decoder.Decode(&user); err != nil {
-		util.Log("api", fmt.Sprintf("/register: %s", err))
+	if err := decoder.Decode(&userIn); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	user.Salt, err = util.RandomBytes(128)
+	var userDB models.UserDB
+	userDB.User = models.User{
+		Name:        userIn.User.Name,
+		FullName:    userIn.User.FullName,
+		Email:       userIn.User.Email,
+		PhoneNumber: userIn.User.PhoneNumber,
+	}
+	userDB.Salt, err = util.RandomBytes(128)
 	if err != nil {
 		util.Log("api", fmt.Sprintf("/register: %s", err))
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("hash error"))
 		return
 	}
-	user.Hash, err = util.GenerateHash([]byte(user.Password), user.Salt)
+	userDB.Hash, err = util.GenerateHash([]byte(userIn.Password), userDB.Salt)
 	if err != nil {
 		util.Log("api", fmt.Sprintf("/register: %s", err))
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("hash error"))
 		return
 	}
-	result := Database.Create(&user)
+	result := Database.Create(&userDB)
 	if result.Error != nil {
 		util.Log("api", fmt.Sprintf("/register: %s", result.Error.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("error creating user"))
 		return
 	}
-	util.Log("api", fmt.Sprintf("/register: %d row(s) affected", result.RowsAffected))
+	util.Log("api", fmt.Sprintf("/register: new user %s", r.Body))
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -61,15 +64,14 @@ func userInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user models.User
-	result = Database.Where("id = ?", dbSession.UserID).Take(&user)
+	result = Database.Where("sessions IN ?", dbSession.Token).Take(&user)
 	if result.Error != nil {
 		util.Log("api", fmt.Sprintf("/userInfo: %s", result.Error.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("error finding user"))
 		return
 	}
-	var toMarshal models.UserJSON
-	toMarshal.Copy(user)
+	var toMarshal models.UserJSONOut
 	marshalled, err := json.Marshal(toMarshal)
 	if err != nil {
 		util.Log("api", fmt.Sprintf("/userInfo: %s", err))
