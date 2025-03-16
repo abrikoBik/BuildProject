@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"mp1/api/middleware"
 	"mp1/models"
 	"mp1/util"
