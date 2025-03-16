@@ -14,6 +14,6 @@ type SessionJSONIn struct {
 }
 
 type SessionJSONOut struct {
-	User  `json:"user"`
-	Token string `json:"token"`
+	UserID uint   `json:"userID"`
+	Token  string `json:"token"`
 }

@@ -30,6 +30,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "user not found", http.StatusNotFound)
 		return
 	}
+
 	hash, err := util.GenerateHash([]byte(user.Password), dbUser.Salt)
 	if err != nil {
 		util.Log("api", fmt.Sprintf("/login: %s", err))
@@ -40,16 +41,15 @@ func login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "hash mismatch", http.StatusForbidden)
 		return
 	}
-
 	token, err := util.GenerateJWT(user.Name, []byte(user.Password), os.Getenv("JWT_KEY"))
 	if err != nil {
 		util.Log("api", fmt.Sprintf("/login: %s", err.Error()))
 		http.Error(w, "couldn't generate token", http.StatusInternalServerError)
 		return
 	}
-
 	session := models.Session{
-		Token: token,
+		UserID: dbUser.ID,
+		Token:  token,
 	}
 	result = Database.Create(&session)
 	if result.Error != nil {
@@ -58,9 +58,17 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	util.Log("api", fmt.Sprintf("/login: %d row(s) affected", result.RowsAffected))
+	out := models.SessionJSONOut{
+		UserID: dbUser.ID,
+		Token:  token,
+	}
+	encoder := json.NewEncoder(w)
+	if err = encoder.Encode(out); err != nil {
+		http.Error(w, "error generating response", http.StatusInternalServerError)
+		return
+	}
+	util.Log("api", fmt.Sprintf("/login: %s logged in", dbUser.Name))
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(token))
 }
 
 // Removes the database entry for a session.
