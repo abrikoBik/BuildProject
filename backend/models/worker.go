@@ -2,13 +2,13 @@ package models
 
 import "gorm.io/gorm"
 
-type Worker struct {
+type WorkerDB struct {
 	gorm.Model
 	User
-	Description string `json:"description"`
+	Description string
 }
 
 type WorkerJSON struct {
-	UserJSON
+	UserJSONOut
 	Description string `json:"description"`
 }

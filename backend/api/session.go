@@ -17,14 +17,14 @@ import (
 // Creates a new database entry for session.
 func login(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
-	var user models.SessionUser
+	var user models.SessionJSONIn
 	if err := decoder.Decode(&user); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	// sanity checks
-	var dbUser models.User
+	var dbUser models.UserDB
 	result := Database.Where("name = ?", user.Name).Take(&dbUser)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		w.WriteHeader(http.StatusNotFound)
@@ -51,8 +51,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	session := models.Session{
-		UserID: dbUser.ID,
-		Token:  token,
+		Token: token,
 	}
 	result = Database.Create(&session)
 	if result.Error != nil {
