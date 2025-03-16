@@ -13,19 +13,18 @@ type User struct {
 	Sessions    []Session `gorm:"foreignKey:UserID"`
 }
 
-type UserJSON struct {
+type UserJSONIn struct {
 	Name        string `json:"name"`
 	FullName    string `json:"fullName"`
 	Email       string `json:"email"`
 	PhoneNumber uint   `json:"phoneNumber"`
-}
-
-type UserJSONIn struct {
-	UserJSON `json:"user"`
-	Password string `json:"password"`
+	Password    string `json:"password"`
 }
 
 type UserJSONOut struct {
-	UserJSON `json:"user"`
-	ID       uint `json:"id"`
+	Name        string `json:"name"`
+	FullName    string `json:"fullName"`
+	Email       string `json:"email"`
+	PhoneNumber uint   `json:"phoneNumber"`
+	ID          uint   `json:"id"`
 }

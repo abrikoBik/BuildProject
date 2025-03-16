@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"mp1/api/middleware"
 	"mp1/models"
 	"mp1/util"
@@ -25,10 +26,10 @@ func register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userDB := models.User{
-		Name:        userIn.UserJSON.Name,
-		FullName:    userIn.UserJSON.FullName,
-		Email:       userIn.UserJSON.Email,
-		PhoneNumber: userIn.UserJSON.PhoneNumber,
+		Name:        userIn.Name,
+		FullName:    userIn.FullName,
+		Email:       userIn.Email,
+		PhoneNumber: userIn.PhoneNumber,
 	}
 	userDB.Salt, err = util.RandomBytes(128)
 	if err != nil {
@@ -49,7 +50,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	util.Log("api", fmt.Sprintf("/register: new user %s", r.Body))
+	util.Log("api", fmt.Sprintf("/register: new user %s", userDB.Name))
 	w.WriteHeader(http.StatusCreated)
 }
 
