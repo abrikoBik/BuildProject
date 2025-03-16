@@ -20,12 +20,11 @@ func register(w http.ResponseWriter, r *http.Request) {
 		err    error
 	)
 	if err := decoder.Decode(&userIn); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, "bad json request", http.StatusBadRequest)
 		return
 	}
 
-	var userDB models.User
-	userDB = models.User{
+	userDB := models.User{
 		Name:        userIn.UserJSON.Name,
 		FullName:    userIn.UserJSON.FullName,
 		Email:       userIn.UserJSON.Email,
@@ -34,25 +33,27 @@ func register(w http.ResponseWriter, r *http.Request) {
 	userDB.Salt, err = util.RandomBytes(128)
 	if err != nil {
 		util.Log("api", fmt.Sprintf("/register: %s", err))
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, "couldn't generate salt", http.StatusInternalServerError)
 		return
 	}
 	userDB.Hash, err = util.GenerateHash([]byte(userIn.Password), userDB.Salt)
 	if err != nil {
 		util.Log("api", fmt.Sprintf("/register: %s", err))
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, "couldn't generate hash", http.StatusInternalServerError)
 		return
 	}
 	result := Database.Create(&userDB)
 	if result.Error != nil {
 		util.Log("api", fmt.Sprintf("/register: %s", result.Error.Error()))
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, "database error", http.StatusInternalServerError)
 		return
 	}
+
 	util.Log("api", fmt.Sprintf("/register: new user %s", r.Body))
 	w.WriteHeader(http.StatusCreated)
 }
 
+// TODO: rewrite
 func userInfo(w http.ResponseWriter, r *http.Request) {
 	token := r.Context().Value(middleware.TokenKey).(string)
 	// sanity checks

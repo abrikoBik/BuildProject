@@ -19,7 +19,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var user models.SessionJSONIn
 	if err := decoder.Decode(&user); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, "bad json request", http.StatusBadRequest)
 		return
 	}
 
@@ -27,26 +27,24 @@ func login(w http.ResponseWriter, r *http.Request) {
 	var dbUser models.User
 	result := Database.Where("name = ?", user.Name).Take(&dbUser)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		w.WriteHeader(http.StatusNotFound)
+		http.Error(w, "user not found", http.StatusNotFound)
 		return
 	}
 	hash, err := util.GenerateHash([]byte(user.Password), dbUser.Salt)
 	if err != nil {
 		util.Log("api", fmt.Sprintf("/login: %s", err))
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("hash error"))
+		http.Error(w, "couldn't generate hash", http.StatusInternalServerError)
 		return
 	}
 	if bytes.Compare(dbUser.Hash, hash) != 0 {
-		w.WriteHeader(http.StatusForbidden)
+		http.Error(w, "hash mismatch", http.StatusForbidden)
 		return
 	}
 
 	token, err := util.GenerateJWT(user.Name, []byte(user.Password), os.Getenv("JWT_KEY"))
 	if err != nil {
 		util.Log("api", fmt.Sprintf("/login: %s", err.Error()))
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("error creating token"))
+		http.Error(w, "couldn't generate token", http.StatusInternalServerError)
 		return
 	}
 
@@ -56,16 +54,17 @@ func login(w http.ResponseWriter, r *http.Request) {
 	result = Database.Create(&session)
 	if result.Error != nil {
 		util.Log("api", fmt.Sprintf("/login: %s", result.Error.Error()))
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("error creating session"))
+		http.Error(w, "database error", http.StatusInternalServerError)
 		return
 	}
+
 	util.Log("api", fmt.Sprintf("/login: %d row(s) affected", result.RowsAffected))
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(token))
 }
 
 // Removes the database entry for a session.
+// TODO: rewrite
 func logout(w http.ResponseWriter, r *http.Request) {
 	token := r.Context().Value(middleware.TokenKey).(string)
 	// sanity checks
