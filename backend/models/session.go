@@ -4,7 +4,8 @@ import "gorm.io/gorm"
 
 type Session struct {
 	gorm.Model
-	Token string `json:"token" gorm:"not null"`
+	Token  string `json:"token" gorm:"not null"`
+	UserID uint   `json:"userID" gorm:"not null"`
 }
 
 type SessionJSONIn struct {

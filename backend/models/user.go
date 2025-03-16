@@ -3,26 +3,29 @@ package models
 import "gorm.io/gorm"
 
 type User struct {
-	Name        string `json:"name" gorm:"unique;not null"`
-	FullName    string `json:"fullName" gorm:"not null"`
-	Email       string `json:"email" gorm:"not null"`
-	PhoneNumber uint   `json:"phoneNumber" gorm:"unique"`
+	gorm.Model
+	Name        string    `gorm:"unique;not null"`
+	FullName    string    `gorm:"not null"`
+	Email       string    `gorm:"not null"`
+	PhoneNumber uint      `gorm:"unique"`
+	Hash        []byte    `gorm:"not null"`
+	Salt        []byte    `gorm:"not null"`
+	Sessions    []Session `gorm:"foreignKey:UserID"`
 }
 
-type UserDB struct {
-	gorm.Model
-	User
-	Hash     []byte `gorm:"not null"`
-	Salt     []byte `gorm:"not null"`
-	Sessions []Session
+type UserJSON struct {
+	Name        string `json:"name"`
+	FullName    string `json:"fullName"`
+	Email       string `json:"email"`
+	PhoneNumber uint   `json:"phoneNumber"`
 }
 
 type UserJSONIn struct {
-	User     `json:"user"`
+	UserJSON `json:"user"`
 	Password string `json:"password"`
 }
 
 type UserJSONOut struct {
-	User `json:"user"`
-	ID   uint `json:"id"`
+	UserJSON `json:"user"`
+	ID       uint `json:"id"`
 }

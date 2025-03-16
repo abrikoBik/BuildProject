@@ -24,7 +24,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// sanity checks
-	var dbUser models.UserDB
+	var dbUser models.User
 	result := Database.Where("name = ?", user.Name).Take(&dbUser)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		w.WriteHeader(http.StatusNotFound)

@@ -2,7 +2,7 @@ package models
 
 import "gorm.io/gorm"
 
-type WorkerDB struct {
+type Worker struct {
 	gorm.Model
 	User
 	Description string

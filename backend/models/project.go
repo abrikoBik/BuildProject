@@ -14,10 +14,10 @@ type Stage struct {
 
 type Project struct {
 	gorm.Model
-	Name    string     `json:"name" gorm:"not null"`
-	Users   []User     `json:"users" gorm:"many2many:user_projects;"`
-	Workers []WorkerDB `json:"workers" gorm:"many2many:worker_projects;"`
-	Stages  []Stage    `json:"stages" gorm:"many2many:project_stages;"`
+	Name    string   `json:"name" gorm:"not null"`
+	Users   []User   `json:"users" gorm:"many2many:user_projects;"`
+	Workers []Worker `json:"workers" gorm:"many2many:worker_projects;"`
+	Stages  []Stage  `json:"stages" gorm:"many2many:project_stages;"`
 }
 
 type ProjectJSON struct {

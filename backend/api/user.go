@@ -24,12 +24,12 @@ func register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var userDB models.UserDB
-	userDB.User = models.User{
-		Name:        userIn.User.Name,
-		FullName:    userIn.User.FullName,
-		Email:       userIn.User.Email,
-		PhoneNumber: userIn.User.PhoneNumber,
+	var userDB models.User
+	userDB = models.User{
+		Name:        userIn.UserJSON.Name,
+		FullName:    userIn.UserJSON.FullName,
+		Email:       userIn.UserJSON.Email,
+		PhoneNumber: userIn.UserJSON.PhoneNumber,
 	}
 	userDB.Salt, err = util.RandomBytes(128)
 	if err != nil {
