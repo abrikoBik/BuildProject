@@ -38,7 +38,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if bytes.Compare(dbUser.Hash, hash) != 0 {
-		http.Error(w, "hash mismatch", http.StatusForbidden)
+		http.Error(w, "wrong password", http.StatusForbidden)
 		return
 	}
 	token, err := util.GenerateJWT(user.Name, []byte(user.Password), os.Getenv("JWT_KEY"))
@@ -64,6 +64,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 	encoder := json.NewEncoder(w)
 	if err = encoder.Encode(out); err != nil {
+		util.Log("api", fmt.Sprintf("/login: %s", err.Error()))
 		http.Error(w, "error generating response", http.StatusInternalServerError)
 		return
 	}
