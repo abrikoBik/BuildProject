@@ -20,23 +20,11 @@ type Project struct {
 	Stages  []Stage  `json:"stages" gorm:"many2many:project_stages;"`
 }
 
-type ProjectJSON struct {
-	Name string `json:"name"`
-	ID   uint   `json:"id"`
-
-	// Array of IDs
-	Users   []uint `json:"users"`
-	Workers []uint `json:"workers"`
-	Stages  []uint `json:"stages"`
+type ProjectResponse struct {
+	*Project
 }
 
-type StageJSON struct {
-	Name string `json:"name"`
-	ID   uint   `json:"id"`
-
-	StartTime uint `json:"startTime"`
-	EndTime   uint `json:"endTime"`
-
-	// Project ID
-	Project uint `json:"project"`
+type StageResponse struct {
+	*Stage
+	ProjectID uint `json:"project"`
 }

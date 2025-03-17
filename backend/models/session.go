@@ -4,16 +4,15 @@ import "gorm.io/gorm"
 
 type Session struct {
 	gorm.Model
-	Token  string `json:"token" gorm:"not null"`
-	UserID uint   `json:"userID" gorm:"not null"`
+	Token  string `json:"token" groups:"public" gorm:"not null"`
+	UserID uint   `json:"userID" groups:"public" gorm:"not null"`
 }
 
-type SessionJSONIn struct {
+type SessionRequest struct {
 	Name     string `json:"name"`
 	Password string `json:"password"`
 }
 
-type SessionJSONOut struct {
-	UserID uint   `json:"userID"`
-	Token  string `json:"token"`
+type SessionResponse struct {
+	*Session
 }

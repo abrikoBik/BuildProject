@@ -4,11 +4,11 @@ import "gorm.io/gorm"
 
 type Worker struct {
 	gorm.Model
-	User
+	*User
 	Description string
 }
 
-type WorkerJSON struct {
-	UserJSONOut
+type WorkerResponse struct {
+	*UserResponse
 	Description string `json:"description"`
 }

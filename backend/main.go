@@ -18,17 +18,17 @@ func main() {
 	signal.Notify(exitChan, syscall.SIGINT, syscall.SIGTERM)
 
 	// connecting to the database
-	database, err := db.Open("localhost", 5432, "mp1")
-	db.Database = database
-	util.Check(err, db.Migrate(models.User{}, models.Session{}, models.Worker{}, models.Stage{}, models.Project{}))
+	util.Check(
+		db.Open("localhost", 5432, "mp1"),
+		db.Migrate(models.User{}, models.Session{}, models.Worker{}, models.Stage{}, models.Project{}),
+	)
 	util.Log("db", "connected to database")
 
 	// starting the api
-	api.Database = database
 	util.Check(api.Init(3000))
 
 	// listening for SIGINT and SIGTERM (graceful shutdown)
 	<-exitChan
-	sqlDB, err := database.DB()
+	sqlDB, err := db.Database.DB()
 	util.Check(err, sqlDB.Close())
 }
