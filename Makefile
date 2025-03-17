@@ -5,11 +5,16 @@ target_directory := bin
 all: backend frontend
 
 init:
-	touch .env
-	sudo docker pull postgres
-	sudo docker create -it --name mp1_db --env-file .env --publish 127.0.0.1:5432:5432 postgres
+	touch .env	
 	cd backend && go mod download
 	cd frontend && npm install
+
+include .env
+createdb:
+	sudo docker pull postgres
+	sudo docker create -it --name mp1_db --env-file .env --publish 127.0.0.1:5432:5432 postgres
+	# TODO: move to .env
+	sudo docker exec -it mp1_db createdb -U ${POSTGRES_USER} mp1
 
 frontend:
 	cd frontend && npm run build
