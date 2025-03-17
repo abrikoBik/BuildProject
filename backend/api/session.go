@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"mp1/db"
 	"mp1/models"
 	"mp1/util"
@@ -34,7 +33,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	hash, err := util.GenerateHash([]byte(request.Password), dbUser.Salt)
 	if err != nil {
-		util.Log("api", fmt.Sprintf("/login: %s", err))
+		util.Error("api:login", err)
 		http.Error(w, "couldn't generate hash", http.StatusInternalServerError)
 		return
 	}
@@ -44,7 +43,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 	token, err := util.GenerateJWT(request.Name, []byte(request.Password), os.Getenv("JWT_KEY"))
 	if err != nil {
-		util.Log("api", fmt.Sprintf("/login: %s", err.Error()))
+		util.Error("api:login", err)
 		http.Error(w, "couldn't generate token", http.StatusInternalServerError)
 		return
 	}
@@ -54,7 +53,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 	result = db.Database.Create(&session)
 	if result.Error != nil {
-		util.Log("api", fmt.Sprintf("/login: %s", result.Error.Error()))
+		util.Error("api:login", result.Error)
 		http.Error(w, "database error", http.StatusInternalServerError)
 		return
 	}
@@ -69,17 +68,17 @@ func login(w http.ResponseWriter, r *http.Request) {
 		Groups: []string{"public"},
 	}, response)
 	if err != nil {
-		util.Log("api", fmt.Sprintf("/login: %s", err.Error()))
+		util.Error("api:login", err)
 		http.Error(w, "error generating response", http.StatusInternalServerError)
 		return
 	}
 	encoder := json.NewEncoder(w)
 	if err = encoder.Encode(toEncode); err != nil {
-		util.Log("api", fmt.Sprintf("/login: %s", err.Error()))
+		util.Error("api:login", err)
 		http.Error(w, "error generating response", http.StatusInternalServerError)
 		return
 	}
-	util.Log("api", fmt.Sprintf("/login: %s logged in", dbUser.Name))
+	util.Info("api:login", "%s logged in", dbUser.Name)
 	w.WriteHeader(http.StatusCreated)
 }
 

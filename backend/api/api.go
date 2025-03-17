@@ -23,7 +23,7 @@ func Init(port int) error {
 	// router.With(middleware.ValidateToken).Get("/userInfo", userInfo)
 	// router.With(middleware.ValidateToken).Post("/logout", logout)
 
-	util.Log("api", "starting server")
+	util.Info("api", "starting server")
 	err := http.ListenAndServe(fmt.Sprintf(":%d", port), router)
 	return err
 }

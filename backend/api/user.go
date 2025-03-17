@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"mp1/db"
 	"mp1/models"
 	"mp1/util"
@@ -29,24 +28,23 @@ func register(w http.ResponseWriter, r *http.Request) {
 	}
 	userDB.Salt, err = util.RandomBytes(128)
 	if err != nil {
-		util.Log("api", fmt.Sprintf("/register: %s", err))
+		util.Error("api:register", err)
 		http.Error(w, "couldn't generate salt", http.StatusInternalServerError)
 		return
 	}
 	userDB.Hash, err = util.GenerateHash([]byte(userIn.Password), userDB.Salt)
 	if err != nil {
-		util.Log("api", fmt.Sprintf("/register: %s", err))
+		util.Error("api:register", err)
 		http.Error(w, "couldn't generate hash", http.StatusInternalServerError)
 		return
 	}
 	result := db.Database.Create(&userDB)
 	if result.Error != nil {
-		util.Log("api", fmt.Sprintf("/register: %s", result.Error.Error()))
 		http.Error(w, "database error", http.StatusInternalServerError)
 		return
 	}
 
-	util.Log("api", fmt.Sprintf("/register: new user %s", userDB.Name))
+	util.Info("api:register", "new user %s", userDB.Name)
 	w.WriteHeader(http.StatusCreated)
 }
 

@@ -22,7 +22,7 @@ func main() {
 		db.Open("localhost", 5432, "mp1"),
 		db.Migrate(models.User{}, models.Session{}, models.Worker{}, models.Stage{}, models.Project{}),
 	)
-	util.Log("db", "connected to database")
+	util.Info("db", "connected to database")
 
 	// starting the api
 	util.Check(api.Init(3000))
