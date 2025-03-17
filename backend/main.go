@@ -53,4 +53,5 @@ func main() {
 	util.Info("db", "stopping")
 	sqlDB, err := db.Database.DB()
 	util.Check(err, sqlDB.Close())
+	util.Info("db", "stopped")
 }
