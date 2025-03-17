@@ -2,7 +2,7 @@ package api
 
 import (
 	"fmt"
-	// "mp1/api/middleware"
+	"mp1/api/middleware"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -20,7 +20,7 @@ func Init(port int) *http.Server {
 	router.Post("/login", login)
 
 	// router.With(middleware.ValidateToken).Get("/userInfo", userInfo)
-	// router.With(middleware.ValidateToken).Post("/logout", logout)
+	router.With(middleware.ValidateToken).Post("/logout", logout)
 
 	return &http.Server{
 		Addr:    fmt.Sprintf(":%d", port),

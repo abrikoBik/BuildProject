@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"mp1/api/middleware"
 	"mp1/db"
 	"mp1/models"
 	"mp1/util"
@@ -85,21 +86,21 @@ func login(w http.ResponseWriter, r *http.Request) {
 // Removes the database entry for a session.
 // TODO: rewrite
 func logout(w http.ResponseWriter, r *http.Request) {
+	token := r.Context().Value(middleware.JWT_CONTEXT_KEY)
 	// sanity checks
-	// var dbSession models.Session
-	// result := db.Database.Where("token = ?", token).Take(&dbSession)
-	// if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-	// 	w.WriteHeader(http.StatusNotFound)
-	// 	return
-	// }
+	var dbSession models.Session
+	result := db.Database.Where("token = ?", token).Take(&dbSession)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		http.Error(w, "token not found", http.StatusNotFound)
+		return
+	}
 
-	// result = db.Database.Where("token = ?", token).Delete(&dbSession)
-	// if result.Error != nil {
-	// 	util.Log("api", fmt.Sprintf("/logout: %s", result.Error.Error()))
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	w.Write([]byte("error invalidating session"))
-	// 	return
-	// }
-	// util.Log("api", fmt.Sprintf("/logout: %d row(s) affected", result.RowsAffected))
-	// w.WriteHeader(http.StatusOK)
+	result = db.Database.Where("token = ?", token).Delete(&dbSession)
+	if result.Error != nil {
+		util.Error("api:logout", result.Error)
+		http.Error(w, "error invalidating session", http.StatusInternalServerError)
+		return
+	}
+	util.Info("api:logout", "token %s removed", token)
+	w.WriteHeader(http.StatusOK)
 }
