@@ -2,19 +2,14 @@ package api
 
 import (
 	"fmt"
-	"mp1/api/middleware"
-	"mp1/util"
+	// "mp1/api/middleware"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
-	"gorm.io/gorm"
 )
 
-// Global database connection.
-var Database *gorm.DB
-
-func Init(port int) error {
+func Init(port int) *http.Server {
 	router := chi.NewRouter()
 	router.Use(chiMiddleware.Logger)
 	router.Use(chiMiddleware.RequestID)
@@ -24,10 +19,11 @@ func Init(port int) error {
 	router.Post("/register", register)
 	router.Post("/login", login)
 
-	router.With(middleware.ValidateToken).Get("/userInfo", userInfo)
-	router.With(middleware.ValidateToken).Post("/logout", logout)
+	// router.With(middleware.ValidateToken).Get("/userInfo", userInfo)
+	// router.With(middleware.ValidateToken).Post("/logout", logout)
 
-	util.Log("api", "starting server")
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port), router)
-	return err
+	return &http.Server{
+		Addr:    fmt.Sprintf(":%d", port),
+		Handler: router,
+	}
 }
