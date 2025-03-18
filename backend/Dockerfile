@@ -5,7 +5,7 @@ RUN go mod download
 COPY . .
 RUN go build -o ./mp1_backend
 
-FROM alpine
+FROM alpine AS runner
 WORKDIR /bin
 COPY --from=builder /src/mp1_backend /bin/mp1_backend
 EXPOSE 3000
