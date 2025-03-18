@@ -9,4 +9,4 @@ FROM alpine
 WORKDIR /bin
 COPY --from=builder /src/mp1_backend /bin/mp1_backend
 EXPOSE 3000
-CMD ["/bin/mp1_backend"]
+CMD ["/bin/mp1_backend", "-db-hostname", "db"]

@@ -20,12 +20,13 @@ const SERVICES_COUNT = 2
 func main() {
 	// TODO: provide flag usage
 	var (
-		hostname = flag.String("hostname", "0.0.0.0", "")
-		dbName   = flag.String("db-name", "mp1", "")
-		dbPort   = flag.Uint("db-port", 5432, "")
-		apiPort  = flag.Uint("api-port", 3000, "")
-		migrate  = flag.Bool("migrate", false, "")
-		logLevel = flag.String("log-level", "info", "")
+		dbName      = flag.String("db-name", "mp1", "")
+		dbHostname  = flag.String("db-hostname", "0.0.0.0", "")
+		dbPort      = flag.Uint("db-port", 5432, "")
+		apiHostname = flag.String("api-hostname", "0.0.0.0", "")
+		apiPort     = flag.Uint("api-port", 3000, "")
+		migrate     = flag.Bool("migrate", false, "")
+		logLevel    = flag.String("log-level", "info", "")
 	)
 	flag.Parse()
 	util.Check(util.LogLevel(*logLevel))
@@ -34,8 +35,8 @@ func main() {
 	servicesWg.Add(SERVICES_COUNT)
 	// connecting to the database
 	go func() {
-		util.Info("db", "connecting to %s @ %s:%d", *dbName, "172.19.0.1", *dbPort)
-		util.Check(db.Open("172.19.0.1", *dbPort, *dbName))
+		util.Info("db", "connecting to %s @ %s:%d", *dbName, *dbHostname, *dbPort)
+		util.Check(db.Open(*dbHostname, *dbPort, *dbName))
 		util.Info("db", "connected")
 		if *migrate {
 			servicesWg.Add(1)
@@ -60,7 +61,7 @@ func main() {
 	// starting the api
 	var server *http.Server
 	go func() {
-		server = api.Init(*hostname, *apiPort)
+		server = api.Init(*apiHostname, *apiPort)
 		util.Info("api", "starting @ %s", server.Addr)
 		listener, err := net.Listen("tcp", server.Addr)
 		util.Check(err)
