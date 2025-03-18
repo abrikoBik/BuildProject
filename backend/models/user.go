@@ -1,12 +1,6 @@
 package models
 
-import (
-	"errors"
-	"fmt"
-	"net/http"
-
-	"gorm.io/gorm"
-)
+import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
@@ -22,14 +16,4 @@ type User struct {
 type UserRequest struct {
 	*User
 	Password string `json:"password"`
-}
-
-func (user *UserRequest) Bind(r *http.Request) error {
-	nonNullable := []any{user.Name, user.FullName, user.Email, user.PhoneNumber}
-	for _, field := range nonNullable {
-		if field == nil {
-			return errors.New(fmt.Sprintf("missing field %s for UserRequest\n", field))
-		}
-	}
-	return nil
 }

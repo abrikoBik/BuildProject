@@ -7,6 +7,7 @@ import (
 	"mp1/db"
 	"mp1/models"
 	"mp1/util"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -15,6 +16,8 @@ import (
 
 	"github.com/joho/godotenv"
 )
+
+const SERVICES_COUNT = 2
 
 func main() {
 	// TODO: provide flag usage
@@ -34,12 +37,15 @@ func main() {
 	util.Check(godotenv.Load(*envFile))
 	util.Info("*", "loaded environment variables")
 
+	var servicesWg sync.WaitGroup
+	servicesWg.Add(SERVICES_COUNT)
 	// connecting to the database
 	go func() {
 		util.Info("db", "connecting to %s @ %s:%d", *dbName, *hostname, *dbPort)
 		util.Check(db.Open(*hostname, *dbPort, *dbName))
 		util.Info("db", "connected")
 		if *migrate {
+			servicesWg.Add(1)
 			util.Info("db", "running migrations")
 			toMigrate := map[string]interface{}{
 				"user":    models.User{},
@@ -53,36 +59,43 @@ func main() {
 				util.Debug("db", "model", name)
 			}
 			util.Info("db", "migrations complete")
+			servicesWg.Done()
 		}
+		servicesWg.Done()
 	}()
 
 	// starting the api
-	util.Info("api", "starting @ %s:%d", *hostname, *apiPort)
-	server := api.Init(*hostname, *apiPort)
+	var server *http.Server
 	go func() {
-		if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+		util.Info("api", "starting @ %s:%d", *hostname, *apiPort)
+		server = api.Init(*hostname, *apiPort)
+		listener, err := net.Listen("tcp", server.Addr)
+		util.Check(err)
+		util.Info("api", "started")
+		servicesWg.Done()
+		if err := server.Serve(listener); !errors.Is(err, http.ErrServerClosed) {
 			util.Error("api", err)
 		}
 	}()
 
+	servicesWg.Wait()
 	// graceful shutdown
 	exitChan := make(chan os.Signal, 1)
 	signal.Notify(exitChan, syscall.SIGINT, syscall.SIGTERM)
 	<-exitChan
-	var stoppedWg sync.WaitGroup
-	stoppedWg.Add(2)
+	servicesWg.Add(SERVICES_COUNT)
 	go func() {
 		util.Info("api", "stopping")
 		util.Check(server.Close())
 		util.Info("api", "stopped")
-		stoppedWg.Done()
+		servicesWg.Done()
 	}()
 	go func() {
 		util.Info("db", "stopping")
 		sqlDB, err := db.Database.DB()
 		util.Check(err, sqlDB.Close())
 		util.Info("db", "stopped")
-		stoppedWg.Done()
+		servicesWg.Done()
 	}()
-	stoppedWg.Wait()
+	servicesWg.Wait()
 }
