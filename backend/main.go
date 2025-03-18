@@ -34,8 +34,8 @@ func main() {
 	servicesWg.Add(SERVICES_COUNT)
 	// connecting to the database
 	go func() {
-		util.Info("db", "connecting to %s @ %s:%d", *dbName, *hostname, *dbPort)
-		util.Check(db.Open(*hostname, *dbPort, *dbName))
+		util.Info("db", "connecting to %s @ %s:%d", *dbName, "172.19.0.1", *dbPort)
+		util.Check(db.Open("172.19.0.1", *dbPort, *dbName))
 		util.Info("db", "connected")
 		if *migrate {
 			servicesWg.Add(1)
