@@ -1,6 +1,7 @@
 package util
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"strings"
@@ -12,6 +13,25 @@ func addServicePrefix(service string) {
 	builder.WriteRune('[')
 	builder.WriteString(service)
 	builder.WriteString("] ")
+}
+
+// Sets the log level to one of these:
+// - debug
+// - warn
+// - info
+func LogLevel(level string) error {
+	allowedLevels := map[string]slog.Level{
+		"debug": slog.LevelDebug,
+		"warn":  slog.LevelWarn,
+		"info":  slog.LevelInfo,
+	}
+	for name, value := range allowedLevels {
+		if strings.Compare(level, name) == 0 {
+			slog.SetLogLoggerLevel(value)
+			return nil
+		}
+	}
+	return errors.New("unknown log level")
 }
 
 func Info(service string, format string, elements ...any) {

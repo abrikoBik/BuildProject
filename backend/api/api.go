@@ -10,7 +10,7 @@ import (
 	"github.com/go-chi/cors"
 )
 
-func Init(port int) *http.Server {
+func Init(hostname string, port uint) *http.Server {
 	router := chi.NewRouter()
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins: []string{"https://*", "http://*"},
@@ -29,7 +29,7 @@ func Init(port int) *http.Server {
 	router.With(middleware.ValidateToken).Post("/logout", logout)
 
 	return &http.Server{
-		Addr:    fmt.Sprintf(":%d", port),
+		Addr:    fmt.Sprintf("%s:%d", hostname, port),
 		Handler: router,
 	}
 }
