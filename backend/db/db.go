@@ -14,7 +14,7 @@ import (
 var Database *gorm.DB
 
 // Opens a PostgreSQL database with the name dbname at hostname:port.
-func Open(hostname string, port int, dbname string) error {
+func Open(hostname string, port uint, dbname string) error {
 	var (
 		username, password string
 		exists             bool

@@ -2,7 +2,7 @@ package api
 
 import (
 	"fmt"
-	// "mp1/api/middleware"
+	"mp1/api/middleware"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -10,26 +10,29 @@ import (
 	"github.com/go-chi/cors"
 )
 
-func Init(port int) *http.Server {
-	router := chi.NewRouter()
-	router.Use(cors.Handler(cors.Options{
-		AllowedOrigins: []string{"https://*", "http://*"},
-		AllowedMethods: []string{"GET", "POST", "DELETE"},
-		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+func Init(hostname string, port uint) *http.Server {
+	r := chi.NewRouter()
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedMethods:   []string{"GET", "POST"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		AllowCredentials: true,
+		MaxAge:           86400,
 	}))
-	router.Use(chiMiddleware.Logger)
-	router.Use(chiMiddleware.RequestID)
-	router.Use(chiMiddleware.Recoverer)
-	router.Use(chiMiddleware.Heartbeat("/health"))
+	r.Use(chiMiddleware.RequestID)
+	r.Use(chiMiddleware.Logger)
+	r.Use(chiMiddleware.AllowContentEncoding("gzip", "deflate"))
+	r.Use(chiMiddleware.AllowContentType("application/json"))
+	r.Use(chiMiddleware.Heartbeat("/health"))
 
-	router.Post("/register", register)
-	router.Post("/login", login)
+	r.Post("/register", register)
+	r.Post("/login", login)
 
-	// router.With(middleware.ValidateToken).Get("/userInfo", userInfo)
-	// router.With(middleware.ValidateToken).Post("/logout", logout)
+	r.With(middleware.ValidateToken).Get("/userInfo", userInfo)
+	r.With(middleware.ValidateToken).Post("/logout", logout)
 
 	return &http.Server{
-		Addr:    fmt.Sprintf(":%d", port),
-		Handler: router,
+		Addr:    fmt.Sprintf("%s:%d", hostname, port),
+		Handler: r,
 	}
 }

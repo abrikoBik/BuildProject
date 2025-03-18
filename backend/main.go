@@ -2,56 +2,94 @@ package main
 
 import (
 	"errors"
+	"flag"
 	"mp1/api"
 	"mp1/db"
 	"mp1/models"
 	"mp1/util"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
-
-	"github.com/joho/godotenv"
 )
 
-const (
-	API_PORT = 3000
-	DB_HOST  = "localhost"
-	DB_PORT  = 5432
-	DB_NAME  = "mp1"
-)
+const SERVICES_COUNT = 2
 
 func main() {
+	// TODO: provide flag usage
+	var (
+		dbName      = flag.String("db-name", "mp1", "")
+		dbHostname  = flag.String("db-hostname", "0.0.0.0", "")
+		dbPort      = flag.Uint("db-port", 5432, "")
+		apiHostname = flag.String("api-hostname", "0.0.0.0", "")
+		apiPort     = flag.Uint("api-port", 3000, "")
+		migrate     = flag.Bool("migrate", false, "")
+		logLevel    = flag.String("log-level", "info", "")
+	)
+	flag.Parse()
+	util.Check(util.LogLevel(*logLevel))
+
+	var servicesWg sync.WaitGroup
+	servicesWg.Add(SERVICES_COUNT)
 	// connecting to the database
-	util.Info("db", "connecting to %s @ %s:%d", DB_NAME, DB_HOST, DB_PORT)
 	go func() {
-		util.Check(
-			godotenv.Load(),
-			db.Open(DB_HOST, DB_PORT, DB_NAME),
-			db.Migrate(models.User{}, models.Session{}, models.Worker{}, models.Stage{}, models.Project{}),
-		)
+		util.Info("db", "connecting to %s @ %s:%d", *dbName, *dbHostname, *dbPort)
+		util.Check(db.Open(*dbHostname, *dbPort, *dbName))
 		util.Info("db", "connected")
+		if *migrate {
+			servicesWg.Add(1)
+			util.Info("db", "running migrations")
+			toMigrate := map[string]interface{}{
+				"user":    models.User{},
+				"session": models.Session{},
+				"worker":  models.Worker{},
+				"stage":   models.Stage{},
+				"project": models.Project{},
+			}
+			for name, model := range toMigrate {
+				util.Check(db.Database.AutoMigrate(&model))
+				util.Debug("db", "model", name)
+			}
+			util.Info("db", "migrations complete")
+			servicesWg.Done()
+		}
+		servicesWg.Done()
 	}()
 
 	// starting the api
-	server := api.Init(API_PORT)
-	util.Info("api", "starting @ :%d", API_PORT)
+	var server *http.Server
 	go func() {
-		if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+		server = api.Init(*apiHostname, *apiPort)
+		util.Info("api", "starting @ %s", server.Addr)
+		listener, err := net.Listen("tcp", server.Addr)
+		util.Check(err)
+		util.Info("api", "started")
+		servicesWg.Done()
+		if err := server.Serve(listener); !errors.Is(err, http.ErrServerClosed) {
 			util.Error("api", err)
 		}
-		util.Info("api", "stopped")
 	}()
 
+	servicesWg.Wait()
 	// graceful shutdown
 	exitChan := make(chan os.Signal, 1)
 	signal.Notify(exitChan, syscall.SIGINT, syscall.SIGTERM)
 	<-exitChan
-
-	util.Info("api", "stopping")
-	util.Check(server.Close())
-	util.Info("db", "stopping")
-	sqlDB, err := db.Database.DB()
-	util.Check(err, sqlDB.Close())
-	util.Info("db", "stopped")
+	servicesWg.Add(SERVICES_COUNT)
+	go func() {
+		util.Info("api", "stopping")
+		util.Check(server.Close())
+		util.Info("api", "stopped")
+		servicesWg.Done()
+	}()
+	go func() {
+		util.Info("db", "stopping")
+		sqlDB, err := db.Database.DB()
+		util.Check(err, sqlDB.Close())
+		util.Info("db", "stopped")
+		servicesWg.Done()
+	}()
+	servicesWg.Wait()
 }

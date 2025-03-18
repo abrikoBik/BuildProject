@@ -1,36 +1,54 @@
 package util
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"strings"
 )
 
-var builder strings.Builder
+// Sets the log level to one of these:
+// - debug
+// - warn
+// - info
+func LogLevel(level string) error {
+	allowedLevels := map[string]slog.Level{
+		"debug": slog.LevelDebug,
+		"warn":  slog.LevelWarn,
+		"info":  slog.LevelInfo,
+	}
+	for name, value := range allowedLevels {
+		if strings.Compare(level, name) == 0 {
+			slog.SetLogLoggerLevel(value)
+			return nil
+		}
+	}
+	return errors.New("unknown log level")
+}
 
-func addServicePrefix(service string) {
+func addServicePrefix(builder *strings.Builder, service string) {
 	builder.WriteRune('[')
 	builder.WriteString(service)
 	builder.WriteString("] ")
 }
 
 func Info(service string, format string, elements ...any) {
-	addServicePrefix(service)
+	var builder strings.Builder
+	addServicePrefix(&builder, service)
 	builder.WriteString(fmt.Sprintf(format, elements...))
 	slog.Info(builder.String())
-	builder.Reset()
 }
 
 func Error(service string, err error) {
+	var builder strings.Builder
 	builder.WriteString("!!! ")
-	addServicePrefix(service)
+	addServicePrefix(&builder, service)
 	builder.WriteString(err.Error())
 	slog.Error(builder.String())
-	builder.Reset()
 }
 
 func Debug(service string, elements ...any) {
-	addServicePrefix(service)
+	var builder strings.Builder
+	addServicePrefix(&builder, service)
 	slog.Debug(builder.String(), elements...)
-	builder.Reset()
 }
