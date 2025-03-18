@@ -20,7 +20,7 @@ const SERVICES_COUNT = 2
 func main() {
 	// TODO: provide flag usage
 	var (
-		hostname = flag.String("hostname", "localhost", "")
+		hostname = flag.String("hostname", "0.0.0.0", "")
 		dbName   = flag.String("db-name", "mp1", "")
 		dbPort   = flag.Uint("db-port", 5432, "")
 		apiPort  = flag.Uint("api-port", 3000, "")
@@ -60,8 +60,8 @@ func main() {
 	// starting the api
 	var server *http.Server
 	go func() {
-		util.Info("api", "starting @ %s:%d", *hostname, *apiPort)
 		server = api.Init(*hostname, *apiPort)
+		util.Info("api", "starting @ %s", server.Addr)
 		listener, err := net.Listen("tcp", server.Addr)
 		util.Check(err)
 		util.Info("api", "started")
