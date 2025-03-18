@@ -13,8 +13,6 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
-
-	"github.com/joho/godotenv"
 )
 
 const SERVICES_COUNT = 2
@@ -22,7 +20,6 @@ const SERVICES_COUNT = 2
 func main() {
 	// TODO: provide flag usage
 	var (
-		envFile  = flag.String("env-file", ".env", "")
 		hostname = flag.String("hostname", "localhost", "")
 		dbName   = flag.String("db-name", "mp1", "")
 		dbPort   = flag.Uint("db-port", 5432, "")
@@ -32,10 +29,6 @@ func main() {
 	)
 	flag.Parse()
 	util.Check(util.LogLevel(*logLevel))
-
-	util.Info("*", "loading environment variables")
-	util.Check(godotenv.Load(*envFile))
-	util.Info("*", "loaded environment variables")
 
 	var servicesWg sync.WaitGroup
 	servicesWg.Add(SERVICES_COUNT)
