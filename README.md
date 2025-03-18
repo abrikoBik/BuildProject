@@ -1,32 +1,25 @@
 # BuildProject
 
 ## Начало работы
-```shell
-$ make init
+Для начала работы следует создать файл `.env` в корне проекта. Примерно выглядит так:
+```python
+POSTGRES_DB=db_name
+POSTGRES_USER=username
+POSTGRES_PASSWORD=password
+JWT_KEY=key
 ```
-Далее в новый файл `.env` добавить переменные `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` и `JWT_KEY`
 
 ## Сборка проекта
 ```shell
-$ make
+$ docker compose build
 ```
 
-### Сборка бэкенда
+## Запуск проекта
 ```shell
-$ make backend
+$ docker compose up
 ```
 
-### Сборка фронтенда
-```
-$ make frontend
-```
-
-## Запуск бэкенда и базы данных
+## Остановка проекта
 ```shell
-$ make start
-```
-
-## Остановка бэкенда и базы данных
-```shell
-$ make stop
+$ docker compose stop
 ```
