@@ -5,7 +5,9 @@ RUN go mod download
 COPY . .
 RUN go build -o ./mp1_backend
 
-FROM alpine AS runner
+# Go is statically compiled,
+# using the scratch image shouldn't cause any issues (in theory)
+FROM scratch AS runner
 WORKDIR /bin
 COPY --from=builder /src/mp1_backend /bin/mp1_backend
 EXPOSE 3000
