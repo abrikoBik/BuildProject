@@ -19,11 +19,11 @@ func Init(hostname string, port uint) *http.Server {
 		AllowCredentials: true,
 		MaxAge:           86400,
 	}))
+	r.Use(chiMiddleware.Heartbeat("/health"))
 	r.Use(chiMiddleware.RequestID)
 	r.Use(chiMiddleware.Logger)
 	r.Use(chiMiddleware.AllowContentEncoding("gzip", "deflate"))
 	r.Use(chiMiddleware.AllowContentType("application/json"))
-	r.Use(chiMiddleware.Heartbeat("/health"))
 
 	r.Post("/register", register)
 	r.Post("/login", login)
