@@ -6,8 +6,8 @@ COPY . .
 RUN npm run build
 
 FROM node:22-alpine AS runner
-WORKDIR /bin
-COPY --from=builder /src .
+WORKDIR /app
+COPY --from=builder /src/. /app
 EXPOSE 5173
 # TODO: /health endpoint
 # RUN apk add curl

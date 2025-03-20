@@ -45,6 +45,11 @@ services:
       - backend
     depends_on:
       - backend
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend
+          target: /app
 
 networks:
   backend:
