@@ -1,7 +1,9 @@
 # BuildProject
 
 ## Начало работы
-Для начала работы следует создать файл `.env` в корне проекта. Примерно выглядит так:
+> [!IMPORTANT]
+> Для начала работы следует создать файл `.env` в корне проекта. Примерно выглядит так:
+
 ```python
 POSTGRES_DB=db_name
 POSTGRES_USER=username
@@ -14,10 +16,22 @@ JWT_KEY=key
 $ docker compose build
 ```
 
+## Запуск миграций
+> [!NOTE]
+> Перед запуском миграций необходимо запустить контейнеры `backend` и `db`.
+
+```shell
+$ docker compose exec backend ./mp1_backend -migrate -db-hostname db
+```
+
 ## Запуск проекта
+> [!IMPORTANT]
+> Необходимо запустить миграцию после каждого изменения моделей в `backend/models/`, либо перед первым запуском.
+
 ```shell
 $ docker compose up
 ```
+
 
 ## Остановка проекта
 ```shell

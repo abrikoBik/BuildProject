@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"errors"
 	"flag"
 	"mp1/api"
@@ -27,19 +28,24 @@ func main() {
 		apiPort     = flag.Uint("api-port", 3000, "")
 		migrate     = flag.Bool("migrate", false, "")
 		logLevel    = flag.String("log-level", "info", "")
+
+		servicesWg sync.WaitGroup
+		sqlDB      *sql.DB
+		err        error
 	)
 	flag.Parse()
 	util.Check(util.LogLevel(*logLevel))
 
-	var servicesWg sync.WaitGroup
 	servicesWg.Add(SERVICES_COUNT)
 	// connecting to the database
 	go func() {
 		util.Info("db", "connecting to %s @ %s:%d", *dbName, *dbHostname, *dbPort)
 		util.Check(db.Open(*dbHostname, *dbPort, *dbName))
+		sqlDB, err = db.Database.DB()
+		util.Check(err)
 		util.Info("db", "connected")
+
 		if *migrate {
-			servicesWg.Add(1)
 			util.Info("db", "running migrations")
 			toMigrate := map[string]interface{}{
 				"user":    models.User{},
@@ -53,14 +59,19 @@ func main() {
 				util.Debug("db", "model", name)
 			}
 			util.Info("db", "migrations complete")
-			servicesWg.Done()
+			util.Check(err, sqlDB.Close())
+			os.Exit(0)
 		}
+
 		servicesWg.Done()
 	}()
 
 	// starting the api
 	var server *http.Server
 	go func() {
+		if *migrate {
+			return
+		}
 		server = api.Init(*apiHostname, *apiPort)
 		util.Info("api", "starting @ %s", server.Addr)
 		listener, err := net.Listen("tcp", server.Addr)
@@ -86,7 +97,6 @@ func main() {
 	}()
 	go func() {
 		util.Info("db", "stopping")
-		sqlDB, err := db.Database.DB()
 		util.Check(err, sqlDB.Close())
 		util.Info("db", "stopped")
 		servicesWg.Done()
