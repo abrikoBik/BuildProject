@@ -5,7 +5,7 @@ import axios from 'axios'
 export const Register = () => {
     const [passShow, setPassShow] = useState(false);
     const [post, setPost] = useState({
-        fullName: "",
+        login: "",
         name: "",
         email: "",
         password: "",
@@ -42,7 +42,7 @@ export const Register = () => {
                     <div className="w-13 ml-10 mb-[-4%] bg-palette-color2 z-10">ФИО</div>
                     <input 
                         onChange={handleInput}
-                        name="fullName"
+                        name="name"
                         type="text" 
                         className="select-none text-center p-2 mx-5 mb-5 bg-palette-color2 border-2 border-paletter-color5"
                     />
@@ -51,7 +51,7 @@ export const Register = () => {
                     <div className="w-15 ml-10 mb-[-3%] bg-palette-color2 z-10">Логин</div>
                     <input 
                         onChange={handleInput}
-                        name="name" 
+                        name="login" 
                         type="text" 
                         className="select-none text-center p-2 mx-5 mb-5 bg-palette-color2 border-2 border-palette-color5"
                     />
