@@ -1,68 +1,77 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import "tailwindcss";
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+html {
+    background-color: #EBE8F0;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+* {
+    font-family: Inter;
+    color: #342A36;
+    transition: .5s;
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+/* Palette background colors */
+
+.bg-palette-color1 {
+    background-color: #EBE8F0;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+.bg-palette-color2 {
+    background-color: #E4DFED;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.bg-palette-color3 {
+    background-color: #D6CCDC;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+.bg-palette-color4 {
+    background-color: #C598E0;
+}
+
+.bg-palette-color5 {
+    background-color: #342A36;
+}
+
+/* Palette text colors */
+
+.text-palette-color1 {
+    color: #EBE8F0;
+}
+
+.text-palette-color2 {
+    color: #E4DFED;
+}
+
+.text-palette-color3 {
+    color: #D6CCDC;
+}
+
+.text-palette-color4 {
+    color: #C598E0;
+}
+
+.text-palette-color5 {
+    color: #342A36;
+}
+
+/* Palette border colors */
+
+.border-palette-color1 {
+    border-color: #EBE8F0;
+}
+
+.border-palette-color2 {
+    border-color: #E4DFED;
+}
+
+.border-palette-color3 {
+    border-color: #D6CCDC;
+}
+
+.border-palette-color4 {
+    border-color: #C598E0;
+}
+
+.border-palette-color5 {
+    border-color: #342A36;
 }
