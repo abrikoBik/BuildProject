@@ -43,7 +43,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	util.Info("api:register", "new user %s", userDB.Name)
+	util.Info("api:register", "%s registered", userDB.Name)
 	w.WriteHeader(http.StatusCreated)
 }
 
