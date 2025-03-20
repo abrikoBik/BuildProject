@@ -6,9 +6,8 @@ export const Register = () => {
     const [passShow, setPassShow] = useState(false);
     const [post, setPost] = useState({
         fullName: "",
-        login: "",
+        name: "",
         email: "",
-        phoneNumber: "",
         password: "",
     })
 
@@ -24,7 +23,7 @@ export const Register = () => {
     function handleSubmit(event: any) {
         event.preventDefault();
         
-        axios.post('http://localhost:3000/register', post)
+        axios.post('http://0.0.0.0:3000/register', post)
             .then(response => console.log(response))
             .catch(err => console.log(err));
     }
@@ -52,7 +51,16 @@ export const Register = () => {
                     <div className="w-15 ml-10 mb-[-3%] bg-palette-color2 z-10">Логин</div>
                     <input 
                         onChange={handleInput}
-                        name="login" 
+                        name="name" 
+                        type="text" 
+                        className="select-none text-center p-2 mx-5 mb-5 bg-palette-color2 border-2 border-palette-color5"
+                    />
+
+                    {/* Email */}
+                    <div className="w-15 ml-10 mb-[-3%] bg-palette-color2 z-10">Email</div>
+                    <input 
+                        onChange={handleInput}
+                        name="email" 
                         type="text" 
                         className="select-none text-center p-2 mx-5 mb-5 bg-palette-color2 border-2 border-palette-color5"
                     />

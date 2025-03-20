@@ -5,6 +5,7 @@ import './index.css'
 import { Home } from './Home.tsx'
 import { Login } from './Login.tsx'
 import { Register } from './Register.tsx'
+import { Health } from './Health.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -13,6 +14,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/" element={<Home />}/>
         <Route path="/login" element={<Login />}/>
         <Route path="/register" element={<Register />}/>
+        <Route path="/health" element={<Health />}/>
       </Routes>
     </Router>
   </StrictMode>
