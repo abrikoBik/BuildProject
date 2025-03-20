@@ -3,28 +3,36 @@ package api
 import (
 	"fmt"
 	"mp1/api/middleware"
-	"mp1/util"
 	"net/http"
 
-	"gorm.io/gorm"
+	"github.com/go-chi/chi/v5"
+	chiMiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 )
 
-// Global database connection.
-var Database *gorm.DB
+func Init(hostname string, port uint) *http.Server {
+	r := chi.NewRouter()
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedMethods:   []string{"GET", "POST"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		AllowCredentials: true,
+		MaxAge:           86400,
+	}))
+	r.Use(chiMiddleware.Heartbeat("/health"))
+	r.Use(chiMiddleware.RequestID)
+	r.Use(chiMiddleware.Logger)
+	r.Use(chiMiddleware.AllowContentEncoding("gzip", "deflate"))
+	r.Use(chiMiddleware.AllowContentType("application/json"))
 
-func Init(port int) error {
-	mux := http.NewServeMux()
+	r.Post("/register", register)
+	r.Post("/login", login)
 
-	mux.HandleFunc("/health", health)
-	mux.HandleFunc("POST /register", register)
-	mux.HandleFunc("POST /login", login)
+	r.With(middleware.ValidateToken).Get("/userInfo", userInfo)
+	r.With(middleware.ValidateToken).Post("/logout", logout)
 
-	logoutHandler := http.HandlerFunc(logout)
-	mux.Handle("DELETE /logout", middleware.ValidateToken(logoutHandler))
-	userInfoHandler := http.HandlerFunc(userInfo)
-	mux.Handle("GET /userInfo", middleware.ValidateToken(userInfoHandler))
-
-	util.Log("api", "starting server")
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port), mux)
-	return err
+	return &http.Server{
+		Addr:    fmt.Sprintf("%s:%d", hostname, port),
+		Handler: r,
+	}
 }

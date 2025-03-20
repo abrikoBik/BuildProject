@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres:alpine
+    container_name: mp1_db
+    env_file: .env
+    restart: always
+    ports:
+      - 5432:5432
+    networks:
+      - backend
+    volumes:
+      - db-volume:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 1s
+      retries: 3
+
+  backend:
+    image: golang
+    container_name: mp1_backend
+    env_file: .env
+    restart: always
+    build: backend
+    ports:
+      - 3000:3000
+    networks:
+      - backend
+      - frontend
+    links:
+      - db
+    depends_on:
+      - db
+
+  frontend:
+    image: node
+    container_name: mp1_frontend
+    restart: always
+    build: frontend
+    ports:
+      - 5173:5173
+    networks:
+      - frontend
+    links:
+      - backend
+    depends_on:
+      - backend
+
+networks:
+  backend:
+  frontend:
+
+volumes:
+  db-volume:
