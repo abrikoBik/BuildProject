@@ -3,7 +3,6 @@ import { Header } from './Header.tsx'
 import axios from 'axios'
 
 export const Register = () => {
-    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     const [passShow, setPassShow] = useState(false);
     const [post, setPost] = useState({
         fullName: "",
