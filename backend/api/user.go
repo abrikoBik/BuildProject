@@ -21,10 +21,9 @@ func register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userDB := models.User{
-		Name:        userIn.Name,
-		FullName:    userIn.FullName,
-		Email:       userIn.Email,
-		PhoneNumber: userIn.PhoneNumber,
+		Name:     userIn.Name,
+		FullName: userIn.FullName,
+		Email:    userIn.Email,
 	}
 	userDB.Salt, err = util.RandomBytes(128)
 	if err != nil {

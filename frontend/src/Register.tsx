@@ -16,11 +16,12 @@ export const Register = () => {
         setPassShow(!passShow);
     }
 
-    const handleInput = (event) => {
+    // TODO: specify correct type
+    const handleInput = (event: any) => {
         setPost({...post, [event.target.name]: event.target.value});
     };
 
-    function handleSubmit(event) {
+    function handleSubmit(event: any) {
         event.preventDefault();
         
         axios.post('http://localhost:3000/register', post)
