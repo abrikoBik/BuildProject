@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"mp1/util"
+
+	"gorm.io/gorm"
+)
 
 type User struct {
 	gorm.Model
@@ -15,4 +19,17 @@ type User struct {
 type UserRequest struct {
 	*User
 	Password string `json:"password"`
+}
+
+func (user *User) Create(db *gorm.DB, r UserRequest) (err error) {
+	if user.Salt, err = util.RandomBytes(128); err != nil {
+		return err
+	}
+	if user.Hash, err = util.GenerateHash([]byte(r.Password), user.Salt); err != nil {
+		return err
+	}
+	if result := db.Create(&user); result.Error != nil {
+		return result.Error
+	}
+	return nil
 }
