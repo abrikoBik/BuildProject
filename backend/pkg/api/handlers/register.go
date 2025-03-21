@@ -2,10 +2,10 @@ package handlers
 
 import (
 	"errors"
-	"mp1/db"
-	"mp1/l10n"
-	"mp1/models"
-	"mp1/util"
+	"mp1/pkg/db"
+	"mp1/pkg/l10n"
+	"mp1/pkg/models"
+	"mp1/pkg/util"
 	"net/http"
 	"net/mail"
 	"strings"

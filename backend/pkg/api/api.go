@@ -2,8 +2,8 @@ package api
 
 import (
 	"fmt"
-	"mp1/api/handlers"
-	"mp1/api/middleware"
+	"mp1/pkg/api/handlers"
+	"mp1/pkg/api/middleware"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"

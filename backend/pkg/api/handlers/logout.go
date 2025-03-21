@@ -2,10 +2,10 @@ package handlers
 
 import (
 	"errors"
-	"mp1/api/middleware"
-	"mp1/db"
-	"mp1/models"
-	"mp1/util"
+	"mp1/pkg/api/middleware"
+	"mp1/pkg/db"
+	"mp1/pkg/models"
+	"mp1/pkg/util"
 	"net/http"
 
 	"gorm.io/gorm"

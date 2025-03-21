@@ -2,7 +2,7 @@ package models
 
 import (
 	"bytes"
-	"mp1/util"
+	"mp1/pkg/util"
 	"os"
 
 	"gorm.io/gorm"

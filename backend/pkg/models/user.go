@@ -1,7 +1,7 @@
 package models
 
 import (
-	"mp1/util"
+	"mp1/pkg/util"
 
 	"gorm.io/gorm"
 )
