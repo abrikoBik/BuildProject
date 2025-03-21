@@ -27,7 +27,9 @@ func Open(hostname string, port uint, dbname string) error {
 	}
 	// TODO: sslmode=verify-full
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", hostname, port, username, password, dbname)
-	database, err := gorm.Open(postgres.Open(connStr), &gorm.Config{})
+	database, err := gorm.Open(postgres.Open(connStr), &gorm.Config{
+		TranslateError: true,
+	})
 	if err != nil {
 		return err
 	}

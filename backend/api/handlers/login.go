@@ -1,10 +1,14 @@
 package handlers
 
 import (
+	"errors"
 	"mp1/db"
 	"mp1/models"
 	"mp1/util"
 	"net/http"
+	"strings"
+
+	"gorm.io/gorm"
 )
 
 // Creates a new database entry for session.
@@ -13,11 +17,21 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if !jsonDecode(w, r, &request) {
 		return
 	}
+	if strings.Compare(request.Name, "") == 0 {
+		http.Error(w, "empty password", http.StatusBadRequest)
+		return
+	}
+
 	var session models.Session
-	// TODO: check for wrong password
 	if err := session.Create(db.Database, request); err != nil {
 		util.Error("api:login", err)
-		http.Error(w, "couldn't log in", http.StatusInternalServerError)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			http.Error(w, "user not found", http.StatusNotFound)
+		} else if errors.Is(err, util.WrongPasswordError) {
+			http.Error(w, util.WrongPasswordError.Error(), http.StatusInternalServerError)
+		} else {
+			http.Error(w, "couldn't create user", http.StatusInternalServerError)
+		}
 		return
 	}
 	response := models.SessionResponse{

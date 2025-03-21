@@ -2,7 +2,6 @@ package models
 
 import (
 	"bytes"
-	"errors"
 	"mp1/util"
 	"os"
 
@@ -35,7 +34,7 @@ func (session *Session) Create(db *gorm.DB, request SessionRequest) (err error) 
 		return err
 	}
 	if bytes.Compare(user.Hash, hash) != 0 {
-		return errors.New("wrong password")
+		return util.WrongPasswordError
 	}
 	token, err := util.GenerateJWT(request.Name, []byte(request.Password), os.Getenv("JWT_KEY"))
 	if err != nil {
