@@ -13,24 +13,27 @@ import (
 
 func Init(hostname string, port uint) *http.Server {
 	r := chi.NewRouter()
-	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"https://*", "http://*"},
-		AllowedMethods:   []string{"GET", "POST"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-		AllowCredentials: true,
-		MaxAge:           86400,
-	}))
-	r.Use(chiMiddleware.Heartbeat("/health"))
-	r.Use(chiMiddleware.RequestID)
-	r.Use(chiMiddleware.Logger)
-	r.Use(chiMiddleware.AllowContentEncoding("gzip", "deflate"))
-	r.Use(chiMiddleware.AllowContentType("application/json"))
+	r.Use(
+		cors.Handler(cors.Options{
+			AllowedOrigins:   []string{"https://*", "http://*"},
+			AllowedMethods:   []string{"GET", "POST"},
+			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+			AllowCredentials: true,
+			MaxAge:           86400,
+		}),
+		chiMiddleware.Heartbeat("/health"),
+		chiMiddleware.RequestID,
+		chiMiddleware.Logger,
+		chiMiddleware.AllowContentEncoding("gzip", "deflate"),
+		chiMiddleware.AllowContentType("application/json"),
+		middleware.AddHeaders,
+	)
 
 	r.Post("/register", handlers.Register)
-	r.Post("/login", handlers.Login)
+	r.With(middleware.JSONResponse).Post("/login", handlers.Login)
 
-	r.With(middleware.ValidateToken).Get("/users", handlers.Users)
-	r.With(middleware.ValidateToken).Post("/logout", handlers.Logout)
+	// r.With(middleware.ValidateToken).Get("/users", handlers.Users)
+	// r.With(middleware.ValidateToken).Post("/logout", handlers.Logout)
 
 	return &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", hostname, port),

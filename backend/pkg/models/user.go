@@ -22,7 +22,7 @@ type UserRequest struct {
 }
 
 func (user *User) Create(db *gorm.DB, r UserRequest) (err error) {
-	if user.Salt, err = util.RandomBytes(128); err != nil {
+	if user.Salt, err = util.RandomBytes(16); err != nil {
 		return err
 	}
 	if user.Hash, err = util.GenerateHash([]byte(r.Password), user.Salt); err != nil {

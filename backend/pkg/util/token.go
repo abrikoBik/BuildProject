@@ -9,9 +9,9 @@ import (
 var JWTIssuer string = "mp1-auth"
 
 // Generates a JWT token with name and password in Claims.
-// Also generates a 64 byte large salt.
+// Also generates a 16 byte large salt.
 func GenerateJWT(name string, password []byte, key string) (string, error) {
-	salt, err := RandomBytes(64)
+	salt, err := RandomBytes(16)
 	if err != nil {
 		return "", err
 	}
