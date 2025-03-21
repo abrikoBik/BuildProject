@@ -1,13 +1,33 @@
 @import "tailwindcss";
 
 html {
-    background-color: #EBE8F0;
+    background-color: #f4f7fa;
 }
 
 * {
-    font-family: Inter;
-    color: #342A36;
+    font-family: Roboto;
     transition: .5s;
+}
+
+label {
+    color: #6f6d74;
+    font-weight: 600;
+    font-size: large;
+}
+
+input[type=text] {
+    user-select: none;
+    margin-bottom: 5vh;
+    height: 40px;
+    width: 30vw;
+    background-color: #f4f7fa;
+    border-bottom-width: 2px;
+    border-color: #2B4074;
+    color: #2B4074;
+}
+
+input:focus {
+    outline: none;
 }
 
 /* Palette background colors */
