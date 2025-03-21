@@ -3,6 +3,7 @@ package handlers
 import (
 	"errors"
 	"mp1/db"
+	"mp1/l10n"
 	"mp1/models"
 	"mp1/util"
 	"net/http"
@@ -18,7 +19,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if strings.Compare(request.Name, "") == 0 {
-		http.Error(w, "empty password", http.StatusBadRequest)
+		http.Error(w, l10n.EmptyPassword, http.StatusBadRequest)
 		return
 	}
 
@@ -26,11 +27,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if err := session.Create(db.Database, request); err != nil {
 		util.Error("api:login", err)
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			http.Error(w, "user not found", http.StatusNotFound)
+			http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		} else if errors.Is(err, util.WrongPasswordError) {
-			http.Error(w, util.WrongPasswordError.Error(), http.StatusInternalServerError)
+			http.Error(w, l10n.WrongPassword, http.StatusInternalServerError)
 		} else {
-			http.Error(w, "couldn't create user", http.StatusInternalServerError)
+			http.Error(w, l10n.UserRegisterError, http.StatusInternalServerError)
 		}
 		return
 	}

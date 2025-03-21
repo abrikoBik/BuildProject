@@ -3,6 +3,7 @@ package handlers
 import (
 	"errors"
 	"mp1/db"
+	"mp1/l10n"
 	"mp1/models"
 	"mp1/util"
 	"net/http"
@@ -19,11 +20,11 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if _, err := mail.ParseAddress(request.Email); err != nil {
-		http.Error(w, "invalid email", http.StatusBadRequest)
+		http.Error(w, l10n.InvalidEmail, http.StatusBadRequest)
 		return
 	}
 	if strings.Compare(request.Password, "") == 0 {
-		http.Error(w, "empty password", http.StatusBadRequest)
+		http.Error(w, l10n.EmptyPassword, http.StatusBadRequest)
 		return
 	}
 
@@ -35,9 +36,9 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	if err := user.Create(db.Database, request); err != nil {
 		util.Error("api:register", err)
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
-			http.Error(w, "email or name taken", http.StatusBadRequest)
+			http.Error(w, l10n.NameOrEmailTaken, http.StatusBadRequest)
 		} else {
-			http.Error(w, "couldn't register user", http.StatusInternalServerError)
+			http.Error(w, l10n.UserRegisterError, http.StatusInternalServerError)
 		}
 		return
 	}
