@@ -1,33 +1,30 @@
 package handlers
 
-import "net/http"
+import (
+	"errors"
+	"mp1/pkg/db"
+	"mp1/pkg/models"
+	"mp1/pkg/util"
+	"net/http"
 
-// TODO: rewrite
-func Users(w http.ResponseWriter, r *http.Request) {
-	// sanity checks
-	// var user models.User
-	// result := db.Database.Where("id = ?", 0).Take(&user)
-	// if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-	// 	w.WriteHeader(http.StatusUnauthorized)
-	// 	return
-	// }
+	"gorm.io/gorm"
+)
 
-	// var user models.User
-	// result = db.Database.Where("sessions IN ?", dbSession.Token).Take(&user)
-	// if result.Error != nil {
-	// 	util.Log("api", fmt.Sprintf("/userInfo: %s", result.Error.Error()))
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	w.Write([]byte("error finding user"))
-	// 	return
-	// }
-	// var toMarshal models.UserResponse
-	// marshalled, err := json.Marshal(toMarshal)
-	// if err != nil {
-	// 	util.Log("api", fmt.Sprintf("/userInfo: %s", err))
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	w.Write([]byte("error marshalling user"))
-	// 	return
-	// }
-	// w.WriteHeader(http.StatusOK)
-	// w.Write(marshalled)
+func GetUser(w http.ResponseWriter, r *http.Request) {
+	var user models.User
+	result := db.Database.Where("id = ?", r.Context().Value("userID")).Take(&user)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		http.Error(w, "user not found", http.StatusNotFound)
+		return
+	}
+	response := models.UserResponse{
+		User:         &user,
+		RegisteredAt: user.CreatedAt.String(),
+	}
+	if err := jsonEncode(w, response, "public"); err != nil {
+		util.Error("api:getUser", err)
+		return
+	}
+	util.Info("api:getUser", "id%d returned", user.ID)
+	w.WriteHeader(http.StatusOK)
 }

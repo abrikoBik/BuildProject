@@ -21,6 +21,12 @@ type UserRequest struct {
 	Password string `json:"password"`
 }
 
+type UserResponse struct {
+	*User
+	ID           uint   `json:"id" groups:"register"`
+	RegisteredAt string `json:"registeredAt" groups:"public"`
+}
+
 func (user *User) Create(db *gorm.DB, r UserRequest) (err error) {
 	if user.Salt, err = util.RandomBytes(16); err != nil {
 		return err

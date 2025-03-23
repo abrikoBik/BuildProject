@@ -42,6 +42,14 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	util.Info("api:register", "%s registered", user.Name)
+
+	response := models.UserResponse{
+		ID: user.ID,
+	}
+	if err := jsonEncode(w, response, "register"); err != nil {
+		util.Error("api:register", err)
+		return
+	}
+	util.Info("api:register", "%s (id%d) registered", user.Name, user.ID)
 	w.WriteHeader(http.StatusCreated)
 }
