@@ -15,7 +15,7 @@ type Session struct {
 }
 
 type SessionRequest struct {
-	Name     string `json:"name"`
+	Login    string `json:"login"`
 	Password string `json:"password"`
 }
 
@@ -25,7 +25,7 @@ type SessionResponse struct {
 
 func (session *Session) Create(db *gorm.DB, request SessionRequest) (err error) {
 	var user User
-	result := db.Where("name = ?", request.Name).Take(&user)
+	result := db.Where("name = ?", request.Login).Take(&user)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -36,7 +36,7 @@ func (session *Session) Create(db *gorm.DB, request SessionRequest) (err error) 
 	if bytes.Compare(user.Hash, hash) != 0 {
 		return util.WrongPasswordError
 	}
-	token, err := util.GenerateJWT(request.Name, []byte(request.Password), os.Getenv("JWT_KEY"))
+	token, err := util.GenerateJWT(request.Login, []byte(request.Password), os.Getenv("JWT_KEY"))
 	if err != nil {
 		return err
 	}

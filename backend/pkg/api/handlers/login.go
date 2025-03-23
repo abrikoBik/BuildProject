@@ -18,7 +18,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if !jsonDecode(w, r, &request) {
 		return
 	}
-	if strings.Compare(request.Name, "") == 0 {
+	if strings.Compare(request.Password, "") == 0 {
 		http.Error(w, l10n.EmptyPassword, http.StatusBadRequest)
 		return
 	}
