@@ -25,7 +25,7 @@ type SessionResponse struct {
 
 func (session *Session) Create(db *gorm.DB, request SessionRequest) (err error) {
 	var user User
-	result := db.Where("name = ?", request.Login).Take(&user)
+	result := db.Where("login = ?", request.Login).Take(&user)
 	if result.Error != nil {
 		return result.Error
 	}
