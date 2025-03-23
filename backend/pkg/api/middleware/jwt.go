@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"mp1/pkg/l10n"
 	"mp1/pkg/util"
 	"net/http"
 	"os"
@@ -15,12 +16,12 @@ func ValidateToken(next http.Handler) http.Handler {
 		authHeader := r.Header.Get("Authorization")
 		token := strings.SplitAfter(authHeader, " ")
 		if len(token) != 2 {
-			http.Error(w, "invalid authorization header", http.StatusBadRequest)
+			http.Error(w, l10n.InvalidAuthHeader, http.StatusBadRequest)
 			return
 		}
 		util.Info("api", "%s %s", token[0], token[1])
 		if token[0] != "Bearer" || util.ValidateJWT(token[1], os.Getenv("JWT_KEY")) {
-			http.Error(w, "invalid token", http.StatusUnauthorized)
+			http.Error(w, l10n.InvalidToken, http.StatusUnauthorized)
 			return
 		}
 		withToken := context.WithValue(r.Context(), JWT_CONTEXT_KEY, token)
