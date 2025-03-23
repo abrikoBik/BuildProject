@@ -26,7 +26,18 @@ export const Login = () => {
             const data: AxiosResponse = await axios.post<User>(
                 "http://0.0.0.0:3000/sessions",
                 post,
+                {withCredentials: true}
             );
+            
+            axios.get(`http://0.0.0.0:3000/users/${data.data.userID}`)
+            .then((resp) =>
+            {
+                if(resp.status == 200)
+                {
+                    alert(`Welcome ${resp.data.name}`);
+                }
+            });
+
             console.log(data);
         } catch (err) {
             console.error(err);
