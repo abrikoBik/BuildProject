@@ -51,7 +51,7 @@ export const Login = () => {
                 <Header/>
 
                 {/* Login inputs */}
-                <section className="w-[50vw] h-[100vh]">
+                <section className="lg:w-[50vw] w-[100vw] h-[95vh]">
                     <div className="flex items-center justify-center h-[100vh]">
                         <form onSubmit={handleSubmit} className="flex flex-col">
                             <label htmlFor="email" className="">Логин</label>
@@ -69,14 +69,14 @@ export const Login = () => {
                                 <label htmlFor="savePass" className="ml-1">Сохранить вход</label>
                                 <a href="" className="ml-[50%] self-end text-[#2B4074]">Забыли пароль?</a>
                             </div>
-                            <button className="mb-5 bg-[#2B4074] text-white h-[40px] w-[40%] self-center font-[600] rounded-[3px]">Вход</button>
-                            <Link to="/register" className="mb-5 pt-1.5 border-[2px] border-[#2B4074] h-[40px] w-[40%] self-center font-[600] rounded-[3px] text-center">Регистрация</Link>
+                            <button className="mb-5 bg-[#2B4074] text-white max-lg:h-[30px] h-[40px] w-[40%] self-center font-[600] rounded-[3px]">Вход</button>
+                            <Link to="/register" className="mb-5 pt-1.5 border-[2px] border-[#2B4074] max-lg:h-[30px] h-[40px] w-[40%] self-center font-[600] rounded-[3px] text-center">Регистрация</Link>
                         </form>
                     </div>
                 </section>
             </section>
 
-            <img src={HalfImage} alt="half_image" className="w-[50vw] h-[100vh]" />
+            <img src={HalfImage} alt="half_image" className="w-[100%] h-[100vh] object-cover max-lg:hidden" />
         </section>
     );
 };
