@@ -5,23 +5,8 @@ import { Link } from "react-router-dom";
 import { Header } from "./Header.tsx";
 import axios, { AxiosResponse } from "axios";
 import errors from "./util/errors.ts";
-
-interface SessionRequest {
-    login: string;
-    password: string;
-}
-
-interface SessionResponse {
-    token: string;
-    userID: number;
-}
-
-interface User {
-    email: string;
-    login: string;
-    name: string;
-    registeredAt: string;
-}
+import { SessionRequest, SessionResponse } from "./types/session.ts";
+import { UserResponse } from "./types/user.ts";
 
 export const Login = () => {
     const [sessionRequest, setSessionRequest] = useState<SessionRequest>({
@@ -52,7 +37,7 @@ export const Login = () => {
                 secure: true,
             });
 
-            const user: AxiosResponse<User> = await axios.get(
+            const user: AxiosResponse<UserResponse> = await axios.get(
                 `http://0.0.0.0:3000/users/${session.data.userID}`,
             );
             if (user.status != 200) {
@@ -61,7 +46,9 @@ export const Login = () => {
             }
             localStorage.setItem("user", JSON.stringify(user.data));
 
-            const storedUser: User = JSON.parse(localStorage.getItem("user")!);
+            const storedUser: UserResponse = JSON.parse(
+                localStorage.getItem("user")!,
+            );
             alert(`Добро пожаловать, ${storedUser.name}!`);
         } catch (err: unknown) {
             errors.axiosError(err);

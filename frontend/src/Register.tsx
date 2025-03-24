@@ -4,13 +4,7 @@ import { Header } from "./Header.tsx";
 import { Link } from "react-router-dom";
 import HalfImage from "./assets/auth_image.png";
 import errors from "./util/errors.ts";
-
-interface UserRequest {
-    login: string;
-    name: string;
-    email: string;
-    password: string;
-}
+import { UserRequest } from "./types/user.ts";
 
 export const Register = () => {
     //    const [passShow, setPassShow] = useState(false);
