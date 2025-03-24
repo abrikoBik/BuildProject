@@ -6,7 +6,7 @@ html {
 
 * {
     font-family: Roboto;
-    transition: .5s;
+    transition: 0.5s;
 }
 
 label {
@@ -15,15 +15,15 @@ label {
     font-size: large;
 }
 
-input[type=text] {
+input[type="text"] {
     user-select: none;
     margin-bottom: 5vh;
     height: 40px;
     width: 100%;
     background-color: #f4f7fa;
     border-bottom-width: 2px;
-    border-color: #2B4074;
-    color: #2B4074;
+    border-color: #2b4074;
+    color: #2b4074;
 }
 
 input:focus {
@@ -33,79 +33,77 @@ input:focus {
 /* Palette background colors */
 
 .bg-palette-color1 {
-    background-color: #EBE8F0;
+    background-color: #ebe8f0;
 }
 
 .bg-palette-color2 {
-    background-color: #E4DFED;
+    background-color: #e4dfed;
 }
 
 .bg-palette-color3 {
-    background-color: #D6CCDC;
+    background-color: #d6ccdc;
 }
 
 .bg-palette-color4 {
-    background-color: #C598E0;
+    background-color: #c598e0;
 }
 
 .bg-palette-color5 {
-    background-color: #342A36;
+    background-color: #342a36;
 }
 
 /* Palette text colors */
 
 .text-palette-color1 {
-    color: #EBE8F0;
+    color: #ebe8f0;
 }
 
 .text-palette-color2 {
-    color: #E4DFED;
+    color: #e4dfed;
 }
 
 .text-palette-color3 {
-    color: #D6CCDC;
+    color: #d6ccdc;
 }
 
 .text-palette-color4 {
-    color: #C598E0;
+    color: #c598e0;
 }
 
 .text-palette-color5 {
-    color: #342A36;
+    color: #342a36;
 }
 
 /* Palette border colors */
 
 .border-palette-color1 {
-    border-color: #EBE8F0;
+    border-color: #ebe8f0;
 }
 
 .border-palette-color2 {
-    border-color: #E4DFED;
+    border-color: #e4dfed;
 }
 
 .border-palette-color3 {
-    border-color: #D6CCDC;
+    border-color: #d6ccdc;
 }
 
 .border-palette-color4 {
-    border-color: #C598E0;
+    border-color: #c598e0;
 }
 
 .border-palette-color5 {
-    border-color: #342A36;
+    border-color: #342a36;
 }
 
-@media (max-width: 64rem)
-{
+@media (max-width: 64rem) {
     * {
-        font-size: 0.90rem;
+        font-size: 0.9rem;
     }
 }
 
-@media (max-height: 680px)
-{
-    input[type=text] {
+@media (max-height: 680px) {
+    input[type="text"] {
         margin-bottom: 1vh;
     }
 }
