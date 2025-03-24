@@ -1,5 +1,6 @@
 import HalfImage from './assets/auth_image.png'
 import { useState } from 'react'
+import { useCookies } from 'react-cookie'
 import { Link } from 'react-router-dom'
 import { Header } from "./Header.tsx";
 import axios, {AxiosResponse} from 'axios'
@@ -15,6 +16,8 @@ export const Login = () => {
         login: "",
         password: "",
     });
+
+    const [cookie, setCookie] = useCookies(['access-token']);
     
     const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
         setPost({ ...post, [event.target.name]: event.target.value });
@@ -34,8 +37,9 @@ export const Login = () => {
             {
                 if(resp.status == 200)
                 {
-                    alert(`Welcome ${resp.data.name}`);
-                }
+                    setCookie('access-token', resp.data.token, {path: '/', sameSite: 'none'});
+                    alert(`Добро пожаловать ${resp.data.name} - ${cookie['access-token']}!`);
+                }   
             });
 
             console.log(data);

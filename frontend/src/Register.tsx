@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { Header } from "./Header.tsx";
 import { Link } from 'react-router-dom'
 import HalfImage from './assets/auth_image.png'
@@ -37,11 +37,14 @@ export const Register = () => {
                 post,
             );
 
-            alert(`User ${post.name} was succesfully registered`);
+            alert(`Пользователь ${post.name} был успешно зарегестрирован!`);
 
             console.log(data);
-        } catch (err) {
-            alert(err.response.data);
+        } catch (err : unknown) {
+            if(err instanceof AxiosError)
+            {
+                alert(err?.response?.data);
+            }
             console.error(err);
         }
     };
