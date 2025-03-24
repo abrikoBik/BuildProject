@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios from "axios";
 import { Header } from "./Header.tsx";
 import { Link } from "react-router-dom";
 import HalfImage from "./assets/auth_image.png";
