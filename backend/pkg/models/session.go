@@ -1,7 +1,6 @@
 package models
 
 import (
-	"bytes"
 	"mp1/pkg/util"
 	"os"
 
@@ -23,17 +22,16 @@ type SessionResponse struct {
 	*Session
 }
 
-func (session *Session) Create(db *gorm.DB, request SessionRequest) (err error) {
+func (session *Session) Create(db *gorm.DB, request SessionRequest) error {
 	var user User
-	result := db.Where("login = ?", request.Login).Take(&user)
-	if result.Error != nil {
-		return result.Error
+	if err := user.FindByLogin(db, request.Login); err != nil {
+		return err
 	}
-	hash, err := util.GenerateHash([]byte(request.Password), user.Salt)
+	match, err := user.VerifyPassword(db, request.Password)
 	if err != nil {
 		return err
 	}
-	if bytes.Compare(user.Hash, hash) != 0 {
+	if !match {
 		return util.WrongPasswordError
 	}
 	token, err := util.GenerateJWT(request.Login, []byte(request.Password), os.Getenv("JWT_KEY"))
@@ -42,7 +40,7 @@ func (session *Session) Create(db *gorm.DB, request SessionRequest) (err error) 
 	}
 	session.UserID = user.ID
 	session.Token = token
-	result = db.Create(&session)
+	result := db.Create(&session)
 	if result.Error != nil {
 		return result.Error
 	}

@@ -6,6 +6,7 @@ const (
 	InvalidAuthHeader = "Некорректный заголовок аутентификации"
 	InvalidToken      = "Некорректный токен"
 	InvalidEmail      = "Некорректная почта"
+	InvalidRole       = "Некорректная роль"
 	WrongPassword     = "Неверный пароль"
 	NameOrEmailTaken  = "Имя пользователя или почта уже занята"
 
