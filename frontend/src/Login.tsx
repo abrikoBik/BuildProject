@@ -2,11 +2,11 @@ import HalfImage from "./assets/auth_image.png";
 import { useState } from "react";
 import { useCookies } from "react-cookie";
 import { Link } from "react-router-dom";
-import { Header } from "./Header.tsx";
 import axios, { AxiosResponse } from "axios";
 import errors from "./util/errors.ts";
 import { SessionRequest, SessionResponse } from "./types/session.ts";
 import { UserResponse } from "./types/user.ts";
+import Logo from "./assets/logo.svg";
 
 export const Login = () => {
     const [sessionRequest, setSessionRequest] = useState<SessionRequest>({
@@ -59,7 +59,17 @@ export const Login = () => {
         <section className="flex flex-row overflow-hidden">
             <section className="flex flex-col max-lg:w-[100vw] w-[50vw] h-[100vh]">
                 {/* Header */}
-                <Header />
+                <header className="flex flex-row w-[100vw] lg:w-[50vw] h-[5vh] pt-2 px-5">
+                    <img src={Logo} alt="logo" />
+                    <section className="flex flex-row w-full mt-1 ml-[-73px] justify-center">
+                        <a href="" className="text-xl max-md:text-lg font-[400] mr-5 text-[#6f6d74]">
+                            Главная
+                        </a>
+                        <a href="" className="text-xl max-md:text-lg font-[400] mr-5 text-[#6f6d74]">
+                            О нас
+                        </a>
+                    </section>
+                </header>
 
                 {/* Login inputs */}
                 <section className="lg:w-[50vw] w-[100vw] h-[95vh]">
