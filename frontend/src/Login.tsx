@@ -56,8 +56,8 @@ export const Login = () => {
     };
 
     return (
-        <section className="flex flex-row">
-            <section className="flex flex-col w-[50vw] h-[100vh]">
+        <section className="flex flex-row overflow-hidden">
+            <section className="flex flex-col max-lg:w-[100vw] w-[50vw] h-[100vh]">
                 {/* Header */}
                 <Header />
 
@@ -90,7 +90,7 @@ export const Login = () => {
                                 </label>
                                 <a
                                     href=""
-                                    className="ml-[50%] self-end text-[#2B4074]"
+                                    className="ml-[5vw] self-end text-[#2B4074]"
                                 >
                                     Забыли пароль?
                                 </a>
@@ -100,7 +100,7 @@ export const Login = () => {
                             </button>
                             <Link
                                 to="/register"
-                                className="mb-5 pt-1.5 border-[2px] border-[#2B4074] max-lg:h-[30px] h-[40px] w-[40%] self-center font-[600] rounded-[3px] text-center"
+                                className="mb-5 lg:pt-1.5 border-[2px] border-[#2B4074] max-lg:h-[30px] h-[40px] w-[40%] self-center font-[600] rounded-[3px] text-center"
                             >
                                 Регистрация
                             </Link>

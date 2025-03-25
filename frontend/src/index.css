@@ -96,12 +96,6 @@ input:focus {
     border-color: #342a36;
 }
 
-@media (max-width: 64rem) {
-    * {
-        font-size: 0.9rem;
-    }
-}
-
 @media (max-height: 680px) {
     input[type="text"] {
         margin-bottom: 1vh;

@@ -52,7 +52,7 @@ export const Register = () => {
                 <Header />
 
                 {/* Register inputs */}
-                <section className="lg:w-[50vw] w-[100vw] h-[95vh]">
+                <section className="max-md:px-[5vw] lg:w-[50vw] w-[100vw] h-[95vh]">
                     <div className="flex items-center justify-center h-[100vh] ">
                         <form onSubmit={handleSubmit} className="flex flex-col">
                             <label htmlFor="name">ФИО</label>
@@ -104,7 +104,7 @@ export const Register = () => {
                             </button>
                             <Link
                                 to="/login"
-                                className="mb-5 border-[2px] border-[#2B4074] max-lg:h-[26px] h-[36px] w-[30%] self-center font-[600] rounded-[3px] text-center"
+                                className="mb-5 lg:pt-1 border-[2px] border-[#2B4074] max-lg:h-[26px] h-[36px] w-[30%] self-center font-[600] rounded-[3px] text-center"
                             >
                                 Вход
                             </Link>
