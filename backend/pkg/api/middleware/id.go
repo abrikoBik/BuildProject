@@ -18,12 +18,12 @@ func ParseID(key, param string) func(http.Handler) http.Handler {
 				http.Error(w, l10n.MissingID, http.StatusBadRequest)
 				return
 			}
-			id, err := strconv.Atoi(idParam)
+			id, err := strconv.ParseUint(idParam, 10, 32)
 			if err != nil {
 				http.Error(w, l10n.InvalidID, http.StatusBadRequest)
 				return
 			}
-			withID := context.WithValue(r.Context(), key, id)
+			withID := context.WithValue(r.Context(), key, uint(id))
 			next.ServeHTTP(w, r.WithContext(withID))
 		})
 	}
