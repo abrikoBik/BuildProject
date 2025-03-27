@@ -70,9 +70,8 @@ func RegisterWorker(w http.ResponseWriter, r *http.Request) {
 	}
 
 	worker := models.Worker{
-		Role:        request.Role,
-		Description: request.Description,
-		UserID:      userID,
+		Role:   request.Role,
+		UserID: userID,
 	}
 	if err := worker.Create(db.Database, request); err != nil {
 		util.Error("api:RegisterWorker", err)
@@ -87,6 +86,6 @@ func RegisterWorker(w http.ResponseWriter, r *http.Request) {
 		util.Error("api:RegisterWorker", err)
 		return
 	}
-	util.Info("api:RegisterWorker", "id%d registered", worker.UserID)
+	util.Info("api:RegisterWorker", "id%d registered", worker.ID)
 	w.WriteHeader(http.StatusCreated)
 }

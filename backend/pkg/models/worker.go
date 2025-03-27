@@ -8,9 +8,8 @@ import (
 
 type Worker struct {
 	gorm.Model
-	Role        string `json:"role" groups:"public" gorm:"not null"`
-	Description string `json:"description" groups:"public"`
-	UserID      uint   `json:"userID" groups:"public" gorm:"not null"`
+	Role   string `json:"role" groups:"public" gorm:"not null"`
+	UserID uint   `json:"userID" groups:"public" gorm:"not null"`
 }
 
 type WorkerRequest struct {
@@ -37,6 +36,5 @@ func (worker *Worker) Create(db *gorm.DB, request WorkerRequest) error {
 		return util.WrongPasswordError
 	}
 	worker.Role = request.Role
-	worker.Description = request.Description
 	return nil
 }
