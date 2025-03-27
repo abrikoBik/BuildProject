@@ -9,6 +9,8 @@ import { UserResponse } from "./types/user.ts";
 import Logo from "./assets/logo.svg";
 
 export const Login = () => {
+    const [visibility, setVisibility] = useState(true);
+
     const [sessionRequest, setSessionRequest] = useState<SessionRequest>({
         login: "",
         password: "",
@@ -54,6 +56,10 @@ export const Login = () => {
             errors.axiosError(err);
         }
     };
+    
+    const toggleVisibility = () => {
+        setVisibility(!visibility);
+    };
 
     return (
         <section className="flex flex-row overflow-hidden">
@@ -82,14 +88,19 @@ export const Login = () => {
                                 onChange={handleInput}
                                 type="text"
                                 name="login"
+                                className="mb-[4vh]"
                             />
-                            <label htmlFor="password">Пароль</label>
-                            <input
-                                onChange={handleInput}
-                                type="text"
-                                name="password"
-                            />
-                            <div className="flex flex-row justify-start w-full mb-5 mt-[-2vh]">
+                            <div>
+                                <label htmlFor="password">Пароль</label>
+                                <input
+                                    onChange={handleInput}
+                                    type={visibility ? "password" : "text"}
+                                    name="password"
+                                    className="mb-[2vh]"
+                                />
+                                <span onClick={toggleVisibility} className="material-symbols-outlined absolute translate-x-[-100%] translate-y-1/3 select-none cursor-pointer">{visibility ? "visibility" : "visibility_off"}</span>
+                            </div>
+                            <div className="flex flex-row justify-start w-full mb-5">
                                 <input
                                     type="checkbox"
                                     name="savePass"

@@ -7,8 +7,10 @@ import { UserRequest } from "./types/user.ts";
 import Logo from './assets/logo.svg'
 
 export const Register = () => {
-    //    const [passShow, setPassShow] = useState(false);
-    //    const passShowToggle = () => setPassShow(!passShow);
+    const [visibility, setVisibility] = useState(true);
+    const toggleVisibility = () => { setVisibility(!visibility); }
+    const [visibilityC, setVisibilityC] = useState(true);
+    const toggleVisibilityC = () => { setVisibilityC(!visibilityC); }
 
     const [userRequest, setUserRequest] = useState<UserRequest>({
         login: "",
@@ -70,31 +72,42 @@ export const Register = () => {
                                 onChange={handleInput}
                                 type="text"
                                 name="name"
+                                className="mb-[4vh]"
                             />
                             <label htmlFor="login">Логин</label>
                             <input
                                 onChange={handleInput}
                                 type="text"
                                 name="login"
+                                className="mb-[4vh]"
                             />
                             <label htmlFor="login">Email</label>
                             <input
                                 onChange={handleInput}
                                 type="text"
                                 name="email"
+                                className="mb-[4vh]"
                             />
-                            <label htmlFor="password">Пароль</label>
-                            <input
-                                onChange={handleInput}
-                                type="text"
-                                name="password"
-                            />
-                            <label htmlFor="checkPass">Повторите пароль</label>
-                            <input
-                                onChange={handleInput}
-                                type="text"
-                                name="checkPass"
-                            />
+                            <div>
+                                <label htmlFor="password">Пароль</label>
+                                <input
+                                    onChange={handleInput}
+                                    type={visibility ? "password" : "text"}
+                                    name="password"
+                                    className="mb-[4vh]"
+                                />
+                                <span onClick={toggleVisibility} className="material-symbols-outlined absolute translate-x-[-100%] translate-y-1/3 select-none cursor-pointer">{visibility ? "visibility" : "visibility_off"}</span>
+                            </div>
+                            <div>
+                                <label htmlFor="checkPassword">Повторите пароль</label>
+                                <input
+                                    onChange={handleInput}
+                                    type={visibilityC ? "password" : "text"}
+                                    name="checkPassword"
+                                    className="mb-[4vh]"
+                                />
+                                <span onClick={toggleVisibilityC} className="material-symbols-outlined absolute translate-x-[-100%] translate-y-1/3 select-none cursor-pointer">{visibilityC ? "visibility" : "visibility_off"}</span>
+                            </div>
                             <div className="flex flex-row justify-start w-full mb-5 mt-[-1vh]">
                                 <input
                                     type="checkbox"

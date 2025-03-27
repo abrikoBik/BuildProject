@@ -1,5 +1,30 @@
 @import "tailwindcss";
 
+.material-symbols-outlined {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+
+    -moz-osx-font-smoothing: grayscale;
+
+    font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24
+}
+
 html {
     background-color: #f4f7fa;
 }
@@ -17,7 +42,16 @@ label {
 
 input[type="text"] {
     user-select: none;
-    margin-bottom: 5vh;
+    height: 40px;
+    width: 100%;
+    background-color: #f4f7fa;
+    border-bottom-width: 2px;
+    border-color: #2b4074;
+    color: #2b4074;
+}
+
+input[type="password"] {
+    user-select: none;
     height: 40px;
     width: 100%;
     background-color: #f4f7fa;
