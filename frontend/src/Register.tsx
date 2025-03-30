@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Header } from "./Header.tsx";
 import { Link } from "react-router-dom";
 import HalfImage from "./assets/auth_image.png";
 import errors from "./util/errors.ts";
 import { UserRequest } from "./types/user.ts";
+import Logo from './assets/logo.svg'
 
 export const Register = () => {
-    //    const [passShow, setPassShow] = useState(false);
-    //    const passShowToggle = () => setPassShow(!passShow);
+    const [visibility, setVisibility] = useState(true);
+    const toggleVisibility = () => { setVisibility(!visibility); }
+    const [visibilityC, setVisibilityC] = useState(true);
+    const toggleVisibilityC = () => { setVisibilityC(!visibilityC); }
 
     const [userRequest, setUserRequest] = useState<UserRequest>({
         login: "",
@@ -49,10 +51,20 @@ export const Register = () => {
         <section className="flex flex-row overflow-hidden">
             <section className="flex flex-col w-[50vw] h-[100vh]">
                 {/* Header */}
-                <Header />
+                <header className="flex flex-row w-[100vw] lg:w-[50vw] h-[5vh] pt-2 px-5">
+                    <img src={Logo} alt="logo" />
+                    <section className="flex flex-row w-full mt-1 ml-[-73px] justify-center">
+                        <a href="" className="text-xl max-md:text-lg font-[400] mr-5 text-[#6f6d74]">
+                            Главная
+                        </a>
+                        <a href="" className="text-xl max-md:text-lg font-[400] mr-5 text-[#6f6d74]">
+                            О нас
+                        </a>
+                    </section>
+                </header>
 
                 {/* Register inputs */}
-                <section className="lg:w-[50vw] w-[100vw] h-[95vh]">
+                <section className="max-md:px-[5vw] lg:w-[50vw] w-[100vw] h-[95vh]">
                     <div className="flex items-center justify-center h-[100vh] ">
                         <form onSubmit={handleSubmit} className="flex flex-col">
                             <label htmlFor="name">ФИО</label>
@@ -60,31 +72,42 @@ export const Register = () => {
                                 onChange={handleInput}
                                 type="text"
                                 name="name"
+                                className="mb-[4vh]"
                             />
                             <label htmlFor="login">Логин</label>
                             <input
                                 onChange={handleInput}
                                 type="text"
                                 name="login"
+                                className="mb-[4vh]"
                             />
                             <label htmlFor="login">Email</label>
                             <input
                                 onChange={handleInput}
                                 type="text"
                                 name="email"
+                                className="mb-[4vh]"
                             />
-                            <label htmlFor="password">Пароль</label>
-                            <input
-                                onChange={handleInput}
-                                type="text"
-                                name="password"
-                            />
-                            <label htmlFor="checkPass">Повторите пароль</label>
-                            <input
-                                onChange={handleInput}
-                                type="text"
-                                name="checkPass"
-                            />
+                            <div>
+                                <label htmlFor="password">Пароль</label>
+                                <input
+                                    onChange={handleInput}
+                                    type={visibility ? "password" : "text"}
+                                    name="password"
+                                    className="mb-[4vh]"
+                                />
+                                <span onClick={toggleVisibility} className="material-symbols-outlined absolute translate-x-[-100%] translate-y-1/3 select-none cursor-pointer">{visibility ? "visibility" : "visibility_off"}</span>
+                            </div>
+                            <div>
+                                <label htmlFor="checkPassword">Повторите пароль</label>
+                                <input
+                                    onChange={handleInput}
+                                    type={visibilityC ? "password" : "text"}
+                                    name="checkPassword"
+                                    className="mb-[4vh]"
+                                />
+                                <span onClick={toggleVisibilityC} className="material-symbols-outlined absolute translate-x-[-100%] translate-y-1/3 select-none cursor-pointer">{visibilityC ? "visibility" : "visibility_off"}</span>
+                            </div>
                             <div className="flex flex-row justify-start w-full mb-5 mt-[-1vh]">
                                 <input
                                     type="checkbox"
@@ -104,7 +127,7 @@ export const Register = () => {
                             </button>
                             <Link
                                 to="/login"
-                                className="mb-5 border-[2px] border-[#2B4074] max-lg:h-[26px] h-[36px] w-[30%] self-center font-[600] rounded-[3px] text-center"
+                                className="mb-5 lg:pt-1 border-[2px] border-[#2B4074] max-lg:h-[26px] h-[36px] w-[30%] self-center font-[600] rounded-[3px] text-center"
                             >
                                 Вход
                             </Link>
