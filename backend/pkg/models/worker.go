@@ -19,8 +19,8 @@ type WorkerRequest struct {
 
 type WorkerResponse struct {
 	*Worker
-	ID           uint   `json:"id" groups:"register"`
 	RegisteredAt string `json:"registeredAt" groups:"public"`
+	ID           uint   `json:"id" groups:"register"`
 }
 
 func (worker *Worker) Create(db *gorm.DB, request WorkerRequest) error {

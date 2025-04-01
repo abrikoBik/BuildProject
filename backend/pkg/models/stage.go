@@ -8,9 +8,9 @@ import (
 type Stage struct {
 	gorm.Model
 	Name      string      `json:"name" groups:"public" gorm:"not null"`
-	Status    bool        `json:"status" groups:"public" gorm:"not null;default:false"`
 	StartTime pq.NullTime `json:"startTime" groups:"public"`
 	EndTime   pq.NullTime `json:"endTime" groups:"public"`
+	Status    bool        `json:"status" groups:"public" gorm:"not null;default:false"`
 }
 
 type StageResponse struct {

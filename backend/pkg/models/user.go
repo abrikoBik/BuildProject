@@ -25,8 +25,8 @@ type UserRequest struct {
 
 type UserResponse struct {
 	*User
-	ID           uint   `json:"id" groups:"register"`
 	RegisteredAt string `json:"registeredAt" groups:"public"`
+	ID           uint   `json:"id" groups:"register"`
 }
 
 func (user *User) Create(db *gorm.DB, request UserRequest) (err error) {
