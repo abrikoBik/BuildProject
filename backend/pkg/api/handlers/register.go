@@ -8,9 +8,13 @@ import (
 	"mp1/pkg/util"
 	"net/http"
 	"net/mail"
-	"strings"
 
 	"gorm.io/gorm"
+)
+
+const (
+	registerUserTag   = "api:RegisterUser"
+	registerWorkerTag = "api:RegisterWorker"
 )
 
 // Creates a new database entry for user.
@@ -23,7 +27,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.InvalidEmail, http.StatusBadRequest)
 		return
 	}
-	if strings.Compare(request.Password, "") == 0 {
+	if len(request.Password) == 0 {
 		http.Error(w, l10n.EmptyPassword, http.StatusBadRequest)
 		return
 	}
@@ -34,7 +38,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 		Email: request.Email,
 	}
 	if err := user.Create(db.Database, request); err != nil {
-		util.Error("api:RegisterUser", err)
+		util.Error(registerUserTag, err)
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
 			http.Error(w, l10n.NameOrEmailTaken, http.StatusBadRequest)
 		} else {
@@ -47,10 +51,10 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 		ID: user.ID,
 	}
 	if err := jsonEncode(w, response, "register"); err != nil {
-		util.Error("api:RegisterUser", err)
+		util.Error(registerUserTag, err)
 		return
 	}
-	util.Info("api:RegisterUser", "%s (id%d) registered", user.Name, user.ID)
+	util.Info(registerUserTag, "%s (id%d) registered", user.Name, user.ID)
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -60,11 +64,11 @@ func RegisterWorker(w http.ResponseWriter, r *http.Request) {
 	if !jsonDecode(w, r, &request) {
 		return
 	}
-	if strings.Compare(request.Role, "") == 0 {
+	if len(request.Role) == 0 {
 		http.Error(w, l10n.InvalidRole, http.StatusBadRequest)
 		return
 	}
-	if strings.Compare(request.Password, "") == 0 {
+	if len(request.Password) == 0 {
 		http.Error(w, l10n.EmptyPassword, http.StatusBadRequest)
 		return
 	}
@@ -74,7 +78,7 @@ func RegisterWorker(w http.ResponseWriter, r *http.Request) {
 		UserID: userID,
 	}
 	if err := worker.Create(db.Database, request); err != nil {
-		util.Error("api:RegisterWorker", err)
+		util.Error(registerWorkerTag, err)
 		http.Error(w, l10n.UserRegisterError, http.StatusInternalServerError)
 		return
 	}
@@ -83,9 +87,9 @@ func RegisterWorker(w http.ResponseWriter, r *http.Request) {
 		ID: worker.ID,
 	}
 	if err := jsonEncode(w, response, "register"); err != nil {
-		util.Error("api:RegisterWorker", err)
+		util.Error(registerWorkerTag, err)
 		return
 	}
-	util.Info("api:RegisterWorker", "id%d registered", worker.ID)
+	util.Info(registerWorkerTag, "id%d registered", worker.ID)
 	w.WriteHeader(http.StatusCreated)
 }

@@ -2,7 +2,6 @@ package models
 
 import (
 	"mp1/pkg/util"
-	"os"
 
 	"gorm.io/gorm"
 )
@@ -22,7 +21,7 @@ type SessionResponse struct {
 	*Session
 }
 
-func (session *Session) Create(db *gorm.DB, request SessionRequest) error {
+func (session *Session) Create(db *gorm.DB, request SessionRequest, jwtKey []byte) error {
 	var user User
 	if err := user.FindByLogin(db, request.Login); err != nil {
 		return err
@@ -34,7 +33,7 @@ func (session *Session) Create(db *gorm.DB, request SessionRequest) error {
 	if !match {
 		return util.WrongPasswordError
 	}
-	token, err := util.GenerateJWT(request.Login, []byte(request.Password), os.Getenv("JWT_KEY"))
+	token, err := util.GenerateJWT(request.Login, []byte(request.Password), jwtKey)
 	if err != nil {
 		return err
 	}

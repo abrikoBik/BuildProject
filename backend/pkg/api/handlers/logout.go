@@ -12,6 +12,8 @@ import (
 	"gorm.io/gorm"
 )
 
+const logoutTag = "api:Logout"
+
 // Removes the database entry for a session.
 // TODO: rewrite
 func Logout(w http.ResponseWriter, r *http.Request) {
@@ -26,10 +28,10 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 
 	result = db.Database.Where("token = ?", token).Delete(&dbSession)
 	if result.Error != nil {
-		util.Error("api:logout", result.Error)
+		util.Error(logoutTag, result.Error)
 		http.Error(w, l10n.LogoutError, http.StatusInternalServerError)
 		return
 	}
-	util.Info("api:logout", "token %s removed", token)
+	util.Info(logoutTag, "token %s removed", token)
 	w.WriteHeader(http.StatusOK)
 }

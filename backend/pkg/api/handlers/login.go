@@ -7,10 +7,11 @@ import (
 	"mp1/pkg/models"
 	"mp1/pkg/util"
 	"net/http"
-	"strings"
 
 	"gorm.io/gorm"
 )
+
+const loginTag = "api:Login"
 
 // Creates a new database entry for session.
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -18,14 +19,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if !jsonDecode(w, r, &request) {
 		return
 	}
-	if strings.Compare(request.Password, "") == 0 {
+	if len(request.Password) == 0 {
 		http.Error(w, l10n.EmptyPassword, http.StatusBadRequest)
 		return
 	}
 
 	var session models.Session
-	if err := session.Create(db.Database, request); err != nil {
-		util.Error("api:login", err)
+	if err := session.Create(db.Database, request, jwtKey); err != nil {
+		util.Error(loginTag, err)
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		} else if errors.Is(err, util.WrongPasswordError) {
@@ -39,9 +40,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Session: &session,
 	}
 	if err := jsonEncode(w, response, "public"); err != nil {
-		util.Error("api:login", err)
+		util.Error(loginTag, err)
 		return
 	}
-	util.Info("api:login", "id%d logged in", session.UserID)
+	util.Info(loginTag, "id%d logged in", session.UserID)
 	w.WriteHeader(http.StatusCreated)
 }
