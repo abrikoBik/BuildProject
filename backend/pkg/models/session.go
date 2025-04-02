@@ -1,6 +1,7 @@
 package models
 
 import (
+	mp1db "mp1/pkg/db"
 	"mp1/pkg/util"
 
 	"gorm.io/gorm"
@@ -23,7 +24,7 @@ type SessionResponse struct {
 
 func (session *Session) Create(db *gorm.DB, request SessionRequest, jwtKey []byte) error {
 	var user User
-	if err := user.FindByLogin(db, request.Login); err != nil {
+	if err := user.Find(db, mp1db.Property{"login": request.Login}); err != nil {
 		return err
 	}
 	match, err := user.VerifyPassword(db, request.Password)

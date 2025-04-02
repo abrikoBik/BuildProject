@@ -2,6 +2,7 @@ package models
 
 import (
 	"bytes"
+	"mp1/pkg/db"
 	"mp1/pkg/util"
 
 	"gorm.io/gorm"
@@ -42,16 +43,12 @@ func (user *User) Create(db *gorm.DB, request UserRequest) (err error) {
 	return nil
 }
 
-func (user *User) FindByID(db *gorm.DB, id uint) error {
-	result := db.Where("id = ?", id).Take(&user)
-	if result.Error != nil {
-		return result.Error
+func (user *User) Find(db *gorm.DB, property db.Property) error {
+	var result *gorm.DB
+	for key, value := range property {
+		result = db.Where("? = ?", key, value).Take(&user)
+		break
 	}
-	return nil
-}
-
-func (user *User) FindByLogin(db *gorm.DB, login string) error {
-	result := db.Where("login = ?", login).Take(&user)
 	if result.Error != nil {
 		return result.Error
 	}
