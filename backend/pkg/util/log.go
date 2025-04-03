@@ -26,7 +26,14 @@ func LogLevel(level string) error {
 	return errors.New("unknown log level")
 }
 
+// +1 for an extra space
+const (
+	bracketLen = 2 + 1
+	errorLen   = 3 + 1
+)
+
 func addServicePrefix(builder *strings.Builder, service string) {
+	builder.Grow(len(service) + bracketLen)
 	builder.WriteRune('[')
 	builder.WriteString(service)
 	builder.WriteString("] ")
@@ -41,6 +48,7 @@ func Info(service string, format string, elements ...any) {
 
 func Error(service string, err error) {
 	var builder strings.Builder
+	builder.Grow(errorLen)
 	builder.WriteString("!!! ")
 	addServicePrefix(&builder, service)
 	builder.WriteString(err.Error())

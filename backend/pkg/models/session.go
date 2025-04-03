@@ -1,9 +1,8 @@
 package models
 
 import (
-	"bytes"
+	mp1db "mp1/pkg/db"
 	"mp1/pkg/util"
-	"os"
 
 	"gorm.io/gorm"
 )
@@ -23,26 +22,25 @@ type SessionResponse struct {
 	*Session
 }
 
-func (session *Session) Create(db *gorm.DB, request SessionRequest) (err error) {
+func (session *Session) Create(db *gorm.DB, request SessionRequest, jwtKey []byte) error {
 	var user User
-	result := db.Where("login = ?", request.Login).Take(&user)
-	if result.Error != nil {
-		return result.Error
+	if err := user.Find(db, mp1db.Property{"login": request.Login}); err != nil {
+		return err
 	}
-	hash, err := util.GenerateHash([]byte(request.Password), user.Salt)
+	match, err := user.VerifyPassword(db, request.Password)
 	if err != nil {
 		return err
 	}
-	if bytes.Compare(user.Hash, hash) != 0 {
+	if !match {
 		return util.WrongPasswordError
 	}
-	token, err := util.GenerateJWT(request.Login, []byte(request.Password), os.Getenv("JWT_KEY"))
+	token, err := util.GenerateJWT(request.Login, []byte(request.Password), jwtKey)
 	if err != nil {
 		return err
 	}
 	session.UserID = user.ID
 	session.Token = token
-	result = db.Create(&session)
+	result := db.Create(&session)
 	if result.Error != nil {
 		return result.Error
 	}

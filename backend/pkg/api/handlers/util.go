@@ -3,9 +3,12 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 
 	"github.com/liip/sheriff/v2"
 )
+
+var jwtKey = []byte(os.Getenv("JWT_KEY"))
 
 func jsonDecode(w http.ResponseWriter, r *http.Request, dst interface{}) bool {
 	if err := json.NewDecoder(r.Body).Decode(&dst); err != nil {

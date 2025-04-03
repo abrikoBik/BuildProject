@@ -11,6 +11,8 @@ import (
 	"gorm.io/gorm"
 )
 
+const getUserTag = "api:GetUser"
+
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	result := db.Database.Where("id = ?", r.Context().Value("userID")).Take(&user)
@@ -23,9 +25,9 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		RegisteredAt: user.CreatedAt.String(),
 	}
 	if err := jsonEncode(w, response, "public"); err != nil {
-		util.Error("api:getUser", err)
+		util.Error(getUserTag, err)
 		return
 	}
-	util.Info("api:getUser", "id%d returned", user.ID)
+	util.Info(getUserTag, "id%d returned", user.ID)
 	w.WriteHeader(http.StatusOK)
 }
