@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 .material-symbols-outlined {
-    font-family: 'Material Icons';
+    font-family: 'Material Symbols Outlined';
     font-weight: normal;
     font-style: normal;
     font-size: 24px;
@@ -19,45 +19,42 @@
     -moz-osx-font-smoothing: grayscale;
 
     font-variation-settings:
-    'FILL' 0,
-    'wght' 400,
-    'GRAD' 0,
-    'opsz' 24
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
 }
 
 html {
-    background-color: #f4f7fa;
+    background-color: #e8ebe4;
 }
 
 * {
-    font-family: Roboto;
-    transition: 0.5s;
+    font-family: 'Open Sans', 'San Francisco', Arial, Helvetica, sans-serif;
 }
 
 label {
-    color: #6f6d74;
-    font-weight: 600;
-    font-size: large;
+    color: #68737c;
+    font-weight: 700;
 }
 
 input[type="text"] {
     user-select: none;
     height: 40px;
-    width: 100%;
-    background-color: #f4f7fa;
+    background-color: #e8ebe4;
     border-bottom-width: 2px;
-    border-color: #2b4074;
-    color: #2b4074;
+    border-color: #37515f;
+    color: #37515f;
 }
 
 input[type="password"] {
     user-select: none;
     height: 40px;
-    width: 100%;
-    background-color: #f4f7fa;
+    width: 90%;
+    background-color: #e8ebe4;
     border-bottom-width: 2px;
-    border-color: #2b4074;
-    color: #2b4074;
+    border-color: #37515f;
+    color: #37515f;
 }
 
 input:focus {
@@ -67,67 +64,67 @@ input:focus {
 /* Palette background colors */
 
 .bg-palette-color1 {
-    background-color: #ebe8f0;
+    background-color: #e8ebe4;
 }
 
 .bg-palette-color2 {
-    background-color: #e4dfed;
+    background-color: #d2d5dd;
 }
 
 .bg-palette-color3 {
-    background-color: #d6ccdc;
+    background-color: #b8bacf;
 }
 
 .bg-palette-color4 {
-    background-color: #c598e0;
+    background-color: #37515f;
 }
 
 .bg-palette-color5 {
-    background-color: #342a36;
+    background-color: #232c33;
 }
 
 /* Palette text colors */
 
 .text-palette-color1 {
-    color: #ebe8f0;
+    color: #e8ebe4;
 }
 
 .text-palette-color2 {
-    color: #e4dfed;
+    color: #d2d5dd;
 }
 
 .text-palette-color3 {
-    color: #d6ccdc;
+    color: #b8bacf;
 }
 
 .text-palette-color4 {
-    color: #c598e0;
+    color: #37515f;
 }
 
 .text-palette-color5 {
-    color: #342a36;
+    color: #232c33;
 }
 
 /* Palette border colors */
 
 .border-palette-color1 {
-    border-color: #ebe8f0;
+    border-color: #e8ebe4;
 }
 
 .border-palette-color2 {
-    border-color: #e4dfed;
+    border-color: #d2d5dd;
 }
 
 .border-palette-color3 {
-    border-color: #d6ccdc;
+    border-color: #b8bacf;
 }
 
 .border-palette-color4 {
-    border-color: #c598e0;
+    border-color: #37515f;
 }
 
 .border-palette-color5 {
-    border-color: #342a36;
+    border-color: #232c33;
 }
 
 @media (max-height: 680px) {

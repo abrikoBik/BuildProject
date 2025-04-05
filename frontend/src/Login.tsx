@@ -62,79 +62,101 @@ export const Login = () => {
     };
 
     return (
-        <section className="flex flex-row overflow-hidden">
-            <section className="flex flex-col max-lg:w-[100vw] w-[50vw] h-[100vh]">
-                {/* Header */}
-                <header className="flex flex-row w-[100vw] lg:w-[50vw] h-[5vh] pt-2 px-5">
-                    <img src={Logo} alt="logo" />
-                    <section className="flex flex-row w-full mt-1 ml-[-73px] justify-center">
-                        <a href="" className="text-xl max-md:text-lg font-[400] mr-5 text-[#6f6d74]">
+        <section className="flex h-screen">
+            <div className="flex-1 flex flex-col items-center justify-center p-8 max-w-[50vw] max-lg:max-w-full">
+                <header className="flex w-1/2 max-lg:w-full absolute top-0 left-0 p-4">
+                    <img src={Logo} alt="logo" className="h-8" />
+                    <nav className="flex items-center justify-center w-full gap-5 ml-[-4vw]">
+                        <a className="text-lg text-palette-color5 hover:cursor-pointer transition-colors">
                             Главная
                         </a>
-                        <a href="" className="text-xl max-md:text-lg font-[400] mr-5 text-[#6f6d74]">
+                        <a className="text-lg text-palette-color5 hover:cursor-pointer transition-colors">
                             О нас
                         </a>
-                    </section>
+                    </nav>
                 </header>
 
-                {/* Login inputs */}
-                <section className="lg:w-[50vw] w-[100vw] h-[95vh]">
-                    <div className="flex items-center justify-center h-[100vh]">
-                        <form onSubmit={handleSubmit} className="flex flex-col">
-                            <label htmlFor="email" className="">
-                                Логин
-                            </label>
-                            <input
-                                onChange={handleInput}
-                                type="text"
-                                name="login"
-                                className="mb-[4vh]"
-                            />
-                            <div>
-                                <label htmlFor="password">Пароль</label>
-                                <input
-                                    onChange={handleInput}
-                                    type={visibility ? "password" : "text"}
-                                    name="password"
-                                    className="mb-[2vh]"
-                                />
-                                <span onClick={toggleVisibility} className="material-symbols-outlined absolute translate-x-[-100%] translate-y-1/3 select-none cursor-pointer">{visibility ? "visibility" : "visibility_off"}</span>
-                            </div>
-                            <div className="flex flex-row justify-start w-full mb-5">
-                                <input
-                                    type="checkbox"
-                                    name="savePass"
-                                    className="m-0 w-5 h-5 border-2 border-[#2B4074]"
-                                />
-                                <label htmlFor="savePass" className="ml-1">
-                                    Сохранить вход
-                                </label>
-                                <a
-                                    href=""
-                                    className="ml-[5vw] self-end text-[#2B4074]"
-                                >
-                                    Забыли пароль?
-                                </a>
-                            </div>
-                            <button className="mb-5 bg-[#2B4074] text-white max-lg:h-[30px] h-[40px] w-[40%] self-center font-[600] rounded-[3px]">
-                                Вход
-                            </button>
-                            <Link
-                                to="/register"
-                                className="mb-5 lg:pt-1.5 border-[2px] border-[#2B4074] max-lg:h-[30px] h-[40px] w-[40%] self-center font-[600] rounded-[3px] text-center"
-                            >
-                                Регистрация
-                            </Link>
-                        </form>
+                <form 
+                    onSubmit={handleSubmit} 
+                    className="w-full max-w-[400px] flex flex-col gap-6"
+                >
+                    <div className="flex flex-col gap-0">
+                        <label className="flex items-center gap-2">
+                            <span className="material-symbols-outlined">
+                                person
+                            </span>
+                            Логин
+                        </label>
+                        <input
+                            onChange={handleInput}
+                            type="text"
+                            name="login"
+                            className="w-full"
+                        />
                     </div>
-                </section>
-            </section>
 
-            <img
-                src={HalfImage}
-                alt="half_image"
-                className="w-[100%] h-[100vh] object-cover max-lg:hidden"
-            />
+                    <div className="flex flex-col gap-0 relative">
+                        <label className="flex items-center gap-2">
+                            <span className="material-symbols-outlined">
+                                key
+                            </span>
+                            Пароль
+                        </label>
+                        <input
+                            onChange={handleInput}
+                            type={visibility ? "password" : "text"}
+                            name="password"
+                            className="w-[90%]"
+                        />
+                        <div className="bg-palette-color4 absolute bottom-0 right-0 w-[10%] h-[2px]"></div>
+                        <button
+                            type="button"
+                            onClick={toggleVisibility}
+                            className="absolute right-2 bottom-1 text-gray-500 hover:text-gray-700"
+                        >
+                            <span className="material-symbols-outlined text-xl">
+                                {visibility ? "visibility" : "visibility_off"}
+                            </span>
+                        </button>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                        <label className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                name="savePass"
+                                className="w-5 h-5 accent-palette-color4"
+                            />
+                            Сохранить вход
+                        </label>
+                        <a href="#" className="text-palette-color4 hover:text-palette-color3">
+                            Забыли пароль?
+                        </a>
+                    </div>
+                    
+                    <button
+                        type="submit"
+                        className="w-1/2 mb-[-1vh] bg-palette-color4 border-2 border-palette-color5 text-palette-color1 py-2 rounded-t-[5px] font-semibold cursor-pointer self-center self-justify-center"
+                    >
+                        Вход
+                    </button>
+                    
+                    <Link
+                        to="/register"
+                        className="w-1/2 text-center border-2 border-palette-color5 py-2 rounded-b-[5px] font-semibold text-palette-color4 self-center self-justify-center"
+                    >
+                        Регистрация
+                    </Link>
+                </form>
+            </div>
+
+            <div className="flex-1 max-lg:hidden">
+                <img
+                    src={HalfImage}
+                    alt="half_image"
+                    className="w-full h-screen object-cover"
+                />
+            </div>
         </section>
     );
 };
