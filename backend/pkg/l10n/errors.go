@@ -8,6 +8,7 @@ const (
 	InvalidEmail      = "Некорректная почта"
 	InvalidRole       = "Некорректная роль"
 	WrongPassword     = "Неверный пароль"
+	InsecurePassword  = "Минимальная длина пароля - 8 символов"
 	NameOrEmailTaken  = "Имя пользователя или почта уже занята"
 
 	// Missing data errors

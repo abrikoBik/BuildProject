@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"mp1/pkg/db"
 	"mp1/pkg/util"
+	"net/mail"
 
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"gorm.io/gorm"
 )
 
@@ -31,28 +34,59 @@ type UserResponse struct {
 }
 
 func (user *User) Create(db *gorm.DB, request UserRequest) (err error) {
-	if user.Salt, err = util.RandomBytes(16); err != nil {
-		return err
+	if _, err = mail.ParseAddress(request.Email); err != nil {
+		return util.InvalidEmailError
 	}
-	if user.Hash, err = util.GenerateHash([]byte(request.Password), user.Salt); err != nil {
-		return err
+	user.Email = request.Email
+	if len(request.Password) < 8 {
+		return util.InsecurePasswordError
 	}
-	if result := db.Create(&user); result.Error != nil {
-		return result.Error
+	if err = user.PreparePassword(request.Password); err != nil {
+		return
 	}
-	return nil
+	user.Name = cases.Title(language.Russian).String(request.Name)
+	user.Login = request.Login
+	err = db.Create(&user).Error
+	return
 }
 
-func (user *User) Find(db *gorm.DB, property db.Property) error {
-	var result *gorm.DB
+func (user *User) Patch(db *gorm.DB, request UserRequest) (err error) {
+	if len(request.Email) > 0 {
+		if _, err = mail.ParseAddress(request.Email); err != nil {
+			return util.InvalidEmailError
+		}
+		user.Email = request.Email
+	}
+	if len(request.Password) > 0 {
+		if len(request.Password) < 8 {
+			return util.InsecurePasswordError
+		}
+		if err = user.PreparePassword(request.Password); err != nil {
+			return
+		}
+	}
+	if len(request.Name) > 0 {
+		user.Name = cases.Title(language.Russian).String(request.Name)
+	}
+	err = db.Save(&user).Error
+	return
+}
+
+func (user User) Find(db *gorm.DB, property db.Property) (err error) {
+	// only one cycle
 	for key, value := range property {
-		result = db.Where("? = ?", key, value).Take(&user)
+		err = db.Where("? = ?", key, value).Take(&user).Error
 		break
 	}
-	if result.Error != nil {
-		return result.Error
+	return
+}
+
+func (user *User) PreparePassword(password string) (err error) {
+	if user.Salt, err = util.RandomBytes(16); err != nil {
+		return
 	}
-	return nil
+	user.Hash, err = util.GenerateHash([]byte(password), user.Salt)
+	return
 }
 
 func (user User) VerifyPassword(db *gorm.DB, password string) (bool, error) {

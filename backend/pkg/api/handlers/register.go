@@ -1,13 +1,11 @@
 package handlers
 
 import (
-	"errors"
 	"mp1/pkg/db"
 	"mp1/pkg/l10n"
 	"mp1/pkg/models"
 	"mp1/pkg/util"
 	"net/http"
-	"net/mail"
 
 	"gorm.io/gorm"
 )
@@ -23,38 +21,30 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	if !jsonDecode(w, r, &request) {
 		return
 	}
-	if _, err := mail.ParseAddress(request.Email); err != nil {
-		http.Error(w, l10n.InvalidEmail, http.StatusBadRequest)
-		return
-	}
-	if len(request.Password) == 0 {
-		http.Error(w, l10n.EmptyPassword, http.StatusBadRequest)
-		return
-	}
-
-	user := models.User{
-		Login: request.Login,
-		Name:  request.Name,
-		Email: request.Email,
-	}
+	var user models.User
 	if err := user.Create(db.Database, request); err != nil {
 		util.Error(registerUserTag, err)
-		if errors.Is(err, gorm.ErrDuplicatedKey) {
+		switch err {
+		case util.EmptyPasswordError:
+			http.Error(w, l10n.EmptyPassword, http.StatusBadRequest)
+		case util.InsecurePasswordError:
+			http.Error(w, l10n.InsecurePassword, http.StatusBadRequest)
+		case util.InvalidEmailError:
+			http.Error(w, l10n.InvalidEmail, http.StatusBadRequest)
+		case gorm.ErrDuplicatedKey:
 			http.Error(w, l10n.NameOrEmailTaken, http.StatusBadRequest)
-		} else {
+		default:
 			http.Error(w, l10n.UserRegisterError, http.StatusInternalServerError)
 		}
 		return
 	}
-
-	response := models.UserResponse{
-		ID: user.ID,
-	}
+	util.Info(registerUserTag, "%s (id%d) registered", user.Name, user.ID)
+	var response models.UserResponse
+	response.ID = user.ID
 	if err := jsonEncode(w, response, "register"); err != nil {
 		util.Error(registerUserTag, err)
 		return
 	}
-	util.Info(registerUserTag, "%s (id%d) registered", user.Name, user.ID)
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -72,7 +62,6 @@ func RegisterWorker(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.EmptyPassword, http.StatusBadRequest)
 		return
 	}
-
 	worker := models.Worker{
 		Role:   request.Role,
 		UserID: userID,
@@ -82,14 +71,12 @@ func RegisterWorker(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.UserRegisterError, http.StatusInternalServerError)
 		return
 	}
-
-	response := models.WorkerResponse{
-		ID: worker.ID,
-	}
+	util.Info(registerWorkerTag, "id%d registered", worker.ID)
+	var response models.WorkerResponse
+	response.ID = worker.ID
 	if err := jsonEncode(w, response, "register"); err != nil {
 		util.Error(registerWorkerTag, err)
 		return
 	}
-	util.Info(registerWorkerTag, "id%d registered", worker.ID)
 	w.WriteHeader(http.StatusCreated)
 }
