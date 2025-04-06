@@ -1,7 +1,6 @@
 package models
 
 import (
-	mp1db "mp1/pkg/db"
 	"mp1/pkg/util"
 
 	"gorm.io/gorm"
@@ -33,9 +32,10 @@ func (worker *Worker) Create(db *gorm.DB, request WorkerRequest) error {
 		return util.InsecurePasswordError
 	}
 	var user User
-	if err := user.Find(db, mp1db.Property{"id": worker.UserID}); err != nil {
+	if err := db.Where("id = ?", request.UserID).Take(&user).Error; err != nil {
 		return err
 	}
+	println("user found")
 	match, err := user.VerifyPassword(db, request.Password)
 	if err != nil {
 		return err

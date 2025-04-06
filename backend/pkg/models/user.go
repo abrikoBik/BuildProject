@@ -2,7 +2,6 @@ package models
 
 import (
 	"bytes"
-	"mp1/pkg/db"
 	"mp1/pkg/util"
 	"net/mail"
 
@@ -69,15 +68,6 @@ func (user *User) Patch(db *gorm.DB, request UserRequest) (err error) {
 		user.Name = cases.Title(language.Russian).String(request.Name)
 	}
 	err = db.Save(&user).Error
-	return
-}
-
-func (user User) Find(db *gorm.DB, property db.Property) (err error) {
-	// only one cycle
-	for key, value := range property {
-		err = db.Where("? = ?", key, value).Take(&user).Error
-		break
-	}
 	return
 }
 

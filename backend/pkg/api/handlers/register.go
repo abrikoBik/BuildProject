@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"mp1/pkg/api/middleware"
 	"mp1/pkg/db"
 	"mp1/pkg/l10n"
 	"mp1/pkg/models"
@@ -48,11 +49,13 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 func RegisterWorker(w http.ResponseWriter, r *http.Request) {
 	var request models.WorkerRequest
+	println("trying to print userID")
+	request.UserID = r.Context().Value(middleware.UserID).(uint)
+	println(request.UserID)
 	if !jsonDecode(w, r, &request) {
 		return
 	}
 	var worker models.Worker
-	worker.UserID = r.Context().Value("userID").(uint)
 	if err := worker.Create(db.Database, request); err != nil {
 		util.Error(registerWorkerTag, err)
 		switch err {
