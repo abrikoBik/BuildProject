@@ -47,26 +47,24 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func RegisterWorker(w http.ResponseWriter, r *http.Request) {
-	userID := r.Context().Value("userID").(uint)
 	var request models.WorkerRequest
 	if !jsonDecode(w, r, &request) {
 		return
 	}
-	if len(request.Role) == 0 {
-		http.Error(w, l10n.InvalidRole, http.StatusBadRequest)
-		return
-	}
-	if len(request.Password) == 0 {
-		http.Error(w, l10n.EmptyPassword, http.StatusBadRequest)
-		return
-	}
-	worker := models.Worker{
-		Role:   request.Role,
-		UserID: userID,
-	}
+	var worker models.Worker
+	worker.UserID = r.Context().Value("userID").(uint)
 	if err := worker.Create(db.Database, request); err != nil {
 		util.Error(registerWorkerTag, err)
-		http.Error(w, l10n.UserRegisterError, http.StatusInternalServerError)
+		switch err {
+		case util.InvalidRoleError:
+			http.Error(w, l10n.InvalidRole, http.StatusBadRequest)
+		case util.InsecurePasswordError:
+			http.Error(w, l10n.InsecurePassword, http.StatusBadRequest)
+		case gorm.ErrDuplicatedKey:
+			http.Error(w, l10n.NameOrEmailTaken, http.StatusBadRequest)
+		default:
+			http.Error(w, l10n.UserRegisterError, http.StatusInternalServerError)
+		}
 		return
 	}
 	util.Info(registerWorkerTag, "id%d registered", worker.ID)

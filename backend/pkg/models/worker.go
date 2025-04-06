@@ -25,6 +25,13 @@ type WorkerResponse struct {
 }
 
 func (worker *Worker) Create(db *gorm.DB, request WorkerRequest) error {
+	if len(request.Role) == 0 {
+		return util.InvalidRoleError
+	}
+	worker.Role = request.Role
+	if len(request.Password) < util.MinPasswordLength {
+		return util.InsecurePasswordError
+	}
 	var user User
 	if err := user.Find(db, mp1db.Property{"id": worker.UserID}); err != nil {
 		return err
@@ -36,6 +43,6 @@ func (worker *Worker) Create(db *gorm.DB, request WorkerRequest) error {
 	if !match {
 		return util.WrongPasswordError
 	}
-	worker.Role = request.Role
+	worker.UserID = request.UserID
 	return nil
 }

@@ -10,6 +10,7 @@ var (
 	InsecurePasswordError = errors.New(l10n.InsecurePassword)
 	WrongPasswordError    = errors.New(l10n.WrongPassword)
 	InvalidEmailError     = errors.New(l10n.InvalidEmail)
+	InvalidRoleError      = errors.New(l10n.InvalidRole)
 )
 
 func Check(errs ...error) {

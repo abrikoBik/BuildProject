@@ -38,7 +38,7 @@ func (user *User) Create(db *gorm.DB, request UserRequest) (err error) {
 		return util.InvalidEmailError
 	}
 	user.Email = request.Email
-	if len(request.Password) < 8 {
+	if len(request.Password) < util.MinPasswordLength {
 		return util.InsecurePasswordError
 	}
 	if err = user.PreparePassword(request.Password); err != nil {
@@ -58,7 +58,7 @@ func (user *User) Patch(db *gorm.DB, request UserRequest) (err error) {
 		user.Email = request.Email
 	}
 	if len(request.Password) > 0 {
-		if len(request.Password) < 8 {
+		if len(request.Password) < util.MinPasswordLength {
 			return util.InsecurePasswordError
 		}
 		if err = user.PreparePassword(request.Password); err != nil {
