@@ -25,8 +25,6 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	if err := user.Create(db.Database, request); err != nil {
 		util.Error(registerUserTag, err)
 		switch err {
-		case util.EmptyPasswordError:
-			http.Error(w, l10n.EmptyPassword, http.StatusBadRequest)
 		case util.InsecurePasswordError:
 			http.Error(w, l10n.InsecurePassword, http.StatusBadRequest)
 		case util.InvalidEmailError:

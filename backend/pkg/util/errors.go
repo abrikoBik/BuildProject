@@ -8,7 +8,7 @@ import (
 
 var (
 	InsecurePasswordError = errors.New(l10n.InsecurePassword)
-	EmptyPasswordError    = errors.New(l10n.EmptyPassword)
+	WrongPasswordError    = errors.New(l10n.WrongPassword)
 	InvalidEmailError     = errors.New(l10n.InvalidEmail)
 )
 
