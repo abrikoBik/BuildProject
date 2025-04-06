@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"mp1/pkg/l10n"
+	"mp1/pkg/util"
 	"net/http"
 	"strconv"
 
@@ -33,4 +34,12 @@ func ParseID(key string) func(http.Handler) http.Handler {
 			next.ServeHTTP(w, r.WithContext(withID))
 		})
 	}
+}
+
+func GetID(key string, context context.Context) (uint, error) {
+	id, ok := context.Value(key).(uint)
+	if !ok {
+		return 0, util.InvalidIDError
+	}
+	return id, nil
 }

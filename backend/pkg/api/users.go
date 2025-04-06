@@ -14,7 +14,7 @@ func addUsers(r chi.Router) {
 		r.Route("/{userID}", func(r chi.Router) {
 			r.Use(middleware.ParseID(middleware.UserID))
 			r.With(middleware.JSONResponse).Get("/", handlers.GetUser)
-			// r.Patch("/", handlers.PatchUser)
+			r.Patch("/", handlers.PatchUser)
 			r.Route("/worker", func(r chi.Router) {
 				addWorker(r)
 			})
