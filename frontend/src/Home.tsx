@@ -9,6 +9,11 @@ export const Home = () => {
     ]);
 
     const [userName, setUserName] = useState('');
+    const [showSidebar, setSidebar] = useState(true);
+
+    const toggleSidebar = () => {
+        setSidebar(!showSidebar);
+    }
 
     useEffect(() => {
         let newName : string;
@@ -33,11 +38,14 @@ export const Home = () => {
     return (
         <main>
             <section className="flex flex-row w-[100vw] h-[100vh] text-2xl">
-                <Sidebar />
+                <Sidebar show={showSidebar}/>
+                <button onClick={toggleSidebar} className={`${!showSidebar ? '' :'hidden'}`}>
+                    {'>'}
+                </button>
 
-                <div className="w-[85vw] text-center">
+                <div className="w-[85vw] max-md:w-[100vw] text-center">
                     <div className="flex flex-row items-center justify-center m-2 rounded-lg border-2 p-2 border-palette-color5">
-                        <section className="mr-5">
+                        <section>
                             {/* Брать данные с бэка */}
                             <div className="text-blue-950">
                                 Строительство дома
