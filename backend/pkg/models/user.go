@@ -2,9 +2,12 @@ package models
 
 import (
 	"bytes"
-	"mp1/pkg/db"
 	"mp1/pkg/util"
+	"net/mail"
 
+	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"gorm.io/gorm"
 )
 
@@ -31,34 +34,81 @@ type UserResponse struct {
 }
 
 func (user *User) Create(db *gorm.DB, request UserRequest) (err error) {
+	if _, err = mail.ParseAddress(request.Email); err != nil {
+		return util.InvalidEmailError
+	}
+	user.Email = request.Email
+	if len(request.Password) < util.MinPasswordLength {
+		return util.InsecurePasswordError
+	}
+	if err = user.PreparePassword(request.Password); err != nil {
+		return
+	}
+	user.Name = cases.Title(language.Russian).String(request.Name)
+	user.Login = request.Login
+	return db.Create(&user).Error
+}
+
+func (user *User) Patch(db *gorm.DB, request UserRequest) (err error) {
+	if len(request.Password) > 0 {
+		if len(request.Password) < util.MinPasswordLength {
+			return util.InsecurePasswordError
+		}
+		if err = user.PreparePassword(request.Password); err != nil {
+			return
+		}
+	}
+	if len(request.User.Email) > 0 {
+		if _, err = mail.ParseAddress(request.User.Email); err != nil {
+			return util.InvalidEmailError
+		}
+		user.Email = request.User.Email
+	}
+	if len(request.User.Name) > 0 {
+		user.Name = cases.Title(language.Russian).String(request.User.Name)
+	}
+	return db.Save(&user).Error
+}
+
+func (user *User) PreparePassword(password string) (err error) {
 	if user.Salt, err = util.RandomBytes(16); err != nil {
-		return err
+		return
 	}
-	if user.Hash, err = util.GenerateHash([]byte(request.Password), user.Salt); err != nil {
-		return err
-	}
-	if result := db.Create(&user); result.Error != nil {
-		return result.Error
-	}
-	return nil
+	user.Hash, err = util.GenerateHash([]byte(password), user.Salt)
+	return
 }
 
-func (user *User) Find(db *gorm.DB, property db.Property) error {
-	var result *gorm.DB
-	for key, value := range property {
-		result = db.Where("? = ?", key, value).Take(&user)
-		break
-	}
-	if result.Error != nil {
-		return result.Error
-	}
-	return nil
-}
-
-func (user User) VerifyPassword(db *gorm.DB, password string) (bool, error) {
+func (user User) VerifyPassword(password string) (bool, error) {
 	hash, err := util.GenerateHash([]byte(password), user.Salt)
 	if err != nil {
 		return false, err
 	}
 	return (bytes.Compare(user.Hash, hash) == 0), nil
+}
+
+func (user User) VerifyToken(db *gorm.DB, token jwt.Token) (bool, error) {
+	var sessions []Session
+	result := db.Where("user_id = ?", user.ID).Find(&sessions)
+	if result.Error != nil {
+		return false, result.Error
+	}
+	found := false
+	for _, session := range sessions {
+		found = session.Token == token.Raw
+		if found {
+			break
+		}
+	}
+	if !found {
+		return false, nil
+	}
+	issuer, err := token.Claims.GetIssuer()
+	if err != nil {
+		return false, err
+	}
+	sub, err := token.Claims.GetSubject()
+	if err != nil {
+		return false, err
+	}
+	return issuer == util.JWTIssuer && sub == user.Login, nil
 }

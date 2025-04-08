@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"mp1/pkg/api/middleware"
 	"mp1/pkg/db"
 	"mp1/pkg/l10n"
 	"mp1/pkg/models"
@@ -15,7 +16,7 @@ const getUserTag = "api:GetUser"
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	var user models.User
-	result := db.Database.Where("id = ?", r.Context().Value("userID")).Take(&user)
+	result := db.Database.Where("id = ?", r.Context().Value(middleware.UserID)).Take(&user)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return

@@ -1,7 +1,6 @@
 package models
 
 import (
-	mp1db "mp1/pkg/db"
 	"mp1/pkg/util"
 
 	"gorm.io/gorm"
@@ -25,17 +24,25 @@ type WorkerResponse struct {
 }
 
 func (worker *Worker) Create(db *gorm.DB, request WorkerRequest) error {
+	if len(request.Role) == 0 {
+		return util.InvalidRoleError
+	}
+	worker.Role = request.Role
+	if len(request.Password) < util.MinPasswordLength {
+		return util.InsecurePasswordError
+	}
 	var user User
-	if err := user.Find(db, mp1db.Property{"id": worker.UserID}); err != nil {
+	if err := db.Where("id = ?", request.UserID).Take(&user).Error; err != nil {
 		return err
 	}
-	match, err := user.VerifyPassword(db, request.Password)
+	println("user found")
+	match, err := user.VerifyPassword(request.Password)
 	if err != nil {
 		return err
 	}
 	if !match {
 		return util.WrongPasswordError
 	}
-	worker.Role = request.Role
+	worker.UserID = request.UserID
 	return nil
 }

@@ -35,7 +35,7 @@ func GenerateJWT(name string, password []byte, key []byte) (string, error) {
 }
 
 // Validates a JWT based on current time.
-func ValidateJWT(token string, key []byte) bool {
+func ValidateJWT(token string, key []byte) jwt.Token {
 	parsed, _ := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		return key, nil
 	},
@@ -43,5 +43,5 @@ func ValidateJWT(token string, key []byte) bool {
 		jwt.WithIssuedAt(),
 		jwt.WithExpirationRequired(),
 	)
-	return parsed.Valid
+	return *parsed
 }

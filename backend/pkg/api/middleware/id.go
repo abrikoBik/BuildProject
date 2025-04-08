@@ -3,13 +3,14 @@ package middleware
 import (
 	"context"
 	"mp1/pkg/l10n"
+	"mp1/pkg/util"
 	"net/http"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
 )
 
-func ParseID(key, param string) func(http.Handler) http.Handler {
+func ParseID(key ContextKey, param string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			idParam := chi.URLParam(r, param)
@@ -26,4 +27,12 @@ func ParseID(key, param string) func(http.Handler) http.Handler {
 			next.ServeHTTP(w, r.WithContext(withID))
 		})
 	}
+}
+
+func GetID(key ContextKey, context context.Context) (uint, error) {
+	id, ok := context.Value(key).(uint)
+	if !ok {
+		return 0, util.InvalidIDError
+	}
+	return id, nil
 }
