@@ -53,9 +53,9 @@ export const Register = () => {
                 <header className="flex w-1/2 max-lg:w-full absolute top-0 left-0 p-4">
                     <img src={Logo} alt="logo" className="h-8" />
                     <nav className="flex items-center justify-center w-full gap-5 ml-[-4vw]">
-                        <a className="text-lg text-palette-color5 hover:cursor-pointer transition-colors">
+                        <Link to="/" className="text-lg text-palette-color5 hover:cursor-pointer transition-colors">
                             Главная
-                        </a>
+                        </Link>
                         <a className="text-lg text-palette-color5 hover:cursor-pointer transition-colors">
                             О нас
                         </a>
@@ -180,7 +180,7 @@ export const Register = () => {
                     </button>
                     
                     <Link
-                        to="/loginWZZZ"
+                        to="/login"
                         className="w-1/2 text-center border-2 border-palette-color5 py-2 rounded-b-[5px] font-semibold text-palette-color4 self-center self-justify-center"
                     >
                         Вход
