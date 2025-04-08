@@ -54,5 +54,13 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	util.Info(patchUserTag, "%s (id%d) patched", user.Name, user.ID)
+	response := models.UserResponse{
+		User:         &user,
+		RegisteredAt: user.CreatedAt.String(),
+	}
+	if err := jsonEncode(w, response, "public"); err != nil {
+		util.Error(patchUserTag, err)
+		return
+	}
 	w.WriteHeader(http.StatusCreated)
 }

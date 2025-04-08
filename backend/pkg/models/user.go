@@ -50,7 +50,6 @@ func (user *User) Create(db *gorm.DB, request UserRequest) (err error) {
 }
 
 func (user *User) Patch(db *gorm.DB, request UserRequest) (err error) {
-	util.Debug("*User.Patch()", "request", request, "request.User", request.User)
 	if len(request.User.Email) > 0 {
 		if _, err = mail.ParseAddress(request.User.Email); err != nil {
 			return util.InvalidEmailError
