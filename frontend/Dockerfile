@@ -7,10 +7,10 @@ RUN npm run lint && npm run build
 
 FROM node:22-alpine AS runner
 WORKDIR /app
+RUN apk add --no-cache curl
 COPY --from=builder /src/. /app
 EXPOSE 5173
 EXPOSE 4173
-RUN apk add --no-cache curl
 HEALTHCHECK --interval=10s --timeout=1s --retries=3 \
   CMD curl -f http://localhost:5173/health || exit 1
 CMD ["npm", "run", "dev"]
