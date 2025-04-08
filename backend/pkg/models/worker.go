@@ -36,7 +36,7 @@ func (worker *Worker) Create(db *gorm.DB, request WorkerRequest) error {
 		return err
 	}
 	println("user found")
-	match, err := user.VerifyPassword(db, request.Password)
+	match, err := user.VerifyPassword(request.Password)
 	if err != nil {
 		return err
 	}

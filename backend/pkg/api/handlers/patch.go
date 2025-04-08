@@ -15,24 +15,28 @@ const patchUserTag = "api:PatchUser"
 
 // Updates the user database entry.
 func PatchUser(w http.ResponseWriter, r *http.Request) {
-	var request models.UserRequest
 	id, err := middleware.GetID(middleware.UserID, r.Context())
-	if err != nil || !jsonDecode(w, r, &request) {
-		return
-	}
 	var user models.User
 	if err := db.Database.Where("id = ?", id).Take(&user).Error; err != nil {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
+	var request models.UserRequest
+	request.User = new(models.User)
+	if err != nil || !jsonDecode(w, r, &request) {
+		return
+	}
+	util.Debug(patchUserTag, "request", request, "user", user)
 	token, err := middleware.GetToken(r.Context())
 	if err != nil {
-		util.Info(patchUserTag, "%v", err)
+		util.Info(patchUserTag, err.Error())
+		http.Error(w, l10n.InvalidToken, http.StatusInternalServerError)
 		return
 	}
 	verified, err := user.VerifyToken(db.Database, token)
 	if err != nil {
-		util.Info(patchUserTag, "%v", err)
+		util.Info(patchUserTag, err.Error())
+		http.Error(w, l10n.InvalidToken, http.StatusInternalServerError)
 		return
 	}
 	if !verified {

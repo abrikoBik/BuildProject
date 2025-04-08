@@ -26,7 +26,7 @@ func (session *Session) Create(db *gorm.DB, request SessionRequest, jwtKey []byt
 	if err := db.Where("login = ?", request.Login).Take(&user).Error; err != nil {
 		return err
 	}
-	match, err := user.VerifyPassword(db, request.Password)
+	match, err := user.VerifyPassword(request.Password)
 	if err != nil {
 		return err
 	}

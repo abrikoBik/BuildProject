@@ -50,12 +50,6 @@ func (user *User) Create(db *gorm.DB, request UserRequest) (err error) {
 }
 
 func (user *User) Patch(db *gorm.DB, request UserRequest) (err error) {
-	if len(request.User.Email) > 0 {
-		if _, err = mail.ParseAddress(request.User.Email); err != nil {
-			return util.InvalidEmailError
-		}
-		user.Email = request.User.Email
-	}
 	if len(request.Password) > 0 {
 		if len(request.Password) < util.MinPasswordLength {
 			return util.InsecurePasswordError
@@ -63,6 +57,12 @@ func (user *User) Patch(db *gorm.DB, request UserRequest) (err error) {
 		if err = user.PreparePassword(request.Password); err != nil {
 			return
 		}
+	}
+	if len(request.User.Email) > 0 {
+		if _, err = mail.ParseAddress(request.User.Email); err != nil {
+			return util.InvalidEmailError
+		}
+		user.Email = request.User.Email
 	}
 	if len(request.User.Name) > 0 {
 		user.Name = cases.Title(language.Russian).String(request.User.Name)
@@ -78,7 +78,7 @@ func (user *User) PreparePassword(password string) (err error) {
 	return
 }
 
-func (user User) VerifyPassword(db *gorm.DB, password string) (bool, error) {
+func (user User) VerifyPassword(password string) (bool, error) {
 	hash, err := util.GenerateHash([]byte(password), user.Salt)
 	if err != nil {
 		return false, err
