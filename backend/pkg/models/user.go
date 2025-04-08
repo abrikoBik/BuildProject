@@ -5,6 +5,7 @@ import (
 	"mp1/pkg/util"
 	"net/mail"
 
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"gorm.io/gorm"
@@ -84,4 +85,31 @@ func (user User) VerifyPassword(db *gorm.DB, password string) (bool, error) {
 		return false, err
 	}
 	return (bytes.Compare(user.Hash, hash) == 0), nil
+}
+
+func (user User) VerifyToken(db *gorm.DB, token jwt.Token) (bool, error) {
+	var sessions []Session
+	result := db.Where("user_id = ?", user.ID).Find(&sessions)
+	if result.Error != nil {
+		return false, result.Error
+	}
+	found := false
+	for _, session := range sessions {
+		found = session.Token == token.Raw
+		if found {
+			break
+		}
+	}
+	if !found {
+		return false, nil
+	}
+	issuer, err := token.Claims.GetIssuer()
+	if err != nil {
+		return false, err
+	}
+	sub, err := token.Claims.GetSubject()
+	if err != nil {
+		return false, err
+	}
+	return issuer == util.JWTIssuer && sub == user.Login, nil
 }

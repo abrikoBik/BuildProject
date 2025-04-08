@@ -13,7 +13,7 @@ func addWorker(r chi.Router) {
 	r.With(middleware.JSONResponse).Post("/", handlers.RegisterWorker)
 	// r.With(middleware.JSONResponse).Get("/", handlers.GetWorkers)
 	r.Route("/{workerID}", func(r chi.Router) {
-		r.Use(middleware.ParseID(middleware.WorkerID))
+		r.Use(middleware.ParseID(middleware.WorkerID, "workerID"))
 		// r.With(middleware.JSONResponse).Get("/", handlers.GetWorker)
 	})
 	util.Debug("api:addWorker", "plugged in")

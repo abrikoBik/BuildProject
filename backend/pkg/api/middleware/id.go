@@ -10,17 +10,10 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-const (
-	UserID    = "userID"
-	WorkerID  = "workerID"
-	ProjectID = "projectID"
-	StageID   = "stageID"
-)
-
-func ParseID(key string) func(http.Handler) http.Handler {
+func ParseID(key ContextKey, param string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			idParam := chi.URLParam(r, key)
+			idParam := chi.URLParam(r, param)
 			if len(idParam) == 0 {
 				http.Error(w, l10n.MissingID, http.StatusBadRequest)
 				return
@@ -36,7 +29,7 @@ func ParseID(key string) func(http.Handler) http.Handler {
 	}
 }
 
-func GetID(key string, context context.Context) (uint, error) {
+func GetID(key ContextKey, context context.Context) (uint, error) {
 	id, ok := context.Value(key).(uint)
 	if !ok {
 		return 0, util.InvalidIDError

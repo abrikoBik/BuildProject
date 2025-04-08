@@ -12,6 +12,7 @@ var (
 	InvalidEmailError     = errors.New(l10n.InvalidEmail)
 	InvalidRoleError      = errors.New(l10n.InvalidRole)
 	InvalidIDError        = errors.New(l10n.InvalidID)
+	InvalidTokenError     = errors.New(l10n.InvalidToken)
 )
 
 func Check(errs ...error) {

@@ -13,7 +13,7 @@ func addStages(r chi.Router) {
 		// r.With(middleware.JSONResponse).Get("/", handlers.GetStages)
 		// r.With(middleware.JSONResponse).Post("/", handlers.CreateStage)
 		r.Route("/{stageID}", func(idRouter chi.Router) {
-			idRouter.Use(middleware.ParseID(middleware.StageID))
+			idRouter.Use(middleware.ParseID(middleware.StageID, "stageID"))
 			// idRouter.With(middleware.JSONResponse).Get("/", handlers.GetStage)
 			// idRouter.Patch("/", handlers.UpdateStage)
 			// idRouter.Delete("/", handlers.DeleteStage)

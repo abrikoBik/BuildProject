@@ -25,6 +25,20 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
+	token, err := middleware.GetToken(r.Context())
+	if err != nil {
+		util.Info(patchUserTag, "%v", err)
+		return
+	}
+	verified, err := user.VerifyToken(db.Database, token)
+	if err != nil {
+		util.Info(patchUserTag, "%v", err)
+		return
+	}
+	if !verified {
+		http.Error(w, l10n.InvalidToken, http.StatusForbidden)
+		return
+	}
 	if err := user.Patch(db.Database, request); err != nil {
 		util.Error(patchUserTag, err)
 		switch err {
