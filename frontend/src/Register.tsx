@@ -4,13 +4,17 @@ import { Link } from "react-router-dom";
 import HalfImage from "./assets/auth_image.png";
 import errors from "./util/errors.ts";
 import { UserRequest } from "./types/user.ts";
-import Logo from './assets/logo.svg'
+import Logo from "./assets/logo.svg";
 
 export const Register = () => {
     const [visibility, setVisibility] = useState(true);
-    const toggleVisibility = () => { setVisibility(!visibility); }
+    const toggleVisibility = () => {
+        setVisibility(!visibility);
+    };
     const [visibilityC, setVisibilityC] = useState(true);
-    const toggleVisibilityC = () => { setVisibilityC(!visibilityC); }
+    const toggleVisibilityC = () => {
+        setVisibilityC(!visibilityC);
+    };
 
     const [userRequest, setUserRequest] = useState<UserRequest>({
         login: "",
@@ -53,7 +57,10 @@ export const Register = () => {
                 <header className="flex w-1/2 max-lg:w-full absolute top-0 left-0 p-4">
                     <img src={Logo} alt="logo" className="h-8" />
                     <nav className="flex items-center justify-center w-full gap-5 ml-[-4vw]">
-                        <Link to="/" className="text-lg text-palette-color5 hover:cursor-pointer transition-colors">
+                        <Link
+                            to="/"
+                            className="text-lg text-palette-color5 hover:cursor-pointer transition-colors"
+                        >
                             Главная
                         </Link>
                         <a className="text-lg text-palette-color5 hover:cursor-pointer transition-colors">
@@ -62,8 +69,8 @@ export const Register = () => {
                     </nav>
                 </header>
 
-                <form 
-                    onSubmit={handleSubmit} 
+                <form
+                    onSubmit={handleSubmit}
                     className="w-full max-w-[400px] flex flex-col gap-6"
                 >
                     <div className="flex flex-col gap-0">
@@ -178,7 +185,7 @@ export const Register = () => {
                     >
                         Регистрация
                     </button>
-                    
+
                     <Link
                         to="/login"
                         className="w-1/2 text-center border-2 border-palette-color5 py-2 rounded-b-[5px] font-semibold text-palette-color4 self-center self-justify-center"

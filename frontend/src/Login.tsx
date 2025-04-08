@@ -56,7 +56,7 @@ export const Login = () => {
             errors.axiosError(err);
         }
     };
-    
+
     const toggleVisibility = () => {
         setVisibility(!visibility);
     };
@@ -67,7 +67,10 @@ export const Login = () => {
                 <header className="flex w-1/2 max-lg:w-full absolute top-0 left-0 p-4">
                     <img src={Logo} alt="logo" className="h-8" />
                     <nav className="flex items-center justify-center w-full gap-5 ml-[-4vw]">
-                        <Link to="/" className="text-lg text-palette-color5 hover:cursor-pointer transition-colors">
+                        <Link
+                            to="/"
+                            className="text-lg text-palette-color5 hover:cursor-pointer transition-colors"
+                        >
                             Главная
                         </Link>
                         <a className="text-lg text-palette-color5 hover:cursor-pointer transition-colors">
@@ -76,8 +79,8 @@ export const Login = () => {
                     </nav>
                 </header>
 
-                <form 
-                    onSubmit={handleSubmit} 
+                <form
+                    onSubmit={handleSubmit}
                     className="w-full max-w-[400px] flex flex-col gap-6"
                 >
                     <div className="flex flex-col gap-0">
@@ -129,18 +132,21 @@ export const Login = () => {
                             />
                             Сохранить вход
                         </label>
-                        <a href="#" className="text-palette-color4 hover:text-palette-color3">
+                        <a
+                            href="#"
+                            className="text-palette-color4 hover:text-palette-color3"
+                        >
                             Забыли пароль?
                         </a>
                     </div>
-                    
+
                     <button
                         type="submit"
                         className="w-1/2 mb-[-1vh] bg-palette-color4 border-2 border-palette-color5 text-palette-color1 py-2 rounded-t-[5px] font-semibold cursor-pointer self-center self-justify-center"
                     >
                         Вход
                     </button>
-                    
+
                     <Link
                         to="/register"
                         className="w-1/2 text-center border-2 border-palette-color5 py-2 rounded-b-[5px] font-semibold text-palette-color4 self-center self-justify-center"
