@@ -13,7 +13,7 @@ type DonutChartProps = {
     outerRadius: number;
 };
 
-export const DonutChart: React.FC<DonutChartProps> = ({
+const DonutChart: React.FC<DonutChartProps> = ({
     data,
     width,
     height,
@@ -96,3 +96,5 @@ export const DonutChart: React.FC<DonutChartProps> = ({
         </div>
     );
 };
+
+export default DonutChart;

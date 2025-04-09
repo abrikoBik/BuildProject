@@ -1,7 +1,7 @@
 //import { Link } from "react-router-dom";
 import Logo from "./assets/logo.svg";
 
-export const Header = () => {
+const Header = () => {
     return (
         <header className="flex flex-row w-[100vw] h-[5vh] pt-2 px-5">
             <img src={Logo} alt="logo" />
@@ -22,3 +22,5 @@ export const Header = () => {
         </header>
     );
 };
+
+export default Header;

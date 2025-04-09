@@ -8,7 +8,7 @@ import { SessionRequest, SessionResponse } from "./types/session.ts";
 import { UserResponse } from "./types/user.ts";
 import Logo from "./assets/logo.svg";
 
-export const Login = () => {
+const Login = () => {
     const [visibility, setVisibility] = useState(true);
 
     const [sessionRequest, setSessionRequest] = useState<SessionRequest>({
@@ -166,3 +166,5 @@ export const Login = () => {
         </section>
     );
 };
+
+export default Login;

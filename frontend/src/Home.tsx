@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Sidebar } from "./Sidebar";
-import { DonutChart } from "./DonutChart";
+import Sidebar from "./Sidebar";
+import DonutChart from "./DonutChart";
 
-export const Home = () => {
+const Home = () => {
     const [chartData, setChartData] = useState([
         { value: 0, color: "#37515f" },
         { value: 4, color: "#d2d5dd" },
@@ -112,3 +112,5 @@ export const Home = () => {
         </main>
     );
 };
+
+export default Home;

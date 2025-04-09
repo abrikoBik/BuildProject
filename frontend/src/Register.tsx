@@ -6,7 +6,7 @@ import errors from "./util/errors.ts";
 import { UserRequest } from "./types/user.ts";
 import Logo from "./assets/logo.svg";
 
-export const Register = () => {
+const Register = () => {
     const [visibility, setVisibility] = useState(true);
     const toggleVisibility = () => {
         setVisibility(!visibility);
@@ -205,3 +205,5 @@ export const Register = () => {
         </section>
     );
 };
+
+export default Register;
