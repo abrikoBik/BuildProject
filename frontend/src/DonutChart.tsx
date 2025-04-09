@@ -1,17 +1,6 @@
 import React from "react";
-
-type DonutChartData = {
-    value: number;
-    color: string;
-};
-
-type DonutChartProps = {
-    data: DonutChartData[];
-    width: number;
-    height: number;
-    innerRadius: number;
-    outerRadius: number;
-};
+import { DonutChartProps } from "./types/donutchart";
+import { getCoordinatesForPercent } from "./util/donutchart";
 
 const DonutChart: React.FC<DonutChartProps> = ({
     data,
@@ -26,12 +15,6 @@ const DonutChart: React.FC<DonutChartProps> = ({
     if (total === 0) {
         return <div>No data</div>;
     }
-
-    const getCoordinatesForPercent = (percent: number): [number, number] => {
-        const x = Math.cos(2 * Math.PI * percent);
-        const y = Math.sin(2 * Math.PI * percent);
-        return [x, y];
-    };
 
     const paths = data
         .map((slice, index) => {
@@ -48,9 +31,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
             );
 
             const largeArcFlag = slice.value / total > 0.5 ? 1 : 0;
-
             let pathData: string;
-
             if (slice.value === total) {
                 pathData = [
                     `M ${outerRadius} 0`,
@@ -81,7 +62,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
     return (
         <div
             className="relative flex items-center justify-center transition-transform"
-            style={{ width: `${width}px`, height: `${height}` }}
+            style={{ width: `${width}px`, height: `${height}px` }}
         >
             <svg
                 width={width}

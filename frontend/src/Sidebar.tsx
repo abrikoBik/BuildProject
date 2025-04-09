@@ -1,7 +1,7 @@
 import Logo from "./assets/logo_2.svg";
 // import { useState } from "react";
 
-const Sidebar = ({show}: {show: boolean}) => {
+const Sidebar = ({ show }: { show: boolean }) => {
     return (
         <section
             className={`flex flex-col items-center h-screen w-[15vw] mr-6 bg-palette-color4 max-md:hidden max-md:m-0 ${show ? " " : "hidden"}`}

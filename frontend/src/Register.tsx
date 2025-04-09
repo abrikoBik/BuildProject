@@ -44,7 +44,7 @@ const Register = () => {
                 return;
             }
 
-            alert(`Регистрация прошла успешно!`);
+            alert("Регистрация прошла успешно!");
             console.log(data);
         } catch (err: unknown) {
             errors.axiosError(err);
@@ -175,7 +175,7 @@ const Register = () => {
                                 name="savePass"
                                 className="w-5 h-5 accent-palette-color4"
                             />
-                            Даю согласие на обработка персональных данных
+                            Даю согласие на обработку персональных данных
                         </label>
                     </div>
 
