@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Backend CI
 
 on:
   push:
@@ -11,7 +11,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Backend
+    - name: Docker Build
       run: docker build backend/ --tag mp1_backend:$(date +%s)
-    - name: Frontend
-      run: docker build frontend/ --tag mp1_frontend:$(date +%s)
