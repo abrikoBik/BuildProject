@@ -48,9 +48,14 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func RegisterWorker(w http.ResponseWriter, r *http.Request) {
+	userID, err := middleware.GetID(middleware.UserID, r.Context())
+	if err != nil {
+		return
+	}
 	var request models.WorkerRequest
+	request.Worker = new(models.Worker)
 	println("trying to print userID")
-	request.UserID = r.Context().Value(middleware.UserID).(uint)
+	request.Worker.UserID = userID
 	println(request.UserID)
 	if !jsonDecode(w, r, &request) {
 		return
