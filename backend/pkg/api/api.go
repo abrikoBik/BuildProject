@@ -42,9 +42,9 @@ func Init(hostname string, port uint) *http.Server {
 		middleware.AddHeaders,
 	)
 
-	go addSessions(r)
-	go addUsers(r)
-	go addProjects(r)
+	addSessions(r)
+	addUsers(r)
+	addProjects(r)
 
 	return &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", hostname, port),
