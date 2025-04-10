@@ -101,21 +101,21 @@ func (user User) VerifyToken(db *gorm.DB, token jwt.Token) (bool, error) {
 		return false, err
 	}
 	var (
-		wg    sync.WaitGroup
-		count int64
-		found = make(chan bool, 1)
+		wg      sync.WaitGroup
+		count   int64
+		session Session
+		found   = make(chan bool, 1)
 	)
 	query.Count(&count)
 	wg.Add(int(count))
 	for rows.Next() {
-		var session Session
 		db.ScanRows(rows, &session)
-		go func() {
-			if session.Token == token.Raw {
+		go func(current string) {
+			if current == token.Raw {
 				found <- true
 			}
 			wg.Done()
-		}()
+		}(session.Token)
 	}
 	go func() {
 		wg.Wait()
