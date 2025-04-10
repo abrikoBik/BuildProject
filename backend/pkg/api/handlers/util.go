@@ -2,6 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
+	"mp1/pkg/api/middleware"
+	"mp1/pkg/db"
+	"mp1/pkg/l10n"
+	"mp1/pkg/models"
 	"net/http"
 	"os"
 
@@ -31,4 +35,22 @@ func jsonEncode(w http.ResponseWriter, src interface{}, groups ...string) error 
 		return err
 	}
 	return nil
+}
+
+func verifyUser(user models.User, w http.ResponseWriter, r *http.Request) bool {
+	token, err := middleware.GetToken(r.Context())
+	if err != nil {
+		http.Error(w, l10n.InvalidToken, http.StatusInternalServerError)
+		return false
+	}
+	verified, err := user.VerifyToken(db.Database, token)
+	if err != nil {
+		http.Error(w, l10n.InvalidToken, http.StatusInternalServerError)
+		return false
+	}
+	if !verified {
+		http.Error(w, l10n.InvalidToken, http.StatusForbidden)
+		return false
+	}
+	return true
 }

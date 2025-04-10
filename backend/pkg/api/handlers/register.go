@@ -54,9 +54,7 @@ func RegisterWorker(w http.ResponseWriter, r *http.Request) {
 	}
 	var request models.WorkerRequest
 	request.Worker = new(models.Worker)
-	println("trying to print userID")
 	request.Worker.UserID = userID
-	println(request.UserID)
 	if !jsonDecode(w, r, &request) {
 		return
 	}
@@ -68,6 +66,8 @@ func RegisterWorker(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, l10n.InvalidRole, http.StatusBadRequest)
 		case util.InsecurePasswordError:
 			http.Error(w, l10n.InsecurePassword, http.StatusBadRequest)
+		case util.WrongPasswordError:
+			http.Error(w, l10n.WrongPassword, http.StatusForbidden)
 		case gorm.ErrDuplicatedKey:
 			http.Error(w, l10n.NameOrEmailTaken, http.StatusBadRequest)
 		default:

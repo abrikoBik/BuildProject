@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"mp1/pkg/util"
 	"net/mail"
+	"sync"
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/text/cases"
@@ -87,28 +88,34 @@ func (user User) VerifyPassword(password string) (bool, error) {
 }
 
 func (user User) VerifyToken(db *gorm.DB, token jwt.Token) (bool, error) {
-	var sessions []Session
-	result := db.Where("user_id = ?", user.ID).Find(&sessions)
-	if result.Error != nil {
-		return false, result.Error
+	if issuer, err := token.Claims.GetIssuer(); err != nil || issuer != util.JWTIssuer {
+		return false, err
 	}
-	found := false
-	for _, session := range sessions {
-		found = session.Token == token.Raw
-		if found {
-			break
-		}
+	if sub, err := token.Claims.GetSubject(); err != nil || sub != user.Login {
+		return false, err
 	}
-	if !found {
-		return false, nil
-	}
-	issuer, err := token.Claims.GetIssuer()
+	rows, err := db.Model(&Session{}).Where("user_id = ?", user.ID).Rows()
+	defer rows.Close()
 	if err != nil {
 		return false, err
 	}
-	sub, err := token.Claims.GetSubject()
-	if err != nil {
-		return false, err
+	wg := sync.WaitGroup{}
+	found := make(chan bool, 1)
+	defer close(found)
+	for rows.Next() {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			var session Session
+			db.ScanRows(rows, &session)
+			if session.Token == token.Raw {
+				found <- true
+			}
+		}()
 	}
-	return issuer == util.JWTIssuer && sub == user.Login, nil
+	go func() {
+		wg.Wait()
+		found <- false
+	}()
+	return <-found, nil
 }
