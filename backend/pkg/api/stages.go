@@ -3,7 +3,6 @@ package api
 import (
 	// "mp1/pkg/api/handlers"
 	"mp1/pkg/api/middleware"
-	"mp1/pkg/util"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -19,5 +18,4 @@ func addStages(r chi.Router) {
 			// idRouter.Delete("/", handlers.DeleteStage)
 		})
 	})
-	util.Debug("api:addStages", "plugged in")
 }

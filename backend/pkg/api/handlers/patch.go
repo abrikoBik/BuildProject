@@ -21,26 +21,14 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
-	var request models.UserRequest
-	request.User = new(models.User)
-	if err != nil || !jsonDecode(w, r, &request) {
-		return
-	}
-	util.Debug(patchUserTag, "request", request, "user", user)
-	token, err := middleware.GetToken(r.Context())
 	if err != nil {
-		util.Info(patchUserTag, err.Error())
-		http.Error(w, l10n.InvalidToken, http.StatusInternalServerError)
 		return
 	}
-	verified, err := user.VerifyToken(db.Database, token)
-	if err != nil {
-		util.Info(patchUserTag, err.Error())
-		http.Error(w, l10n.InvalidToken, http.StatusInternalServerError)
+	if !verifyUser(user, w, r) {
 		return
 	}
-	if !verified {
-		http.Error(w, l10n.InvalidToken, http.StatusForbidden)
+	request := models.UserRequest{User: &models.User{}}
+	if !jsonDecode(w, r, &request) {
 		return
 	}
 	if err := user.Patch(db.Database, request); err != nil {
@@ -58,10 +46,7 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	util.Info(patchUserTag, "%s (id%d) patched", user.Name, user.ID)
-	response := models.UserResponse{
-		User:         &user,
-		RegisteredAt: user.CreatedAt.String(),
-	}
+	response := models.UserResponse{User: &user, RegisteredAt: user.CreatedAt.String()}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		util.Error(patchUserTag, err)
 		return

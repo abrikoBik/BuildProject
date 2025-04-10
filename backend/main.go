@@ -14,17 +14,15 @@ import (
 const SERVICES_COUNT = 2
 
 func main() {
-	// TODO: provide flag usage
 	var (
-		dbName      = flag.String("db-name", "mp1", "")
-		dbHostname  = flag.String("db-hostname", "0.0.0.0", "")
-		dbPort      = flag.Uint("db-port", 5432, "")
-		apiHostname = flag.String("api-hostname", "0.0.0.0", "")
-		apiPort     = flag.Uint("api-port", 3000, "")
-		migrate     = flag.Bool("migrate", false, "")
-		logLevel    = flag.String("log-level", "info", "")
-
-		servicesWg sync.WaitGroup
+		servicesWg  sync.WaitGroup
+		dbName      = flag.String("db-name", "mp1", "PostgreSQL database name")
+		dbHostname  = flag.String("db-hostname", "0.0.0.0", "PostgreSQL database IP")
+		dbPort      = flag.Uint("db-port", 5432, "PostgreSQL database port")
+		apiHostname = flag.String("api-hostname", "0.0.0.0", "Hostname for the API to listen to")
+		apiPort     = flag.Uint("api-port", 3000, "Port for the API to listen to")
+		migrate     = flag.Bool("migrate", false, "Run migrations (exits after successful migrations)")
+		logLevel    = flag.String("log-level", "info", "General log level (debug, warn, info)")
 	)
 	flag.Parse()
 	util.Check(util.LogLevel(*logLevel))
@@ -35,9 +33,7 @@ func main() {
 		servicesWg.Done()
 		servicesWg.Wait()
 		db.Migrate(func() {
-			db.Stop(func() {
-				os.Exit(0)
-			})
+			db.Stop(func() { os.Exit(0) })
 		})
 	}
 	go api.Start(*apiHostname, *apiPort, servicesWg.Done)

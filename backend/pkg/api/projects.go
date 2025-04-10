@@ -2,7 +2,6 @@ package api
 
 import (
 	"mp1/pkg/api/middleware"
-	"mp1/pkg/util"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -17,5 +16,4 @@ func addProjects(r chi.Router) {
 			// addWorkers(idRouter)
 		})
 	})
-	util.Debug("api:addProjects", "plugged in")
 }
