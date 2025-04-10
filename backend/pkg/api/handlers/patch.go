@@ -21,12 +21,14 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
+	if err != nil {
+		return
+	}
 	if !verifyUser(user, w, r) {
 		return
 	}
-	var request models.UserRequest
-	request.User = new(models.User)
-	if err != nil || !jsonDecode(w, r, &request) {
+	request := models.UserRequest{User: &models.User{}}
+	if !jsonDecode(w, r, &request) {
 		return
 	}
 	if err := user.Patch(db.Database, request); err != nil {
@@ -44,10 +46,7 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	util.Info(patchUserTag, "%s (id%d) patched", user.Name, user.ID)
-	response := models.UserResponse{
-		User:         &user,
-		RegisteredAt: user.CreatedAt.String(),
-	}
+	response := models.UserResponse{User: &user, RegisteredAt: user.CreatedAt.String()}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		util.Error(patchUserTag, err)
 		return

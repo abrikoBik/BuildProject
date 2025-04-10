@@ -13,8 +13,18 @@ import (
 
 var jwtKey []byte
 
+func init() {
+	var (
+		keyString string
+		exists    bool
+	)
+	if keyString, exists = os.LookupEnv("JWT_KEY"); !exists {
+		panic("JWT_KEY not found in environment")
+	}
+	jwtKey = []byte(keyString)
+}
+
 func Init(hostname string, port uint) *http.Server {
-	jwtKey = []byte(os.Getenv("JWT_KEY"))
 	r := chi.NewRouter()
 	r.Use(
 		cors.Handler(cors.Options{
@@ -32,9 +42,9 @@ func Init(hostname string, port uint) *http.Server {
 		middleware.AddHeaders,
 	)
 
-	addSessions(r)
-	addUsers(r)
-	addProjects(r)
+	go addSessions(r)
+	go addUsers(r)
+	go addProjects(r)
 
 	return &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", hostname, port),

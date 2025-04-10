@@ -38,8 +38,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	util.Info(registerUserTag, "%s (id%d) registered", user.Name, user.ID)
-	var response models.UserResponse
-	response.ID = user.ID
+	response := models.UserResponse{ID: user.ID}
 	if err := jsonEncode(w, response, "register"); err != nil {
 		util.Error(registerUserTag, err)
 		return
@@ -52,9 +51,9 @@ func RegisterWorker(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	var request models.WorkerRequest
-	request.Worker = new(models.Worker)
-	request.Worker.UserID = userID
+	request := models.WorkerRequest{
+		Worker: &models.Worker{UserID: userID},
+	}
 	if !jsonDecode(w, r, &request) {
 		return
 	}
@@ -76,8 +75,7 @@ func RegisterWorker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	util.Info(registerWorkerTag, "id%d registered", worker.ID)
-	var response models.WorkerResponse
-	response.ID = worker.ID
+	response := models.WorkerResponse{ID: worker.ID}
 	if err := jsonEncode(w, response, "register"); err != nil {
 		util.Error(registerWorkerTag, err)
 		return

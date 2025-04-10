@@ -16,6 +16,7 @@ const SERVICES_COUNT = 2
 func main() {
 	// TODO: provide flag usage
 	var (
+		servicesWg  sync.WaitGroup
 		dbName      = flag.String("db-name", "mp1", "")
 		dbHostname  = flag.String("db-hostname", "0.0.0.0", "")
 		dbPort      = flag.Uint("db-port", 5432, "")
@@ -23,8 +24,6 @@ func main() {
 		apiPort     = flag.Uint("api-port", 3000, "")
 		migrate     = flag.Bool("migrate", false, "")
 		logLevel    = flag.String("log-level", "info", "")
-
-		servicesWg sync.WaitGroup
 	)
 	flag.Parse()
 	util.Check(util.LogLevel(*logLevel))
@@ -35,9 +34,7 @@ func main() {
 		servicesWg.Done()
 		servicesWg.Wait()
 		db.Migrate(func() {
-			db.Stop(func() {
-				os.Exit(0)
-			})
+			db.Stop(func() { os.Exit(0) })
 		})
 	}
 	go api.Start(*apiHostname, *apiPort, servicesWg.Done)

@@ -23,7 +23,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.EmptyPassword, http.StatusBadRequest)
 		return
 	}
-
 	var session models.Session
 	if err := session.Create(db.Database, request, jwtKey); err != nil {
 		util.Error(loginTag, err)
@@ -36,13 +35,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	response := models.SessionResponse{
-		Session: &session,
-	}
+	util.Info(loginTag, "id%d logged in", session.UserID)
+	response := models.SessionResponse{Session: &session}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		util.Error(loginTag, err)
 		return
 	}
-	util.Info(loginTag, "id%d logged in", session.UserID)
 	w.WriteHeader(http.StatusCreated)
 }

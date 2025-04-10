@@ -12,7 +12,11 @@ import (
 	"github.com/liip/sheriff/v2"
 )
 
-var jwtKey = []byte(os.Getenv("JWT_KEY"))
+var jwtKey []byte
+
+func init() {
+	jwtKey = []byte(os.Getenv("JWT_KEY"))
+}
 
 func jsonDecode(w http.ResponseWriter, r *http.Request, dst interface{}) bool {
 	if err := json.NewDecoder(r.Body).Decode(&dst); err != nil {
@@ -23,9 +27,7 @@ func jsonDecode(w http.ResponseWriter, r *http.Request, dst interface{}) bool {
 }
 
 func jsonEncode(w http.ResponseWriter, src interface{}, groups ...string) error {
-	toEncode, err := sheriff.Marshal(&sheriff.Options{
-		Groups: groups,
-	}, src)
+	toEncode, err := sheriff.Marshal(&sheriff.Options{Groups: groups}, src)
 	if err != nil {
 		http.Error(w, "error generating response", http.StatusInternalServerError)
 		return err

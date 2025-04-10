@@ -111,10 +111,10 @@ func (user User) VerifyToken(db *gorm.DB, token jwt.Token) (bool, error) {
 		var session Session
 		db.ScanRows(rows, &session)
 		go func() {
-			defer wg.Done()
 			if session.Token == token.Raw {
 				found <- true
 			}
+			wg.Done()
 		}()
 	}
 	go func() {
