@@ -94,20 +94,24 @@ func (user User) VerifyToken(db *gorm.DB, token jwt.Token) (bool, error) {
 	if sub, err := token.Claims.GetSubject(); err != nil || sub != user.Login {
 		return false, err
 	}
-	rows, err := db.Model(&Session{}).Where("user_id = ?", user.ID).Rows()
+	query := db.Model(&Session{}).Where("user_id = ?", user.ID).Select("token")
+	rows, err := query.Rows()
 	defer rows.Close()
 	if err != nil {
 		return false, err
 	}
-	wg := sync.WaitGroup{}
-	found := make(chan bool, 1)
-	defer close(found)
+	var (
+		wg    sync.WaitGroup
+		count int64
+		found = make(chan bool, 1)
+	)
+	query.Count(&count)
+	wg.Add(int(count))
 	for rows.Next() {
-		wg.Add(1)
+		var session Session
+		db.ScanRows(rows, &session)
 		go func() {
 			defer wg.Done()
-			var session Session
-			db.ScanRows(rows, &session)
 			if session.Token == token.Raw {
 				found <- true
 			}
@@ -116,6 +120,7 @@ func (user User) VerifyToken(db *gorm.DB, token jwt.Token) (bool, error) {
 	go func() {
 		wg.Wait()
 		found <- false
+		close(found)
 	}()
 	return <-found, nil
 }
