@@ -46,15 +46,15 @@ const Home = () => {
                     {">"}
                 </button>
 
-                <div className="w-[85vw] max-md:w-[100vw] text-center">
-                    <div className="flex flex-row items-center justify-center m-2 rounded-lg border-2 p-2 border-palette-color5">
-                        <section>
+                <div className="w-[60vw] max-md:w-[100vw] text-center">
+                    <div className="flex flex-row m-2 items-center rounded-lg border-2 p-2 border-palette-color5">
+                        <section className="justify-self-start text-left ml-5">
                             {/* Брать данные с бэка */}
-                            <div className="text-blue-950">
+                            <div className="text-blue-950 font-bold text-3xl mb-5">
                                 Строительство дома
                             </div>
 
-                            <div>
+                            <div className="mb-5">
                                 {userName === "unknown"
                                     ? "Пользователь не вошел!"
                                     : `Заказчик: ${userName}`}
@@ -63,50 +63,72 @@ const Home = () => {
                             {/* Брать данные с бэка */}
                             <div>Выполняется</div>
                         </section>
-
-                        <DonutChart
-                            data={chartData}
-                            width={200}
-                            height={200}
-                            innerRadius={80}
-                            outerRadius={100}
-                        />
+                        
+                        <section className="ml-auto self-end">
+                            <DonutChart
+                                data={chartData}
+                                width={200}
+                                height={200}
+                                innerRadius={80}
+                                outerRadius={100}
+                                
+                            />
+                        </section>
                     </div>
 
-                    <ul>
-                        <li>
-                            <input
-                                onChange={checkInput}
-                                type="checkbox"
-                                id="1"
-                            />
-                            <label htmlFor="1">Заливка фундамента</label>
-                        </li>
-                        <li>
-                            <input
-                                onChange={checkInput}
-                                type="checkbox"
-                                id="2"
-                            />
-                            <label htmlFor="2">Возведение стен</label>
-                        </li>
-                        <li>
-                            <input
-                                onChange={checkInput}
-                                type="checkbox"
-                                id="3"
-                            />
-                            <label htmlFor="3">Монтаж кровли</label>
-                        </li>
-                        <li>
-                            <input
-                                onChange={checkInput}
-                                type="checkbox"
-                                id="4"
-                            />
-                            <label htmlFor="4">Устройство террасы</label>
-                        </li>
-                    </ul>
+                    <div className="flex flex-row m-2 items-center rounded-lg border-2 p-2 border-palette-color5 text-left p-4">
+                        <div className="text-blue-950 font-bold">
+                            Связь с клиентом:
+                        </div>
+                        <input type="button" value="Показать номер" className="border-2 border-blue-950 ml-auto self-end p-1 rounded-xl px-2"/>
+                    </div>
+
+                    <div className="flex flex-col m-2 items-center rounded-lg border-2 p-2 border-palette-color5 text-left">
+                        <section className="flex flex-row w-[100%]">
+                            <div className="text-blue-950 font-bold text-3xl ml-5 self-start">
+                                Задачи
+                            </div>
+
+                            <div className="text-blue-950 font-bold text-3xl ml-auto mr-5 self-end">
+                                Дата
+                            </div>
+                        </section>
+
+                        <ul className="flex flex-col self-start gap-3 ml-5">
+                            <li>
+                                <input
+                                    onChange={checkInput}
+                                    type="checkbox"
+                                    id="1"
+                                />
+                                <label htmlFor="1">Заливка фундамента</label>
+                            </li>
+                            <li>
+                                <input
+                                    onChange={checkInput}
+                                    type="checkbox"
+                                    id="2"
+                                />
+                                <label htmlFor="2">Возведение стен</label>
+                            </li>
+                            <li>
+                                <input
+                                    onChange={checkInput}
+                                    type="checkbox"
+                                    id="3"
+                                />
+                                <label htmlFor="3">Монтаж кровли</label>
+                            </li>
+                            <li>
+                                <input
+                                    onChange={checkInput}
+                                    type="checkbox"
+                                    id="4"
+                                />
+                                <label htmlFor="4">Устройство террасы</label>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </section>
         </main>

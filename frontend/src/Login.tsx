@@ -111,7 +111,7 @@ const Login = () => {
                             name="password"
                             className="w-[90%]"
                         />
-                        <div className="bg-palette-color4 absolute bottom-0 right-0 w-[10%] h-[2px]"></div>
+                        <div className="bg-palette-color4 absolute bottom-0 right-0 w-[10%] h-[1px]"></div>
                         <button
                             type="button"
                             onClick={toggleVisibility}

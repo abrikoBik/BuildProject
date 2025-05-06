@@ -15,6 +15,7 @@ const Register = () => {
     const toggleVisibilityC = () => {
         setVisibilityC(!visibilityC);
     };
+    const [checkPass, setCheckPass] = useState("");
 
     const [userRequest, setUserRequest] = useState<UserRequest>({
         login: "",
@@ -29,12 +30,19 @@ const Register = () => {
                 ...userRequest,
                 [event.target.name]: event.target.value,
             });
-        }
+        } else {
+	    setCheckPass(event.target.value);
+	}
     };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
+	    if(checkPass != userRequest.password)
+	    {
+		alert("Пароли не совпадают!");
+		return;
+            }
             const { data, status } = await axios.post<UserRequest>(
                 "http://0.0.0.0:3000/users",
                 userRequest,
@@ -131,7 +139,7 @@ const Register = () => {
                             name="password"
                             className="w-[90%]"
                         />
-                        <div className="bg-palette-color4 absolute bottom-0 right-0 w-[10%] h-[2px]"></div>
+                        <div className="bg-palette-color4 absolute bottom-0 right-0 w-[10%] h-[1px]"></div>
                         <button
                             type="button"
                             onClick={toggleVisibility}
@@ -156,7 +164,7 @@ const Register = () => {
                             name="checkPass"
                             className="w-[90%]"
                         />
-                        <div className="bg-palette-color4 absolute bottom-0 right-0 w-[10%] h-[2px]"></div>
+                        <div className="bg-palette-color4 absolute bottom-0 right-0 w-[10%] h-[1px]"></div>
                         <button
                             type="button"
                             onClick={toggleVisibilityC}
