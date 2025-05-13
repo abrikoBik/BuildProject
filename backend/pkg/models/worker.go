@@ -14,7 +14,6 @@ type Worker struct {
 
 type WorkerRequest struct {
 	*Worker
-	Password string `json:"password"`
 }
 
 type WorkerResponse struct {
@@ -28,20 +27,17 @@ func (worker *Worker) Create(db *gorm.DB, request WorkerRequest) error {
 		return util.InvalidRoleError
 	}
 	worker.Role = request.Role
-	if len(request.Password) < util.MinPasswordLength {
-		return util.InsecurePasswordError
-	}
 	var user User
 	if err := db.Where("id = ?", request.UserID).Take(&user).Error; err != nil {
 		return err
 	}
-	match, err := user.VerifyPassword(request.Password)
-	if err != nil {
-		return err
-	}
-	if !match {
-		return util.WrongPasswordError
-	}
 	worker.UserID = request.UserID
 	return nil
+}
+
+func (worker *Worker) Patch(db *gorm.DB, request WorkerRequest) error {
+	if len(request.Role) > 0 {
+		worker.Role = request.Role
+	}
+	return db.Save(&worker).Error
 }

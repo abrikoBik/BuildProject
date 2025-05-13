@@ -16,10 +16,13 @@ const (
 	EmptyPassword = "Пароль не может быть пустым"
 
 	// "X not found" errors
-	UserNotFound  = "Пользователь не найден"
-	TokenNotFound = "Токен не найден"
+	UserNotFound   = "Пользователь не найден"
+	WorkerNotFound = "Рабочий не найден"
+	TokenNotFound  = "Токен не найден"
 
 	// Generic errors
-	UserRegisterError = "Ошибка регистрации"
-	LogoutError       = "Не удалось выйти"
+	RegisterError = "Ошибка регистрации"
+	PatchError    = "Ошибка редактирования"
+	LoginError    = "Не удалось войти"
+	LogoutError   = "Не удалось выйти"
 )

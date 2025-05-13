@@ -33,7 +33,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 		case gorm.ErrDuplicatedKey:
 			http.Error(w, l10n.NameOrEmailTaken, http.StatusBadRequest)
 		default:
-			http.Error(w, l10n.UserRegisterError, http.StatusInternalServerError)
+			http.Error(w, l10n.RegisterError, http.StatusInternalServerError)
 		}
 		return
 	}
@@ -70,7 +70,7 @@ func RegisterWorker(w http.ResponseWriter, r *http.Request) {
 		case gorm.ErrDuplicatedKey:
 			http.Error(w, l10n.NameOrEmailTaken, http.StatusBadRequest)
 		default:
-			http.Error(w, l10n.UserRegisterError, http.StatusInternalServerError)
+			http.Error(w, l10n.RegisterError, http.StatusInternalServerError)
 		}
 		return
 	}

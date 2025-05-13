@@ -11,13 +11,16 @@ import (
 	"gorm.io/gorm"
 )
 
-const patchUserTag = "api:PatchUser"
+const (
+	patchUserTag   = "api:PatchUser"
+	patchWorkerTag = "api:PatchWorker"
+)
 
 // Updates the user database entry.
 func PatchUser(w http.ResponseWriter, r *http.Request) {
 	id, err := middleware.GetID(middleware.UserID, r.Context())
 	var user models.User
-	if err := db.Database.Where("id = ?", id).Take(&user).Error; err != nil {
+	if user.Get(db.Database, id) != nil {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
@@ -41,7 +44,7 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 		case gorm.ErrDuplicatedKey:
 			http.Error(w, l10n.NameOrEmailTaken, http.StatusBadRequest)
 		default:
-			http.Error(w, l10n.UserRegisterError, http.StatusInternalServerError)
+			http.Error(w, l10n.PatchError, http.StatusInternalServerError)
 		}
 		return
 	}
@@ -51,5 +54,42 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 		util.Error(patchUserTag, err)
 		return
 	}
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
+}
+
+func PatchWorker(w http.ResponseWriter, r *http.Request) {
+	userID, err := middleware.GetID(middleware.UserID, r.Context())
+	if err != nil {
+		return
+	}
+	var user models.User
+	if user.Get(db.Database, userID) != nil {
+		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
+		return
+	}
+	util.Debug(patchWorkerTag, "user", user)
+	if !verifyUser(user, w, r) {
+		return
+	}
+	var worker models.Worker
+	if db.Database.Where("user_id = ?", userID).Take(&worker).Error != nil {
+		http.Error(w, l10n.WorkerNotFound, http.StatusNotFound)
+		return
+	}
+	var request models.WorkerRequest
+	if !jsonDecode(w, r, &request) {
+		return
+	}
+	if err := worker.Patch(db.Database, request); err != nil {
+		util.Error(patchWorkerTag, err)
+		http.Error(w, l10n.PatchError, http.StatusInternalServerError)
+		return
+	}
+	util.Info(patchWorkerTag, "%s (id%d) patched", user.Name, worker.ID)
+	response := models.WorkerResponse{Worker: &worker, RegisteredAt: worker.CreatedAt.String()}
+	if err := jsonEncode(w, response, "public"); err != nil {
+		util.Error(patchWorkerTag, err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }
