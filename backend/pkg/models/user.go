@@ -34,6 +34,10 @@ type UserResponse struct {
 	ID           uint   `json:"id" groups:"register"`
 }
 
+func (user *User) Get(db *gorm.DB, id uint) error {
+	return db.Preload("Sessions").Where("id = ?", id).Take(&user).Error
+}
+
 func (user *User) Create(db *gorm.DB, request UserRequest) (err error) {
 	if _, err = mail.ParseAddress(request.Email); err != nil {
 		return util.InvalidEmailError
@@ -87,40 +91,38 @@ func (user User) VerifyPassword(password string) (bool, error) {
 	return (bytes.Compare(user.Hash, hash) == 0), nil
 }
 
-func (user User) VerifyToken(db *gorm.DB, token jwt.Token) (bool, error) {
+func (user User) VerifyToken(db *gorm.DB, token jwt.Token) (result bool, err error) {
 	if issuer, err := token.Claims.GetIssuer(); err != nil || issuer != util.JWTIssuer {
 		return false, err
 	}
 	if sub, err := token.Claims.GetSubject(); err != nil || sub != user.Login {
 		return false, err
 	}
-	query := db.Model(&Session{}).Where("user_id = ?", user.ID).Select("token")
-	rows, err := query.Rows()
-	defer rows.Close()
-	if err != nil {
-		return false, err
-	}
 	var (
-		wg      sync.WaitGroup
-		count   int64
-		session Session
-		found   = make(chan bool, 1)
+		wg    sync.WaitGroup
+		found = make(chan bool)
 	)
-	query.Count(&count)
-	wg.Add(int(count))
-	for rows.Next() {
-		db.ScanRows(rows, &session)
-		go func(current string) {
-			if current == token.Raw {
-				found <- true
+	wg.Add(len(user.Sessions))
+	for _, session := range user.Sessions {
+		go func(foundChan chan<- bool, current string) {
+			defer wg.Done()
+			if current != token.Raw {
+				return
 			}
-			wg.Done()
-		}(session.Token)
+			if !result {
+				foundChan <- true
+				close(foundChan)
+			}
+		}(found, session.Token)
 	}
-	go func() {
+	go func(foundChan chan<- bool) {
 		wg.Wait()
-		found <- false
-		close(found)
-	}()
-	return <-found, nil
+		if result {
+			return
+		}
+		foundChan <- false
+		close(foundChan)
+	}(found)
+	result = <-found
+	return
 }

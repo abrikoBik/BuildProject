@@ -29,9 +29,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		} else if errors.Is(err, util.WrongPasswordError) {
-			http.Error(w, l10n.WrongPassword, http.StatusInternalServerError)
+			http.Error(w, l10n.WrongPassword, http.StatusForbidden)
 		} else {
-			http.Error(w, l10n.UserRegisterError, http.StatusInternalServerError)
+			http.Error(w, l10n.LoginError, http.StatusInternalServerError)
 		}
 		return
 	}
