@@ -22,6 +22,10 @@ type WorkerResponse struct {
 	ID           uint   `json:"id" groups:"register"`
 }
 
+func (worker *Worker) Get(db *gorm.DB, id uint) error {
+	return db.Where("id = ?", id).Take(&worker).Error
+}
+
 func (worker *Worker) Create(db *gorm.DB, request WorkerRequest) error {
 	if len(request.Role) == 0 {
 		return util.InvalidRoleError

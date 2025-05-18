@@ -1,5 +1,6 @@
 package l10n
 
+// TODO: reorder
 const (
 	// Invalid request errors
 	InvalidID         = "Некорректный ID"
