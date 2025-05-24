@@ -6,21 +6,25 @@ paths:
   /sessions:
     post:
       responses:
-        "201":
+        '201':
           description: Сессия создана успешно
-        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/session/response'
+        '403':
           description: Неверный пароль
-        "404":
+        '404':
           description: Пользователь не найден
-        "500":
+        '500':
           description: Неизвестная ошибка
     delete:
       responses:
-        "200":
+        '200':
           description: Сессия удалена успешно
-        "401":
+        '401':
           description: Токен не найден
-        "500":
+        '500':
           description: Неизвестная ошибка
 
   /users/{id}:
@@ -31,29 +35,41 @@ paths:
     get:
       summary: Получение информации о пользователе
       responses:
-        "200":
+        '200':
           description: Пользователь существует
-        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user/response'
+        '404':
           description: Пользователь не найден
     patch:
       summary: Обновление информации о пользователе
       responses:
-        "200":
+        '200':
           description: Информация о пользователе обновлена успешно
-        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user/response'
+        '400':
           description: Ошибка во входных данных
-        "404":
+        '404':
           description: Пользователь не найден
-        "500":
+        '500':
           description: Неизвестная ошибка
     post:
       summary: Регистрация пользователя
       responses:
-        "201":
+        '201':
           description: Пользователь зарегистрирован успешно
-        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/id'
+        '400':
           description: Ошибка во входных данных
-        "500":
+        '500':
          description: Неизвестная ошибка
 
   /users/{userID}/worker:
@@ -64,18 +80,26 @@ paths:
     get:
       summary: Получение информации о рабочем
       responses:
-        "200":
+        '200':
           description: Рабочий существует
-        "404":
+        '404':
           description: Рабочий не найден
     post:
       summary: Регистрация рабочего
       responses:
-        "201":
+        '201':
           description: Рабочий зарегистрирован успешно
-        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/id'
+        '400':
           description: Ошибка во входных данных
-        "403":
+        '403':
           description: Неверный пароль
-        "500":
+        '500':
          description: Неизвестная ошибка
+
+components:
+  schemas:
+    $ref: './schemas/_index.yaml'
