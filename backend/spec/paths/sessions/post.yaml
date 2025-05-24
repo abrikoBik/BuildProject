@@ -1,0 +1,14 @@
+summary: Создание сессии (иначе - вход)
+responses:
+  '201':
+    description: Сессия создана успешно
+    content:
+      application/json:
+        schema:
+          $ref: '../../schemas/session/response.yaml'
+  '403':
+    description: Неверный пароль
+  '404':
+    description: Пользователь не найден
+  '500':
+    $ref: '../../responses/errors/generic.yaml'

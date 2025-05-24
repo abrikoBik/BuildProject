@@ -1,0 +1,8 @@
+summary: Удаление сессии (иначе - выход)
+responses:
+  '200':
+    description: Сессия удалена успешно
+  '401':
+    description: Токен не найден
+  '500':
+    $ref: '../../responses/errors/generic.yaml'

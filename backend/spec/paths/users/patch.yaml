@@ -1,0 +1,14 @@
+summary: Обновление информации о пользователе
+responses:
+  '200':
+    description: Информация о пользователе обновлена успешно
+    content:
+      application/json:
+        schema:
+          $ref: '../../schemas/user/response.yaml'
+  '400':
+    description: Ошибка во входных данных
+  '404':
+    description: Пользователь не найден
+  '500':
+    $ref: '../../responses/errors/generic.yaml'

@@ -1,0 +1,14 @@
+summary: Регистрация рабочего
+responses:
+  '201':
+    description: Рабочий зарегистрирован успешно
+    content:
+      application/json:
+        schema:
+          $ref: '../../schemas/id'
+  '400':
+    description: Ошибка во входных данных
+  '403':
+    description: Неверный пароль
+  '500':
+    $ref: '../../responses/errors/generic'

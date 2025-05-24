@@ -1,0 +1,10 @@
+summary: Получение информации о пользователе
+responses:
+  '200':
+    description: Пользователь существует
+    content:
+      application/json:
+        schema:
+          $ref: '../../schemas/user/response.yaml'
+  '404':
+    description: Пользователь не найден

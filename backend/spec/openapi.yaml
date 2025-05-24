@@ -5,101 +5,34 @@ info:
 paths:
   /sessions:
     post:
-      responses:
-        '201':
-          description: Сессия создана успешно
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/session/response'
-        '403':
-          description: Неверный пароль
-        '404':
-          description: Пользователь не найден
-        '500':
-          description: Неизвестная ошибка
+      $ref: '#/components/paths/sessions/post'
     delete:
-      responses:
-        '200':
-          description: Сессия удалена успешно
-        '401':
-          description: Токен не найден
-        '500':
-          description: Неизвестная ошибка
+      $ref: '#/components/paths/sessions/delete'
 
   /users/{id}:
     parameters:
-      - name: id
-        in: path
-        required: true
+      $ref: '#/components/parameters/id'
     get:
-      summary: Получение информации о пользователе
-      responses:
-        '200':
-          description: Пользователь существует
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/user/response'
-        '404':
-          description: Пользователь не найден
+      $ref: '#/components/paths/users/get'
     patch:
-      summary: Обновление информации о пользователе
-      responses:
-        '200':
-          description: Информация о пользователе обновлена успешно
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/user/response'
-        '400':
-          description: Ошибка во входных данных
-        '404':
-          description: Пользователь не найден
-        '500':
-          description: Неизвестная ошибка
+      $ref: '#/components/paths/users/patch'
     post:
-      summary: Регистрация пользователя
-      responses:
-        '201':
-          description: Пользователь зарегистрирован успешно
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/id'
-        '400':
-          description: Ошибка во входных данных
-        '500':
-         description: Неизвестная ошибка
+      $ref: '#/components/paths/users/post'
 
   /users/{userID}/worker:
     parameters:
-      - name: userID
-        in: path
-        required: true
+      $ref: '#/components/parameters/id'
     get:
-      summary: Получение информации о рабочем
-      responses:
-        '200':
-          description: Рабочий существует
-        '404':
-          description: Рабочий не найден
+      $ref: '#/components/paths/workers/get'
     post:
-      summary: Регистрация рабочего
-      responses:
-        '201':
-          description: Рабочий зарегистрирован успешно
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/id'
-        '400':
-          description: Ошибка во входных данных
-        '403':
-          description: Неверный пароль
-        '500':
-         description: Неизвестная ошибка
+      $ref: '#/components/paths/workers/post'
 
 components:
   schemas:
     $ref: './schemas/_index.yaml'
+  responses:
+    $ref: './responses/_index.yaml'
+  paths:
+    $ref: './paths/_index.yaml'
+  parameters:
+    $ref: './parameters/_index.yaml'
