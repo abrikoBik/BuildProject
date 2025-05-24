@@ -20,6 +20,7 @@ const (
 	UserNotFound   = "Пользователь не найден"
 	WorkerNotFound = "Рабочий не найден"
 	TokenNotFound  = "Токен не найден"
+	StageNotFound  = "Стадия не найдена"
 
 	// Generic errors
 	RegisterError = "Ошибка регистрации"

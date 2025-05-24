@@ -25,7 +25,8 @@ type StageRequest struct {
 
 type StageResponse struct {
 	*Stage
-	ID uint `json:"id" groups:"register"`
+	ID        uint   `json:"id" groups:"register"`
+	CreatedAt string `json:"createdAt" groups:"public"`
 }
 
 func (stage *Stage) Get(db *gorm.DB, id uint) error {
