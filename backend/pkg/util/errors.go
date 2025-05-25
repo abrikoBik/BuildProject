@@ -14,6 +14,7 @@ var (
 	InvalidIDError        = errors.New(l10n.InvalidID)
 	InvalidTokenError     = errors.New(l10n.InvalidToken)
 	WorkerNotFoundError   = errors.New(l10n.WorkerNotFound)
+	UserNotFoundError     = errors.New(l10n.UserNotFound)
 )
 
 func Check(errs ...error) {
