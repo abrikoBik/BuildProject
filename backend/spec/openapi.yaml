@@ -2,6 +2,7 @@ openapi: 3.1.1
 info:
   title: Веб-приложение система управления строительством
   version: 1.0.0
+
 paths:
   /sessions:
     post:
@@ -29,10 +30,10 @@ paths:
 
 components:
   schemas:
-    $ref: './schemas/_index.yaml'
+    $ref: schemas/_index.yaml
   responses:
-    $ref: './responses/_index.yaml'
+    $ref: responses/_index.yaml
   paths:
-    $ref: './paths/_index.yaml'
+    $ref: paths/_index.yaml
   parameters:
-    $ref: './parameters/_index.yaml'
+    $ref: parameters/_index.yaml
