@@ -1,0 +1,3 @@
+errors:
+  generic:
+    $ref: './errors/generic.yaml'

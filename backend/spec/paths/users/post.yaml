@@ -1,0 +1,12 @@
+summary: Регистрация пользователя
+responses:
+  '201':
+    description: Пользователь зарегистрирован успешно
+    content:
+      application/json:
+        schema:
+          $ref: '../../schemas/id.yaml'
+  '400':
+    description: Ошибка во входных данных
+  '500':
+    $ref: '../../responses/errors/generic.yaml'

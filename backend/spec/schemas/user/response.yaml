@@ -1,0 +1,10 @@
+type: object
+properties:
+  email:
+    type: string
+  login:
+    type: string
+  name:
+    type: string
+  registeredAt:
+    type: string

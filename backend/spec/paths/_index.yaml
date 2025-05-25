@@ -1,0 +1,17 @@
+sessions:
+  post:
+    $ref: './sessions/post.yaml'
+  delete:
+    $ref: './sessions/delete.yaml'
+users:
+  get:
+    $ref: './users/get.yaml'
+  patch:
+    $ref: './users/patch.yaml'
+  post:
+    $ref: './users/post.yaml'
+workers:
+  get:
+    $ref: './workers/get.yaml'
+  post:
+    $ref: './workers/post.yaml'

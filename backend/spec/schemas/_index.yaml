@@ -1,0 +1,11 @@
+id:
+  $ref: './id.yaml'
+session:
+  response:
+    $ref: './session/response.yaml'
+user:
+  response:
+    $ref: './user/response.yaml'
+worker:
+  response:
+    $ref: './worker/response.yaml'

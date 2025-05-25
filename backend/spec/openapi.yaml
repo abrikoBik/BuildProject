@@ -1,0 +1,39 @@
+openapi: 3.1.1
+info:
+  title: Веб-приложение система управления строительством
+  version: 1.0.0
+
+paths:
+  /sessions:
+    post:
+      $ref: '#/components/paths/sessions/post'
+    delete:
+      $ref: '#/components/paths/sessions/delete'
+
+  /users/{id}:
+    parameters:
+      $ref: '#/components/parameters/id'
+    get:
+      $ref: '#/components/paths/users/get'
+    patch:
+      $ref: '#/components/paths/users/patch'
+    post:
+      $ref: '#/components/paths/users/post'
+
+  /users/{userID}/worker:
+    parameters:
+      $ref: '#/components/parameters/id'
+    get:
+      $ref: '#/components/paths/workers/get'
+    post:
+      $ref: '#/components/paths/workers/post'
+
+components:
+  schemas:
+    $ref: schemas/_index.yaml
+  responses:
+    $ref: responses/_index.yaml
+  paths:
+    $ref: paths/_index.yaml
+  parameters:
+    $ref: parameters/_index.yaml

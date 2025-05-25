@@ -29,7 +29,7 @@ func Init(hostname string, port uint) *http.Server {
 	r.Use(
 		cors.Handler(cors.Options{
 			AllowedOrigins:   []string{"https://*", "http://*"},
-			AllowedMethods:   []string{"GET", "POST"},
+			AllowedMethods:   []string{"GET", "POST", "PATCH", "DELETE"},
 			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 			AllowCredentials: true,
 			MaxAge:           86400,
