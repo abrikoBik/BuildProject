@@ -20,6 +20,7 @@ type User struct {
 	Hash     []byte    `gorm:"not null"`
 	Salt     []byte    `gorm:"not null"`
 	Sessions []Session `gorm:"foreignKey:UserID"`
+	Projects []Project `gorm:"foreignKey:UserID"`
 	Worker   Worker    `gorm:"foreignKey:UserID"`
 }
 
@@ -35,7 +36,7 @@ type UserResponse struct {
 }
 
 func (user *User) Get(db *gorm.DB, id uint) error {
-	return db.Preload("Sessions").Where("id = ?", id).Take(&user).Error
+	return db.Preload("Sessions").Preload("Workers").Where("id = ?", id).Take(&user).Error
 }
 
 func (user *User) Create(db *gorm.DB, request UserRequest) (err error) {

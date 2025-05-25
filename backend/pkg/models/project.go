@@ -10,8 +10,8 @@ type Project struct {
 	gorm.Model
 	Name        string  `json:"name" groups:"public" gorm:"not null"`
 	Description string  `json:"description" groups:"public"`
-	User        User    `json:"user" groups:"public" gorm:"many2many:user_projects"`
-	Stages      []Stage `json:"stages" groups:"public"`
+	UserID      uint    `json:"user" groups:"public"`
+	Stages      []Stage `json:"stages" groups:"public" gorm:"foreignKey:ProjectID"`
 }
 
 type ProjectRequest struct {
@@ -35,7 +35,7 @@ func (project *Project) Create(db *gorm.DB, request ProjectRequest) error {
 	if err := user.Get(db, request.UserID); err != nil {
 		return util.UserNotFoundError
 	}
-	project.User = user
+	project.UserID = user.ID
 	project.Name = request.Name
 	project.Description = request.Description
 	project.Stages = make([]Stage, 0)

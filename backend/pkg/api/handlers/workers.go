@@ -15,17 +15,16 @@ import (
 const getWorkerTag = "api:GetWorker"
 
 func GetWorker(w http.ResponseWriter, r *http.Request) {
-	var worker models.Worker
-	result := db.Database.Where("id = ?", r.Context().Value(middleware.WorkerID)).Take(&worker)
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+	var user models.User
+	if errors.Is(user.Get(db.Database, r.Context().Value(middleware.UserID).(uint)), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
-	response := models.WorkerResponse{Worker: &worker, RegisteredAt: worker.CreatedAt.String()}
+	response := models.WorkerResponse{Worker: &user.Worker, RegisteredAt: user.Worker.CreatedAt.String()}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		util.Error(getWorkerTag, err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	util.Info(getWorkerTag, "id%d returned", worker.ID)
+	util.Info(getWorkerTag, "id%d returned", user.Worker.ID)
 }

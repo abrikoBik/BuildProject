@@ -36,7 +36,7 @@ func (worker *Worker) Create(db *gorm.DB, request WorkerRequest) error {
 		return err
 	}
 	worker.UserID = request.UserID
-	return nil
+	return db.Create(&worker).Error
 }
 
 func (worker *Worker) Patch(db *gorm.DB, request WorkerRequest) error {
