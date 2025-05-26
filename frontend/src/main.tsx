@@ -6,6 +6,9 @@ import "./index.css";
 import Home from "./Home.tsx";
 import Login from "./Login.tsx";
 import Register from "./Register.tsx";
+import Estimates from "./Estimates.tsx";
+import Projects from "./Projects.tsx";
+import Blueprints from "./Blueprints.tsx";
 
 createRoot(document.getElementById("root")!).render(
     <CookiesProvider>
@@ -15,6 +18,9 @@ createRoot(document.getElementById("root")!).render(
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/estimates" element={<Estimates />} />
+                    <Route path="/blueprints" element={<Blueprints />} />
+                    <Route path="/projects" element={<Projects />}/>
                 </Routes>
             </Router>
         </StrictMode>

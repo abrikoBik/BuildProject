@@ -1,24 +1,23 @@
-//import { Link } from "react-router-dom";
-import Logo from "./assets/logo.svg";
+import { Link } from "react-router-dom";
 
 const Header = () => {
     return (
-        <header className="flex flex-row w-[100vw] h-[5vh] pt-2 px-5">
-            <img src={Logo} alt="logo" />
-            <section className="flex flex-row w-full mt-1 ml-[-73px] justify-center">
-                <a
-                    href=""
-                    className="text-xl max-md:text-lg font-[400] mr-5 text-[#6f6d74]"
-                >
-                    Главная
-                </a>
-                <a
-                    href=""
-                    className="text-xl max-md:text-lg font-[400] mr-5 text-[#6f6d74]"
-                >
-                    О нас
-                </a>
-            </section>
+        <header className="flex flex-row w-[80%] h-20 ml-[17%] mr-[10%]">
+            <Link
+                to="/"
+                className="w-80 h-10 justify-center text-center border-2 bg-palette-color4 pt-1 rounded-xl font-semibold text-xl text-white self-center"
+            >
+                Вернуться на главную
+            </Link>
+            <a
+                href=""
+                className="text-2xl self-center max-md:text-lg font-[400] ml-5 text-[#6f6d74]"
+            >
+                О нас
+            </a>
+            <div className="ml-auto rounded-4xl text-2xl font-bold bg-[#1D3266] text-white w-10 h-10 flex items-center justify-center self-center">
+                V
+            </div>
         </header>
     );
 };
