@@ -27,4 +27,6 @@ const (
 	PatchError    = "Ошибка редактирования"
 	LoginError    = "Не удалось войти"
 	LogoutError   = "Не удалось выйти"
+
+	WorkerExists = "Рабочий уже существует"
 )

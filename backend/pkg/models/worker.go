@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"mp1/pkg/util"
 
 	"gorm.io/gorm"
@@ -9,11 +10,13 @@ import (
 type Worker struct {
 	gorm.Model
 	Role   string `json:"role" groups:"public" gorm:"not null"`
-	UserID uint   `json:"userID" groups:"public" gorm:"not null"`
+	UserID uint
+	User   *User `gorm:"foreignKey:UserID"`
 }
 
 type WorkerRequest struct {
 	*Worker
+	UserID uint
 }
 
 type WorkerResponse struct {
@@ -23,20 +26,25 @@ type WorkerResponse struct {
 }
 
 func (worker *Worker) Get(db *gorm.DB, id uint) error {
-	return db.Where("id = ?", id).Take(&worker).Error
+	return db.Preload("Users").Where("id = ?", id).Take(&worker).Error
 }
 
 func (worker *Worker) Create(db *gorm.DB, request WorkerRequest) error {
 	if len(request.Role) == 0 {
 		return util.InvalidRoleError
 	}
-	worker.Role = request.Role
 	var user User
-	if err := db.Where("id = ?", request.UserID).Take(&user).Error; err != nil {
+	if err := user.Get(db, request.UserID); err != nil {
 		return err
 	}
-	worker.UserID = request.UserID
-	return db.Create(&worker).Error
+	if user.Worker != nil {
+		return util.WorkerExistsError
+	}
+	worker.Role = request.Role
+	worker.User = &user
+	worker.UserID = user.ID
+	err := db.Save(&user).Error
+	return errors.Join(err, db.Create(&worker).Error)
 }
 
 func (worker *Worker) Patch(db *gorm.DB, request WorkerRequest) error {

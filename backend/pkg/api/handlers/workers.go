@@ -20,11 +20,19 @@ func GetWorker(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
-	response := models.WorkerResponse{Worker: &user.Worker, RegisteredAt: user.Worker.CreatedAt.String()}
+	util.Debug(getWorkerTag, "user", user)
+	if user.Worker == nil {
+		http.Error(w, l10n.WorkerNotFound, http.StatusNotFound)
+		return
+	}
+	var worker models.Worker
+	worker.Get(db.Database, user.Worker.ID)
+	util.Debug(getWorkerTag, "worker", worker)
+	response := models.WorkerResponse{Worker: &worker, RegisteredAt: worker.CreatedAt.String()}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		util.Error(getWorkerTag, err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	util.Info(getWorkerTag, "id%d returned", user.Worker.ID)
+	util.Info(getWorkerTag, "id%d returned", worker.ID)
 }

@@ -51,16 +51,19 @@ func RegisterWorker(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
+	var worker models.Worker
 	request := models.WorkerRequest{
-		Worker: &models.Worker{UserID: userID},
+		Worker: &worker,
+		UserID: userID,
 	}
 	if !jsonDecode(w, r, &request) {
 		return
 	}
-	var worker models.Worker
 	if err := worker.Create(db.Database, request); err != nil {
 		util.Error(registerWorkerTag, err)
 		switch err {
+		case util.WorkerExistsError:
+			http.Error(w, l10n.WorkerExists, http.StatusBadRequest)
 		case util.InvalidRoleError:
 			http.Error(w, l10n.InvalidRole, http.StatusBadRequest)
 		case util.InsecurePasswordError:
