@@ -15,7 +15,7 @@ const Header = () => {
             >
                 О нас
             </a>
-            <div className="ml-auto rounded-4xl text-2xl font-bold bg-[#1D3266] text-white w-10 h-10 flex items-center justify-center self-center">
+            <div className="ml-auto pointer-events-none select-none rounded-4xl text-2xl font-bold bg-[#1D3266] text-white w-10 h-10 flex items-center justify-center self-center">
                 V
             </div>
         </header>

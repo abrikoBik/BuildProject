@@ -2,7 +2,7 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 
 const Projects = () => {
-    const projects = Array.from({ length: 50 }, (_, i) => i + 1);
+    const projects = Array.from({ length: 500 }, (_, i) => i + 1);
 
     return (
         <div className="flex flex-col h-screen">

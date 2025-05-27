@@ -53,9 +53,9 @@ const Home = () => {
                 <Sidebar show={showSidebar} choice={0}/>
                 <button
                     onClick={toggleSidebar}
-                    className={`${!showSidebar ? "" : "ml-[-50px]"} ${safeWidth <= 1100 ? "" : "hidden"} relative h-10 w-10 bg-palette-color4 rounded-2xl text-white`}
+                    className={`${!showSidebar ? "ml-[-10%]" : "ml-[-50px]"} ${safeWidth <= 1100 ? "" : "hidden"} relative h-10 w-10 bg-palette-color4 rounded-2xl text-white`}
                 >
-                    {showSidebar ? "<" : ">"}
+                    {showSidebar ? ">" : "<"}
                 </button>
 
                 <div className="w-[60vw] max-lg:w-[100vw] text-center">
@@ -93,7 +93,7 @@ const Home = () => {
                             Связь с клиентом:
                         </div>
                         <section className="flex flex-row ml-auto self-end items-center space-x-2">
-                            <div className={`absolute z-50 pointer-events-none text-center justify-self-center transition-opacity duration-300 ${showNumber ? "opacity-100" : "opacity-0"}`}>
+                            <div className={`absolute z-50 ${showNumber ? "" : "pointer-events-none"} text-center justify-self-center transition-opacity duration-300 ${showNumber ? "opacity-100" : "opacity-0"}`}>
                                 +78005353535
                             </div>
                             <input
@@ -104,7 +104,7 @@ const Home = () => {
                             />
                         </section>
                         <section className="flex flex-row ml-auto self-end items-center space-x-2 mt-2 mr-15">
-                            <div className={`absolute pointer-events-none text-center justify-self-center transition-opacity duration-300 ${showEMail ? "opacity-100" : "opacity-0"}`}>
+                            <div className={`absolute ${showEMail ? "" : "pointer-events-none"} text-center justify-self-center transition-opacity duration-300 ${showEMail ? "opacity-100" : "opacity-0"}`}>
                                 aelilkidae@gmail.com
                             </div>
                             <input
