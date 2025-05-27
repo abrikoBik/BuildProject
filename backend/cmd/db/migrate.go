@@ -16,7 +16,7 @@ func Migrate(callback func()) {
 		"project": models.Project{},
 	}
 	for name, model := range toMigrate {
-		util.Check(db.Database.AutoMigrate(&model))
+		util.Check(db.Database.Debug().AutoMigrate(&model))
 		util.Debug("db", "model", name)
 	}
 	util.Info("db", "migrations complete")
