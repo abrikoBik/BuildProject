@@ -29,4 +29,5 @@ const (
 	LogoutError   = "Не удалось выйти"
 
 	WorkerExists = "Рабочий уже существует"
+	OutOfBounds  = "Индекс вне диапазона"
 )

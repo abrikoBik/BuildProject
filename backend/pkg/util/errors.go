@@ -16,6 +16,7 @@ var (
 	WorkerNotFoundError   = errors.New(l10n.WorkerNotFound)
 	UserNotFoundError     = errors.New(l10n.UserNotFound)
 	WorkerExistsError     = errors.New(l10n.WorkerExists)
+	OutOfBoundsError      = errors.New(l10n.OutOfBounds)
 )
 
 func Check(errs ...error) {
