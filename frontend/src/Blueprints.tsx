@@ -29,7 +29,7 @@ const Blueprints = () => {
                         </button>
 
                         <div className="flex flex-col w-100 border-3 rounded-xl p-5">
-                            <img src={Img3} alt="img1" className='rounded-xl'/>
+                            <img src={Img3} alt="img1" className='rounded-xl min-h-[50%]'/>
                             <section className="flex flex-row my-5 gap-5">
                                 <div>
                                     <div className="text-xl font-bold mb-2">Чертеж фасада</div>
@@ -55,7 +55,7 @@ const Blueprints = () => {
                         </div>
 
                         <div className="flex flex-col w-100 border-3 rounded-xl p-5">
-                            <img src={Img4} alt="img1" className='rounded-xl'/>
+                            <img src={Img4} alt="img1" className='rounded-xl min-h-[50%]'/>
                             <section className="flex flex-row my-5 gap-5">
                                 <div>
                                     <div className="text-xl font-bold mb-2">План фундамента</div>
@@ -81,7 +81,7 @@ const Blueprints = () => {
                         </div>
 
                         <div className="flex flex-col w-100 border-3 rounded-xl p-5">
-                            <img src={Img2} alt="img1" className='rounded-xl'/>
+                            <img src={Img2} alt="img1" className='rounded-xl min-h-[50%]'/>
                             <section className="flex flex-row my-5 gap-5">
                                 <div>
                                     <div className="text-xl font-bold mb-2">Каркас дома</div>
@@ -107,7 +107,7 @@ const Blueprints = () => {
                         </div>
 
                         <div className="flex flex-col w-100 border-3 rounded-xl p-5">
-                         <img src={Img1} alt="img1" className='rounded-xl'/>
+                         <img src={Img1} alt="img1" className='rounded-xl min-h-[50%]'/>
                             <section className="flex flex-row my-5 gap-5">
                                 <div>
                                     <div className="text-xl font-bold mb-2">План этажа</div>

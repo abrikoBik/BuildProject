@@ -3,6 +3,9 @@ import Sidebar from "./Sidebar";
 import DonutChart from "./DonutChart";
 import { useWindowSize } from "@uidotdev/usehooks";
 
+import BlueprintsIcon from "./assets/BlueprintIcon.svg";
+import SmetaIcon from "./assets/SmetaIcon.svg";
+
 const Home = () => {
     const [chartData, setChartData] = useState([
         { value: 0, color: "#37515f" },
@@ -49,7 +52,7 @@ const Home = () => {
 
     return (
         <main>
-            <section className="flex flex-row w-[80vw] h-[100vh] text-2xl ml-[17vw]">
+            <section className="flex flex-row w-[85%] h-[100vh] text-2xl ml-[15%]">
                 <Sidebar show={showSidebar} choice={0}/>
                 <button
                     onClick={toggleSidebar}
@@ -58,7 +61,7 @@ const Home = () => {
                     {showSidebar ? ">" : "<"}
                 </button>
 
-                <div className="w-[60vw] max-lg:w-[100vw] text-center">
+                <div className="w-[80%] max-lg:w-[100vw] text-center">
                     <div className="flex flex-row m-2 items-center rounded-lg border-3 p-2 border-palette-color5">
                         <section className="justify-self-start text-left ml-5">
                             {/* Брать данные с бэка */}
@@ -163,6 +166,24 @@ const Home = () => {
                         </ul>
                     </div>
                 </div>
+		<div className="flex flex-col w-[20%] h-screen p-2 gap-2">
+		    <a href="/estimates" className="flex flex-col w-full h-1/3 border-3 border-palette-color5 justify-center items-center rounded-lg">
+		        <div className="flex items-center justify-center w-[60%] h-[60%] bg-palette-color2 rounded-full">
+		    	    <img src={SmetaIcon} className="max-w-[55%] max-h-[55%]"/>  
+		    	</div>
+			<div className="mt-5 font-semibold font-[#1d3266]">Создать смету</div>
+		    </a>
+		    <a href="/projects" className="flex flex-col w-full h-1/3 border-3 border-palette-color5 justify-center items-center rounded-lg">
+		        <div className="flex items-center justify-center w-[60%] h-[60%] bg-palette-color2 rounded-full">
+		    	    <img src={BlueprintsIcon} className="max-w-[55%] max-h-[55%]"/>  
+		    	</div>
+			<div className="mt-5 font-semibold font-[#1d3266]">Открыть чертежи</div>
+		    </a>
+		    <a href="/blueprints" className="flex flex-col w-full h-1/3 border-3 border-palette-color5 justify-center items-center rounded-lg">
+		        <span className="material-symbols-outlined-huge">settings</span>
+			<div className="mt-5 font-semibold font-[#1d3266]">Настройки</div>
+		    </a>
+		</div>
             </section>
         </main>
     );
