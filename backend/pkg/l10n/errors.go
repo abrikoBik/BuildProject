@@ -1,5 +1,6 @@
 package l10n
 
+// TODO: reorder
 const (
 	// Invalid request errors
 	InvalidID         = "Некорректный ID"
@@ -19,10 +20,14 @@ const (
 	UserNotFound   = "Пользователь не найден"
 	WorkerNotFound = "Рабочий не найден"
 	TokenNotFound  = "Токен не найден"
+	StageNotFound  = "Стадия не найдена"
 
 	// Generic errors
 	RegisterError = "Ошибка регистрации"
 	PatchError    = "Ошибка редактирования"
 	LoginError    = "Не удалось войти"
 	LogoutError   = "Не удалось выйти"
+
+	WorkerExists = "Рабочий уже существует"
+	OutOfBounds  = "Индекс вне диапазона"
 )
