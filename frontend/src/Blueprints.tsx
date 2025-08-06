@@ -6,6 +6,45 @@ import Img3 from '../src/assets/image-3.png';
 import Img4 from '../src/assets/image.png';
 
 const Blueprints = () => {
+
+    const handleZoom = (e: React.MouseEvent<HTMLButtonElement>) => {
+        const card = e.currentTarget.closest('.flex.flex-col.w-100') as HTMLElement;
+
+        const imgElement = card?.querySelector('img.image') as HTMLImageElement;
+
+        if (imgElement?.src) {
+          console.log("Image src:", imgElement.src);
+          
+          const overlay = document.createElement('div');
+          overlay.style.position = 'fixed';
+          overlay.style.top = '0';
+          overlay.style.left = '0';
+          overlay.style.width = '100vw';
+          overlay.style.height = '100vh';
+          overlay.style.backgroundColor = 'rgba(0,0,0,0.9)';
+          overlay.style.display = 'flex';
+          overlay.style.justifyContent = 'center';
+          overlay.style.alignItems = 'center';
+          overlay.style.zIndex = '1000';
+          overlay.style.cursor = 'zoom-out';
+
+          const zoomedImg = new Image();
+          zoomedImg.src = imgElement.src;
+          zoomedImg.style.maxWidth = '90vw';
+          zoomedImg.style.maxHeight = '90vh';
+          zoomedImg.style.objectFit = 'contain';
+
+          overlay.appendChild(zoomedImg);
+          document.body.appendChild(overlay);
+          document.body.style.overflow = 'hidden';
+
+          overlay.onclick = () => {
+            document.body.removeChild(overlay);
+            document.body.style.overflow = '';
+          };
+        }
+    };  
+
     return (
         <div className="flex flex-col h-screen">
             <div className='mb-5'></div>
@@ -29,7 +68,7 @@ const Blueprints = () => {
                         </button>
 
                         <div className="flex flex-col w-100 border-3 rounded-xl p-5">
-                            <img src={Img3} alt="img1" className='rounded-xl min-h-[50%]'/>
+                            <img src={Img3} alt="img1" className='rounded-xl min-h-[50%] image'/>
                             <section className="flex flex-row my-5 gap-5">
                                 <div>
                                     <div className="text-xl font-bold mb-2">Чертеж фасада</div>
@@ -44,6 +83,7 @@ const Blueprints = () => {
                                         </span>
                                     </button>
                                     <button
+                                        onClick={handleZoom}
                                         className="flex flex-row w-8 h-8 rounded-lg bg-palette-color3 items-center justify-center"
                                     >
                                         <span className="material-symbols-outlined">
@@ -55,7 +95,7 @@ const Blueprints = () => {
                         </div>
 
                         <div className="flex flex-col w-100 border-3 rounded-xl p-5">
-                            <img src={Img4} alt="img1" className='rounded-xl min-h-[50%]'/>
+                            <img src={Img4} alt="img1" className='rounded-xl min-h-[50%] image'/>
                             <section className="flex flex-row my-5 gap-5">
                                 <div>
                                     <div className="text-xl font-bold mb-2">План фундамента</div>
@@ -71,6 +111,7 @@ const Blueprints = () => {
                                     </button>
                                     <button
                                         className="flex flex-row w-8 h-8 rounded-lg bg-palette-color3 items-center justify-center"
+                                        onClick={handleZoom}
                                     >
                                         <span className="material-symbols-outlined">
                                             search
@@ -81,7 +122,7 @@ const Blueprints = () => {
                         </div>
 
                         <div className="flex flex-col w-100 border-3 rounded-xl p-5">
-                            <img src={Img2} alt="img1" className='rounded-xl min-h-[50%]'/>
+                            <img src={Img2} alt="img1" className='rounded-xl min-h-[50%] image'/>
                             <section className="flex flex-row my-5 gap-5">
                                 <div>
                                     <div className="text-xl font-bold mb-2">Каркас дома</div>
@@ -97,6 +138,7 @@ const Blueprints = () => {
                                     </button>
                                     <button
                                         className="flex flex-row w-8 h-8 rounded-lg bg-palette-color3 items-center justify-center"
+                                        onClick={handleZoom}
                                     >
                                         <span className="material-symbols-outlined">
                                             search
@@ -107,7 +149,7 @@ const Blueprints = () => {
                         </div>
 
                         <div className="flex flex-col w-100 border-3 rounded-xl p-5">
-                         <img src={Img1} alt="img1" className='rounded-xl min-h-[50%]'/>
+                         <img src={Img1} alt="img1" className='rounded-xl min-h-[50%] image'/>
                             <section className="flex flex-row my-5 gap-5">
                                 <div>
                                     <div className="text-xl font-bold mb-2">План этажа</div>
@@ -123,6 +165,7 @@ const Blueprints = () => {
                                     </button>
                                     <button
                                         className="flex flex-row w-8 h-8 rounded-lg bg-palette-color3 items-center justify-center"
+                                        onClick={handleZoom}
                                     >
                                         <span className="material-symbols-outlined">
                                             search

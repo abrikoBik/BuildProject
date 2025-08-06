@@ -18,9 +18,19 @@ const Home = () => {
     const [showNumber, setNumber] = useState(false);
     const [showEMail, setEmail] = useState(false);
 
+    const [infoBoxVisible, setInfoBox] = useState(false);
+    const [infoBoxContent, setInfoboxContent] = useState("");
+    const [infoBoxActive, setActive] = useState(false);
+
     const toggleSidebar = () => {
         setSidebar(!showSidebar);
     };
+
+    const pushNotification = (text : string) => {
+        setActive(true);
+        setInfoBox(true);
+        setInfoboxContent(text);
+    }
 
     const checkInput = (event: React.ChangeEvent<HTMLInputElement>) => {
         const checked = event.currentTarget.checked;
@@ -29,6 +39,30 @@ const Home = () => {
         newData[1].value = 4 - newData[0].value;
         setChartData(newData);
         console.log(`1: ${chartData[0].value} 2: ${chartData[1].value}`);
+    };
+
+    const emailCopy = () => {
+        const emailTextElement = document.getElementById("email");
+        try {
+            navigator.clipboard.writeText(emailTextElement!.innerText);
+            setEmail(true);
+            pushNotification("Электронная почта скопирована");
+        } catch (err : any)
+        {
+            pushNotification("Не удалось скопировать электронную почту")
+        }
+    };
+
+    const numberCopy = () => {
+        const numberTextElement = document.getElementById("number");
+        try {
+            navigator.clipboard.writeText(numberTextElement!.innerText);
+            setNumber(true);
+            pushNotification("Номер телефона скопирован");
+        } catch (err : any)
+        {
+            pushNotification("Не удалось скопировать номер телефона");
+        }
     };
 
     const { width } = useWindowSize();
@@ -51,7 +85,12 @@ const Home = () => {
     }, [safeWidth]);
 
     return (
-        <main>
+        <main className="relative">
+            {/* Information window */}
+            <div onAnimationEnd={() => setInfoBox(false)} className={`absolute ${infoBoxActive ? "" : "opacity-0"} ${infoBoxVisible ? "infoBoxAnimationIn" : "infoBoxAnimationOut"} w-[30%] h-[5%] m-auto left-0 right-0 z-50 rounded-b-xl border-3 border-t-0 flex justify-center items-center border-palette-color5 bg-palette-color2`}>
+                <p id="infoBoxText">{infoBoxContent}</p>
+            </div>
+
             <section className="flex flex-row w-[85%] h-[100vh] text-2xl ml-[15%]">
                 <Sidebar show={showSidebar} choice={0}/>
                 <button
@@ -96,22 +135,24 @@ const Home = () => {
                             Связь с клиентом:
                         </div>
                         <section className="flex flex-row ml-auto self-end items-center space-x-2">
-                            <div className={`absolute z-50 ${showNumber ? "" : "pointer-events-none"} text-center justify-self-center transition-opacity duration-300 ${showNumber ? "opacity-100" : "opacity-0"}`}>
+                            <div id="number" className={`absolute ${showNumber ? "" : "pointer-events-none"} select-none text-center justify-self-center transition-opacity duration-300 ${showNumber ? "opacity-100" : "opacity-0"}`}>
                                 +78005353535
                             </div>
                             <input
-                                onClick={() => setNumber(!showNumber)}
+                                data-copy-to-clipboard-target="number"
+                                onClick={() => numberCopy()}
                                 type="button"
                                 value="Показать номер"
                                 className={`border-2 border-blue-950 p-2 rounded-xl transition-opacity duration-300 ${showNumber ? "opacity-0" : "opacity-100"}`}
                             />
                         </section>
                         <section className="flex flex-row ml-auto self-end items-center space-x-2 mt-2 mr-15">
-                            <div className={`absolute ${showEMail ? "" : "pointer-events-none"} text-center justify-self-center transition-opacity duration-300 ${showEMail ? "opacity-100" : "opacity-0"}`}>
+                            <div id="email" className={`absolute ${showEMail ? "" : "pointer-events-none"} select-none text-center justify-self-center transition-opacity duration-300 ${showEMail ? "opacity-100" : "opacity-0"}`}>
                                 aelilkidae@gmail.com
                             </div>
                             <input
-                                onClick={() => setEmail(!showEMail)}
+                                data-copy-to-clipboard-target="email"
+                                onClick={() => emailCopy()}
                                 type="button"
                                 value="Показать почту"
                                 className={`border-2 border-blue-950 p-2 rounded-xl transition-opacity duration-300 ${showEMail ? "opacity-0" : "opacity-100"}`}

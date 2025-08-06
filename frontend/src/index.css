@@ -157,3 +157,37 @@ input:focus {
         margin-bottom: 1vh;
     }
 }
+
+/* Push notification animation block */
+
+.infoBoxAnimationIn {
+    animation: infoBoxFadeIn 1s forwards;
+}
+
+.infoBoxAnimationOut {
+    animation: infoBoxFadeOut 1s 3s forwards;
+}
+
+@keyframes infoBoxFadeIn {
+    from {
+        margin-top: -5%;
+    }
+    to {
+        margin-top: 0;
+    }
+}
+
+@keyframes infoBoxFadeOut {
+    from {
+        margin-top: 0;
+    }
+    to {
+        margin-top: -5%;
+    }
+}
+
+/* Styles appliable to the childrens */
+
+bold-child > li, p, div {
+    font-weight: bold;
+}

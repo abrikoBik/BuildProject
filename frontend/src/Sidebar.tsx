@@ -4,7 +4,7 @@ import Logo from "./assets/logo_2.svg";
 const Sidebar = ({ show, choice }: { show: boolean, choice: number }) => {
     return (
         <section className={`fixed top-0 left-0 flex flex-col items-center h-screen w-[15vw] mr-6 bg-palette-color4 max-md:hidden max-md:m-0 ${show ? "" : "hidden"}`}>
-            <img src={Logo} alt="logo" className="mt-6 mx-2 mb-4 h-14" />
+            <a href="/"><img src={Logo} alt="logo" className="mt-6 mx-2 mb-4 h-14" /></a>
             <nav className="flex flex-col w-full m-0">
                 <a
                     href="/projects"

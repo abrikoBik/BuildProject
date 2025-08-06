@@ -5,7 +5,7 @@ const Header = () => {
         <header className="flex flex-row w-[80%] h-20 ml-[17%] mr-[10%]">
             <Link
                 to="/"
-                className="w-80 h-10 justify-center text-center border-2 bg-palette-color4 pt-1 rounded-xl font-semibold text-xl text-white self-center"
+                className="w-80 h-10 justify-center text-center bg-palette-color4 pt-1 rounded-xl font-semibold text-xl text-white self-center"
             >
                 Вернуться на главную
             </Link>
