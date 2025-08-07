@@ -47,9 +47,9 @@ const Home = () => {
             navigator.clipboard.writeText(emailTextElement!.innerText);
             setEmail(true);
             pushNotification("Электронная почта скопирована");
-        } catch (err : any)
+        } catch (err : unknown)
         {
-            pushNotification("Не удалось скопировать электронную почту")
+            pushNotification(`Не удалось скопировать электронную почту ${err}`);
         }
     };
 
@@ -59,9 +59,9 @@ const Home = () => {
             navigator.clipboard.writeText(numberTextElement!.innerText);
             setNumber(true);
             pushNotification("Номер телефона скопирован");
-        } catch (err : any)
+        } catch (err : unknown)
         {
-            pushNotification("Не удалось скопировать номер телефона");
+            pushNotification(`Не удалось скопировать номер телефона ${err}`);
         }
     };
 

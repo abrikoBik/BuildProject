@@ -1,9 +1,17 @@
 import Header from './Header';
 import Sidebar from './Sidebar';
-import { ReactElement, useEffect, useState } from 'react';
+import { useState } from 'react';
+
+interface LineItem {
+    name: string,
+    unit: string,
+    amount: number,
+    price: number,
+    cost: number
+};
 
 const Estimates = () => {
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<LineItem>({
       name: '',
       unit: '',
       amount: 0,
@@ -11,7 +19,7 @@ const Estimates = () => {
       cost: 0
     });
 
-    const [lineArray, setLineArray] = useState<Array<any>>([]);
+    const [lineArray, setLineArray] = useState<LineItem[]>([]);
     const [totalCost, setTotalCost] = useState(0);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
