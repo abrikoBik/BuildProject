@@ -11,8 +11,8 @@ import Projects from "./Projects.tsx";
 import Blueprints from "./Blueprints.tsx";
 
 createRoot(document.getElementById("root")!).render(
-    <CookiesProvider>
-        <StrictMode>
+    <StrictMode>
+        <CookiesProvider>
             <Router>
                 <Routes>
                     <Route path="/" element={<Home />} />
@@ -23,6 +23,6 @@ createRoot(document.getElementById("root")!).render(
                     <Route path="/projects" element={<Projects />}/>
                 </Routes>
             </Router>
-        </StrictMode>
-    </CookiesProvider>,
+        </CookiesProvider>
+    </StrictMode>,
 );

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import DonutChart from "./DonutChart";
+import PushNotification from "./PushNotication";
 import { useWindowSize } from "@uidotdev/usehooks";
 
 import BlueprintsIcon from "./assets/BlueprintIcon.svg";
@@ -18,18 +19,14 @@ const Home = () => {
     const [showNumber, setNumber] = useState(false);
     const [showEMail, setEmail] = useState(false);
 
-    const [infoBoxVisible, setInfoBox] = useState(false);
-    const [infoBoxContent, setInfoboxContent] = useState("");
-    const [infoBoxActive, setActive] = useState(false);
+    const [pushNotificationText, setPushNotificationText] = useState("");
 
     const toggleSidebar = () => {
         setSidebar(!showSidebar);
     };
 
     const pushNotification = (text : string) => {
-        setActive(true);
-        setInfoBox(true);
-        setInfoboxContent(text);
+        setPushNotificationText(text);
     }
 
     const checkInput = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,10 +83,8 @@ const Home = () => {
 
     return (
         <main className="relative">
-            {/* Information window */}
-            <div onAnimationEnd={() => setInfoBox(false)} className={`absolute ${infoBoxActive ? "" : "opacity-0"} ${infoBoxVisible ? "infoBoxAnimationIn" : "infoBoxAnimationOut"} w-[30%] h-[5%] m-auto left-0 right-0 z-50 rounded-b-xl border-3 border-t-0 flex justify-center items-center border-palette-color5 bg-palette-color2`}>
-                <p id="infoBoxText">{infoBoxContent}</p>
-            </div>
+            {/* TODO: fix notification laggy animation and make it more stable */}
+            <PushNotification text={pushNotificationText}/>
 
             <section className="flex flex-row w-[85%] h-[100vh] text-2xl ml-[15%]">
                 <Sidebar show={showSidebar} choice={0}/>

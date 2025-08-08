@@ -1,6 +1,7 @@
 import Header from './Header';
 import Sidebar from './Sidebar';
 import { useState } from 'react';
+import PushNotification from './PushNotication';
 
 interface LineItem {
     name: string,
@@ -8,6 +9,59 @@ interface LineItem {
     amount: number,
     price: number,
     cost: number
+};
+
+interface EditableCellProps {
+    value: string;
+    onSave?: (newValue: string) => void;
+    onChange?: (newValue: string) => void;
+}
+
+const EditableCell = ({ value, onSave, onChange }: EditableCellProps) => {
+    const [isEdit, setEdit] = useState(false);
+    const [curValue, setValue] = useState(value);
+
+    const handleEditEnd = (event: React.KeyboardEvent<HTMLInputElement> | React.FocusEvent) => {
+        if (event.type === 'keydown' && (event as React.KeyboardEvent).key !== 'Enter') {
+            return;
+        }
+
+        setEdit(false);
+        if (onSave) {
+            onSave(curValue);
+        }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setValue(e.target.value);
+
+        if(onChange) {
+            onChange(e.target.value);
+        }
+    };
+
+    return (
+        <div className="text-center">
+            {isEdit ? (
+                <input
+                    type="text"
+                    value={curValue}
+                    onChange={handleChange}
+                    onBlur={handleEditEnd}
+                    onKeyDown={handleEditEnd}
+                    autoFocus
+                    className="w-full px-2 border-2"
+                />
+            ) : (
+                <div 
+                    onDoubleClick={() => setEdit(true)}
+                    className="cursor-text hover:bg-gray-100 p-1"
+                >
+                    {curValue}
+                </div>
+            )}
+        </div>
+    );
 };
 
 const Estimates = () => {
@@ -21,6 +75,12 @@ const Estimates = () => {
 
     const [lineArray, setLineArray] = useState<LineItem[]>([]);
     const [totalCost, setTotalCost] = useState(0);
+
+    const [pushNotificationText, setPushNotificationText] = useState("");
+
+    const pushNotification = (text : string) => {
+        setPushNotificationText(text);
+    }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const { id, value } = e.target;
@@ -47,10 +107,22 @@ const Estimates = () => {
         });
     };
 
-    return (
-        <div className="flex flex-col h-screen">
-            <Header />
+    const handleDelete = (index : number) => {
+        if(index != null)
+        {
+            var array = [...lineArray];
+            setTotalCost(totalCost - array[index].cost);
+            array.splice(index, 1);
+            setLineArray(array);
+            pushNotification(`Удалена строка номер ${index+1}`);
+        }
+    }
 
+    {/* TODO: fix buttons size when add new estimation line */}
+    return (
+        <main className="flex flex-col h-screen">
+            <Header />
+            <PushNotification text={pushNotificationText}/>
             <div className="flex flex-row flex-1">
                 <Sidebar show={true} choice={2}/>
 
@@ -66,26 +138,79 @@ const Estimates = () => {
                         </section>
 
                         <section className="flex flex-col h-[80%] w-full p-[3px]">
-                            <ul className="flex flex-row bold-child relative items-center z-0 rounded-t-xl mb-[-40px] w-full h-10 bg-palette-color2 px-[2%] justify-between">
-                                <li>Наименование</li>
-                                <li>Единица</li>
-                                <li>Количество</li>
-                                <li>Цена</li>
-                                <li>Стоимость</li>
+                             <ul className="grid grid-cols-5 bold-child relative z-0 rounded-t-xl w-full h-10 bg-palette-color2 px-[2%] items-center mb-[-40px]">
+                              <li className="text-center">Наименование</li>
+                              <li className="text-center">Единица</li>
+                              <li className="text-center">Количество</li>
+                              <li className="text-center">Цена</li>
+                              <li className="text-center">Стоимость</li>
                             </ul>
                             <section className="flex flex-row w-full h-full rounded-xl border-3 py-[50px] z-50 border-palette-color4">
                                 <form className="flex flex-col items-center w-full overflow-scroll">
                                     {lineArray.map((item, index) => {
                                         return (
-                                            <section key={index} className="flex flex-row justify-between w-full px-[2%]">
-                                                <div className="self-center">{item.name}</div>
-                                                <div className="self-center">{item.unit}</div>
-                                                <div className="self-center">{item.amount}</div>
-                                                <div className="self-center">{item.price} р</div>
-                                                <div className="self-center">{item.cost} р</div>
-                                            </section>
+                                        <div 
+                                            key={index}
+                                            className="grid grid-cols-5 gap-4 w-full px-[2%] py-3 items-center border-b border-gray-200"
+                                        >
+                                            {/* TODO: fix bug when input stays blank */}
+                                            <EditableCell 
+                                              value={item.name || '-'} 
+                                              onSave={(newValue) => {
+                                                const updated = [...lineArray];
+                                                updated[index].name = newValue ?? '-';
+                                                setLineArray(updated);
+                                              }}
+                                            />
+                                            <EditableCell 
+                                              value={item.unit || '-'} 
+                                              onSave={(newValue) => {
+                                                const updated = [...lineArray];
+                                                updated[index].unit = newValue ?? '-';
+                                                setLineArray(updated);
+                                              }}
+                                            />
+                                            <EditableCell 
+                                              value={String(item.amount ?? '0')} 
+                                              onSave={(newValue) => {
+                                                const updated = [...lineArray];
+                                                updated[index].amount = parseFloat(newValue) ?? 0;
+                                                setLineArray(updated);
+                                              }}
+                                              onChange={(newValue) => {
+                                                const updated = [...lineArray];
+                                                updated[index].cost = (parseFloat(newValue) || 0) * updated[index].price;
+                                                setLineArray(updated);
+                                              }}
+                                            />
+                                            <EditableCell 
+                                              value={String(item.price ?? '0')} 
+                                              onSave={(newValue) => {
+                                                const updated = [...lineArray];
+                                                updated[index].price = parseFloat(newValue) ?? 0;
+                                                setLineArray(updated);
+                                              }}
+                                              onChange={(newValue) => {
+                                                const updated = [...lineArray];
+                                                updated[index].cost = (parseFloat(newValue) || 0) * updated[index].amount;
+                                                setLineArray(updated);
+                                              }}
+                                            />
+                                            <div className="flex flex-row gap-10 justify-center pl-15">
+                                                <div className="text-center font-medium">{item.cost ?? '0'} р</div>
+                                                <button onMouseDown={() => handleDelete(index)} 
+                                                    className="flex w-7 h-7 items-center justify-center hover:text-red-700 select-none hover:cursor-pointer"
+                                                    aria-label="Удалить строку"
+                                                >
+                                                    <span className="material-symbols-outlined">
+                                                        close
+                                                    </span>
+                                                </button>
+                                            </div>
+                                        </div>
                                         )
                                     })}
+
                                     <section className="flex flex-row justify-between w-full px-[2%]">
                                         <input type="text" onChange={handleChange} className="border-2 border-palette-color4 mb-2 text-black" id="name"/>
                                         {/* should be dropbox */}<input type="text" onChange={handleChange} className="border-2 border-palette-color4 mb-2" id="unit"/>
@@ -138,7 +263,7 @@ const Estimates = () => {
                     </section>
                 </main>
             </div>
-        </div>
+        </main>
     );
 }
 
