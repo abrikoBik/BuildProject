@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DonutChartProps } from "./types/donutchart";
 import { getCoordinatesForPercent } from "./util/donutchart";
 
@@ -16,12 +16,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
   const startTimeRef = useRef<number>(0);
   const startValuesRef = useRef<number[]>(data.map(item => item.value));
 
-  if (total === 0) {
-    return <div>No data</div>;
-  }
-
   useEffect(() => {
-    // Сохраняем текущие отображаемые значения как начальные для анимации
     startValuesRef.current = displayData.map(item => item.value);
     startTimeRef.current = 0;
     
@@ -33,7 +28,6 @@ const DonutChart: React.FC<DonutChartProps> = ({
       const elapsed = timestamp - startTimeRef.current;
       const progress = Math.min(elapsed / animationDuration, 1);
       
-      // Интерполяция между текущими отображаемыми и новыми значениями
       const newDisplayData = data.map((item, i) => {
         const startValue = startValuesRef.current[i] || 0;
         const targetValue = item.value;
@@ -57,7 +51,11 @@ const DonutChart: React.FC<DonutChartProps> = ({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [data, animationDuration]);
+  }, [data, animationDuration, displayData]);
+
+  if (total === 0) {
+    return <div>No data</div>;
+  }
 
   let cumulativeValue = 0;
   const paths = displayData.map((slice, index) => {

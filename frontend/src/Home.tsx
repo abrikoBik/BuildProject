@@ -115,7 +115,7 @@ const Home = () => {
                             <div>Выполняется</div>
                         </section>
                         
-                        <section className="ml-auto self-end">
+                        <section className="ml-auto self-end transition-all">
                             <DonutChart
                                 data={chartData}
                                 width={200}
