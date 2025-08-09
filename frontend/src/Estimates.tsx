@@ -110,7 +110,7 @@ const Estimates = () => {
     const handleDelete = (index : number) => {
         if(index != null)
         {
-            var array = [...lineArray];
+            const array = [...lineArray];
             setTotalCost(totalCost - array[index].cost);
             array.splice(index, 1);
             setLineArray(array);
