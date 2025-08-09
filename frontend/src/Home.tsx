@@ -88,6 +88,7 @@ const Home = () => {
 
             <section className="flex flex-row w-[85%] h-[100vh] text-2xl ml-[15%]">
                 <Sidebar show={showSidebar} choice={0}/>
+                {/* Move to Sidebar component */}
                 <button
                     onClick={toggleSidebar}
                     className={`${!showSidebar ? "ml-[-10%]" : "ml-[-50px]"} ${safeWidth <= 1100 ? "" : "hidden"} relative h-10 w-10 bg-palette-color4 rounded-2xl text-white`}
@@ -96,9 +97,10 @@ const Home = () => {
                 </button>
 
                 <div className="w-[80%] max-lg:w-[100vw] text-center">
+                    {/* Header info */}
                     <div className="flex flex-row m-2 items-center rounded-lg border-3 p-2 border-palette-color5">
                         <section className="justify-self-start text-left ml-5">
-                            {/* Брать данные с бэка */}
+                            {/* Recieve data from backend */}
                             <div className="text-blue-950 font-bold text-3xl mb-5">
                                 Строительство дома
                             </div>
@@ -109,7 +111,7 @@ const Home = () => {
                                     : `Заказчик: ${userName}`}
                             </div>
 
-                            {/* Брать данные с бэка */}
+                            {/* Recieve data from backend */}
                             <div>Выполняется</div>
                         </section>
                         
@@ -124,8 +126,9 @@ const Home = () => {
                             />
                         </section>
                     </div>
-
-                    <div className="flex flex-row m-2 items-center rounded-lg border-3 p-2 border-palette-color5 text-left p-4">
+                    
+                    {/* Contact panel */}
+                    <div className="flex flex-row m-2 items-center rounded-lg border-3 border-palette-color5 text-left p-4">
                         <div className="text-blue-950 font-bold">
                             Связь с клиентом:
                         </div>
@@ -154,7 +157,12 @@ const Home = () => {
                             />
                         </section>
                     </div>
+                    
+                    <div className="flex m-2 h-100 items-center justify-center rounded-lg border-3 border-paletter-color5 text-left p-4">
+                        ДИАГРАММА ГАНТА
+                    </div>
 
+                    {/* Tasks panel */}
                     <div className="flex flex-col m-2 items-center rounded-lg border-3 p-2 border-palette-color5 text-left">
                         <section className="flex flex-row w-[100%]">
                             <div className="text-blue-950 font-bold text-3xl ml-5 self-start">
@@ -172,6 +180,7 @@ const Home = () => {
                                     onChange={checkInput}
                                     type="checkbox"
                                     id="1"
+                                    className="mr-2"
                                 />
                                 <label htmlFor="1">Заливка фундамента</label>
                             </li>
@@ -180,6 +189,7 @@ const Home = () => {
                                     onChange={checkInput}
                                     type="checkbox"
                                     id="2"
+                                    className="mr-2"
                                 />
                                 <label htmlFor="2">Возведение стен</label>
                             </li>
@@ -188,6 +198,7 @@ const Home = () => {
                                     onChange={checkInput}
                                     type="checkbox"
                                     id="3"
+                                    className="mr-2"
                                 />
                                 <label htmlFor="3">Монтаж кровли</label>
                             </li>
@@ -196,30 +207,35 @@ const Home = () => {
                                     onChange={checkInput}
                                     type="checkbox"
                                     id="4"
+                                    className="mr-2"
                                 />
                                 <label htmlFor="4">Устройство террасы</label>
                             </li>
                         </ul>
                     </div>
+                    
+                    {/* Empty div */}
+                    <div className="w-full h-5"></div>
                 </div>
-		<div className="flex flex-col w-[20%] h-screen p-2 gap-2">
-		    <a href="/estimates" className="flex flex-col w-full h-1/3 border-3 border-palette-color5 justify-center items-center rounded-lg">
-		        <div className="flex items-center justify-center w-[60%] h-[60%] bg-palette-color2 rounded-full">
-		    	    <img src={SmetaIcon} className="max-w-[55%] max-h-[55%]"/>  
-		    	</div>
-			<div className="mt-5 font-semibold font-[#1d3266]">Создать смету</div>
-		    </a>
-		    <a href="/projects" className="flex flex-col w-full h-1/3 border-3 border-palette-color5 justify-center items-center rounded-lg">
-		        <div className="flex items-center justify-center w-[60%] h-[60%] bg-palette-color2 rounded-full">
-		    	    <img src={BlueprintsIcon} className="max-w-[55%] max-h-[55%]"/>  
-		    	</div>
-			<div className="mt-5 font-semibold font-[#1d3266]">Открыть чертежи</div>
-		    </a>
-		    <a href="/blueprints" className="flex flex-col w-full h-1/3 border-3 border-palette-color5 justify-center items-center rounded-lg">
-		        <span className="material-symbols-outlined-huge">settings</span>
-			<div className="mt-5 font-semibold font-[#1d3266]">Настройки</div>
-		    </a>
-		</div>
+
+		        <div className="flex flex-col w-[20%] h-screen p-2 gap-2">
+		            <a href="/estimates" className="flex flex-col w-full h-1/3 border-3 border-palette-color5 justify-center items-center rounded-lg">
+		                <div className="flex items-center justify-center w-[60%] h-[60%] bg-palette-color2 rounded-full">
+		            	    <img src={SmetaIcon} className="max-w-[55%] max-h-[55%]"/>  
+		            	</div>
+		        	<div className="mt-5 font-semibold font-[#1d3266]">Создать смету</div>
+		            </a>
+		            <a href="/projects" className="flex flex-col w-full h-1/3 border-3 border-palette-color5 justify-center items-center rounded-lg">
+		                <div className="flex items-center justify-center w-[60%] h-[60%] bg-palette-color2 rounded-full">
+		            	    <img src={BlueprintsIcon} className="max-w-[55%] max-h-[55%]"/>  
+		            	</div>
+		        	<div className="mt-5 font-semibold font-[#1d3266]">Открыть чертежи</div>
+		            </a>
+		            <a href="/blueprints" className="flex flex-col w-full h-1/3 border-3 border-palette-color5 justify-center items-center rounded-lg">
+		                <span className="material-symbols-outlined-huge">settings</span>
+		        	<div className="mt-5 font-semibold font-[#1d3266]">Настройки</div>
+		            </a>
+		        </div>
             </section>
         </main>
     );

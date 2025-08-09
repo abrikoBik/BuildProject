@@ -179,7 +179,7 @@ const Estimates = () => {
                                               }}
                                               onChange={(newValue) => {
                                                 const updated = [...lineArray];
-                                                updated[index].cost = (parseFloat(newValue) || 0) * updated[index].price;
+                                                updated[index].cost = (parseFloat(newValue) ?? 0) * updated[index].price;
                                                 setLineArray(updated);
                                               }}
                                             />
@@ -192,20 +192,20 @@ const Estimates = () => {
                                               }}
                                               onChange={(newValue) => {
                                                 const updated = [...lineArray];
-                                                updated[index].cost = (parseFloat(newValue) || 0) * updated[index].amount;
+                                                updated[index].cost = (parseFloat(newValue) ?? 0) * updated[index].amount;
                                                 setLineArray(updated);
                                               }}
                                             />
                                             <div className="flex flex-row gap-10 justify-center pl-15">
                                                 <div className="text-center font-medium">{item.cost ?? '0'} р</div>
-                                                <button onMouseDown={() => handleDelete(index)} 
+                                                <div onMouseDown={() => handleDelete(index)} 
                                                     className="flex w-7 h-7 items-center justify-center hover:text-red-700 select-none hover:cursor-pointer"
                                                     aria-label="Удалить строку"
                                                 >
                                                     <span className="material-symbols-outlined">
                                                         close
                                                     </span>
-                                                </button>
+                                                </div>
                                             </div>
                                         </div>
                                         )
@@ -214,8 +214,8 @@ const Estimates = () => {
                                     <section className="flex flex-row justify-between w-full px-[2%]">
                                         <input type="text" onChange={handleChange} className="border-2 border-palette-color4 mb-2 text-black" id="name"/>
                                         {/* should be dropbox */}<input type="text" onChange={handleChange} className="border-2 border-palette-color4 mb-2" id="unit"/>
-                                        <input onChange={handleChange} type="number" className="border-2 border-palette-color4 mb-2" id="amount"/>
-                                        <input onChange={handleChange} type="number" className="border-2 border-palette-color4 mb-2" id="price"/>
+                                        <input onChange={handleChange} type="text" className="border-2 border-palette-color4 mb-2" id="amount"/>
+                                        <input onChange={handleChange} type="text" className="border-2 border-palette-color4 mb-2" id="price"/>
                                         <div className="self-center" id="cost">{formData.cost} р</div>
                                     </section>
                                     <input onClick={handleAppending} type="reset" value="Добавить строку" className="w-40 h-10 hover:cursor-pointer bg-palette-color4 text-white rounded-lg"/>
@@ -231,7 +231,7 @@ const Estimates = () => {
                     {/* Estimate groups */}
                     <section className="w-full h-1/2 mb-5">
                         <h2 className="text-[#1D3266] font-bold text-2xl mb-6">Предварительное ведение смет</h2>
-                        <ul className="flex flex-col gap-5">
+                        <ul className="flex flex-col gap-5 select-none">
                             <li>
                                 <div className="flex flex-row h-18 border-3 rounded-xl p-3 hover:shadow-[0px_0px_5px_#37515fff] border-palette-color4 ">
                                     <h5 className="self-center">Фундамент</h5>                                    
