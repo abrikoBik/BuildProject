@@ -120,46 +120,11 @@ const Home = () => {
                                 data={chartData}
                                 width={200}
                                 height={200}
-                                innerRadius={80}
+                                innerRadius={90}
                                 outerRadius={100}
                                 
                             />
                         </section>
-                    </div>
-                    
-                    {/* Contact panel */}
-                    <div className="flex flex-row m-2 items-center rounded-lg border-3 border-palette-color5 text-left p-4">
-                        <div className="text-blue-950 font-bold">
-                            Связь с клиентом:
-                        </div>
-                        <section className="flex flex-row ml-auto self-end items-center space-x-2">
-                            <div id="number" className={`absolute ${showNumber ? "" : "pointer-events-none"} select-none text-center justify-self-center transition-opacity duration-300 ${showNumber ? "opacity-100" : "opacity-0"}`}>
-                                +78005353535
-                            </div>
-                            <input
-                                data-copy-to-clipboard-target="number"
-                                onClick={() => numberCopy()}
-                                type="button"
-                                value="Показать номер"
-                                className={`border-2 border-blue-950 p-2 rounded-xl transition-opacity duration-300 ${showNumber ? "opacity-0" : "opacity-100"}`}
-                            />
-                        </section>
-                        <section className="flex flex-row ml-auto self-end items-center space-x-2 mt-2 mr-15">
-                            <div id="email" className={`absolute ${showEMail ? "" : "pointer-events-none"} select-none text-center justify-self-center transition-opacity duration-300 ${showEMail ? "opacity-100" : "opacity-0"}`}>
-                                aelilkidae@gmail.com
-                            </div>
-                            <input
-                                data-copy-to-clipboard-target="email"
-                                onClick={() => emailCopy()}
-                                type="button"
-                                value="Показать почту"
-                                className={`border-2 border-blue-950 p-2 rounded-xl transition-opacity duration-300 ${showEMail ? "opacity-0" : "opacity-100"}`}
-                            />
-                        </section>
-                    </div>
-                    
-                    <div className="flex m-2 h-100 items-center justify-center rounded-lg border-3 border-paletter-color5 text-left p-4">
-                        ДИАГРАММА ГАНТА
                     </div>
 
                     {/* Tasks panel */}
@@ -214,6 +179,41 @@ const Home = () => {
                         </ul>
                     </div>
                     
+                    <div className="flex m-2 h-100 items-center justify-center rounded-lg border-3 border-paletter-color5 text-left p-4">
+                        ДИАГРАММА ГАНТА
+                    </div>
+
+                    {/* Contact panel */}
+                    <div className="flex flex-row m-2 items-center rounded-lg border-3 border-palette-color5 text-left p-4">
+                        <div className="text-blue-950 font-bold">
+                            Связь с клиентом:
+                        </div>
+                        <section className="flex flex-row ml-auto self-end items-center space-x-2">
+                            <div id="number" className={`absolute ${showNumber ? "" : "pointer-events-none"} select-none text-center justify-self-center transition-opacity duration-300 ${showNumber ? "opacity-100" : "opacity-0"}`}>
+                                +78005353535
+                            </div>
+                            <input
+                                data-copy-to-clipboard-target="number"
+                                onClick={() => numberCopy()}
+                                type="button"
+                                value="Показать номер"
+                                className={`border-2 border-blue-950 p-2 rounded-xl transition-opacity duration-300 ${showNumber ? "opacity-0" : "opacity-100"}`}
+                            />
+                        </section>
+                        <section className="flex flex-row ml-auto self-end items-center space-x-2 mt-2 mr-15">
+                            <div id="email" className={`absolute ${showEMail ? "" : "pointer-events-none"} select-none text-center justify-self-center transition-opacity duration-300 ${showEMail ? "opacity-100" : "opacity-0"}`}>
+                                aelilkidae@gmail.com
+                            </div>
+                            <input
+                                data-copy-to-clipboard-target="email"
+                                onClick={() => emailCopy()}
+                                type="button"
+                                value="Показать почту"
+                                className={`border-2 border-blue-950 p-2 rounded-xl transition-opacity duration-300 ${showEMail ? "opacity-0" : "opacity-100"}`}
+                            />
+                        </section>
+                    </div>
+
                     {/* Empty div */}
                     <div className="w-full h-5"></div>
                 </div>

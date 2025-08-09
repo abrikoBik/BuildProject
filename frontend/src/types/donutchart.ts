@@ -9,6 +9,7 @@ export type DonutChartProps = {
     height: number;
     innerRadius: number;
     outerRadius: number;
+    animationDuration?: number;
 };
 
 export type Coordinates = number[];
