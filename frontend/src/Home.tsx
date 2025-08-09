@@ -225,15 +225,15 @@ const Home = () => {
 		            	</div>
 		        	<div className="mt-5 font-semibold font-[#1d3266]">Создать смету</div>
 		            </a>
-		            <a href="/projects" className="flex flex-col w-full h-1/3 border-3 border-palette-color5 justify-center items-center rounded-lg">
+		            <a href="/blueprints" className="flex flex-col w-full h-1/3 border-3 border-palette-color5 justify-center items-center rounded-lg">
 		                <div className="flex items-center justify-center w-[60%] h-[60%] bg-palette-color2 rounded-full">
 		            	    <img src={BlueprintsIcon} className="max-w-[55%] max-h-[55%]"/>  
 		            	</div>
 		        	<div className="mt-5 font-semibold font-[#1d3266]">Открыть чертежи</div>
 		            </a>
-		            <a href="/blueprints" className="flex flex-col w-full h-1/3 border-3 border-palette-color5 justify-center items-center rounded-lg">
+		            <a href="/projects" className="flex flex-col w-full h-1/3 border-3 border-palette-color5 justify-center items-center rounded-lg">
 		                <span className="material-symbols-outlined-huge">settings</span>
-		        	<div className="mt-5 font-semibold font-[#1d3266]">Настройки</div>
+		        	<div className="mt-5 font-semibold font-[#1d3266]">Открыть проекты</div>
 		            </a>
 		        </div>
             </section>

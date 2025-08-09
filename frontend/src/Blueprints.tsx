@@ -157,40 +157,62 @@ const Blueprints = () => {
     ]);
 
     const handleZoom = (e: React.MouseEvent<HTMLButtonElement>) => {
-        const card = e.currentTarget.closest('.flex.flex-col.border-2') as HTMLElement;
+        const card = e.currentTarget.closest(".flex.flex-col.border-2") as HTMLElement;
 
-        const imgElement = card?.querySelector('img.image') as HTMLImageElement;
+        const imgElement = card?.querySelector("img.image") as HTMLImageElement;
 
         if (imgElement?.src) {
-          console.log("Image src:", imgElement.src);
-          
-          const overlay = document.createElement('div');
-          overlay.style.position = 'fixed';
-          overlay.style.top = '0';
-          overlay.style.left = '0';
-          overlay.style.width = '100vw';
-          overlay.style.height = '100vh';
-          overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
-          overlay.style.display = 'flex';
-          overlay.style.justifyContent = 'center';
-          overlay.style.alignItems = 'center';
-          overlay.style.zIndex = '1000';
-          overlay.style.cursor = 'zoom-out';
+            console.log("Image src:", imgElement.src);
+            
+            const overlay = document.createElement('div');
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100vw';
+            overlay.style.height = '100vh';
+            overlay.style.backgroundColor = 'rgba(0,0,0,0.4)';
+            overlay.style.display = 'flex';
+            overlay.style.justifyContent = 'center';
+            overlay.style.alignItems = 'center';
+            overlay.style.zIndex = '50';
+            overlay.style.cursor = 'grab';
 
-          const zoomedImg = new Image();
-          zoomedImg.src = imgElement.src;
-          zoomedImg.style.maxWidth = '90vw';
-          zoomedImg.style.maxHeight = '90vh';
-          zoomedImg.style.objectFit = 'contain';
+            const exitButton = document.createElement('a');
+            exitButton.style.position = 'fixed';
+            exitButton.style.display = 'flex';
+            exitButton.style.justifyContent = 'center';
+            exitButton.style.alignItems = 'center';
+            exitButton.style.flex = '1';
+            exitButton.style.top = '0';
+            exitButton.style.right = '0';
+            exitButton.style.width = '30px';
+            exitButton.style.height = '30px';
+            exitButton.style.backgroundColor = 'white';
+            exitButton.style.borderRadius = '100%';
+            exitButton.style.marginRight = '10px';
+            exitButton.style.marginTop = '10px';
+            exitButton.style.cursor = 'pointer';
+            
+            const exitIcon = document.createElement('span');
+            exitIcon.className = 'material-symbols-outlined';
+            exitIcon.textContent = 'close';
 
-          overlay.appendChild(zoomedImg);
-          document.body.appendChild(overlay);
-          document.body.style.overflow = 'hidden';
+            const zoomedImg = new Image();
+            zoomedImg.src = imgElement.src;
+            zoomedImg.style.maxWidth = '90vw';
+            zoomedImg.style.maxHeight = '90vh';
+            zoomedImg.style.objectFit = 'contain';
 
-          overlay.onclick = () => {
-            document.body.removeChild(overlay);
-            document.body.style.overflow = '';
-          };
+            exitButton.appendChild(exitIcon);
+            overlay.appendChild(zoomedImg);
+            overlay.appendChild(exitButton);
+            document.body.appendChild(overlay);
+            document.body.style.overflow = 'hidden';
+
+            exitButton.onclick = () => {
+              document.body.removeChild(overlay);
+              document.body.style.overflow = '';
+            };
         }
     };  
 
@@ -225,8 +247,8 @@ const Blueprints = () => {
             <Header />
 
             { editVisible ? 
-                <section className="fixed left-1/2 top-1/2 -translate-1/2 w-screen h-screen bg-[rgba(0,0,0,0.4)] z-50">
-                    <div className="flex flex-col relative left-1/2 top-1/2 -translate-1/2 w-[60%] h-[60%] rounded-xl border-2 border-palette-color4 bg-palette-color1">
+                <section className="fixed left-0 top-0 w-screen h-screen bg-[rgba(0,0,0,0.4)] z-50">
+                    <div className="flex flex-col relative left-1/2 top-1/2 -translate-1/2 w-[60%] h-[80%] rounded-xl border-2 border-palette-color4 bg-palette-color1">
                         <button onClick={() => setEditVisible(false)} type="button" className="hover:cursor-pointer hover:text-red-700 w-7 h-7 flex items-center justify-center self-end">
                             <span className="material-symbols-outlined">
                                 close
@@ -238,7 +260,7 @@ const Blueprints = () => {
                         />
                         <button className="w-40 h-10 hover:cursor-pointer text-center bg-palette-color4 rounded-xl font-semibold text-white self-center">Поменять чертеж</button>
 
-                        <div className="grid grid-rows-2 gap-4 h-full min-h-0 overflow-auto p-5">
+                        <div className="grid grid-rows-4 h-full min-h-0 overflow-auto p-5">
                             <div className="flex flex-col">
                                 <label className="text-sm font-medium mb-1">Название</label>
                                 <EditableCell 
