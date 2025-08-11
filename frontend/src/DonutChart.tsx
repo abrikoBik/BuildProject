@@ -51,7 +51,7 @@ const DonutChart: React.FC<DonutChartProps> = ({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [data, animationDuration, displayData]);
+  }, [data, animationDuration]);
 
   if (total === 0) {
     return <div>No data</div>;
