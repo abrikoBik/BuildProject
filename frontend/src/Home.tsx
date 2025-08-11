@@ -7,7 +7,44 @@ import { useWindowSize } from "@uidotdev/usehooks";
 import BlueprintsIcon from "./assets/BlueprintIcon.svg";
 import SmetaIcon from "./assets/SmetaIcon.svg";
 
+import { Gantt, Task, EventOption, StylingOption, ViewMode, DisplayOption } from 'gantt-task-react';
+import "gantt-task-react/dist/index.css";
+
 const Home = () => {
+
+    const tasks: Task[] = [
+    {
+      start: new Date(2020, 1, 1),
+      end: new Date(2020, 1, 2),
+      name: 'Idea',
+      id: 'Task 0',
+      type:'task',
+      progress: 45,
+      isDisabled: true,
+      styles: { progressColor: '#ffbb54', progressSelectedColor: '#ff9e0d' },
+    },
+    {
+      start: new Date(2021, 1, 1),
+      end: new Date(2021, 1, 2),
+      name: 'Idea',
+      id: 'Task 1',
+      type:'task',
+      progress: 45,
+      isDisabled: true,
+      styles: { progressColor: '#ffbb54', progressSelectedColor: '#ff9e0d' },
+    },
+    {
+      start: new Date(2022, 1, 1),
+      end: new Date(2022, 1, 2),
+      name: 'Idea',
+      id: 'Task 2',
+      type:'task',
+      progress: 45,
+      isDisabled: true,
+      styles: { progressColor: '#ffbb54', progressSelectedColor: '#ff9e0d' },
+    }
+    ];
+
     const [chartData, setChartData] = useState([
         { value: 0, color: "#37515f" },
         { value: 4, color: "#d2d5dd" },
@@ -179,8 +216,8 @@ const Home = () => {
                         </ul>
                     </div>
                     
-                    <div className="flex m-2 h-100 items-center justify-center rounded-lg border-3 border-paletter-color5 text-left p-4">
-                        ДИАГРАММА ГАНТА
+                    <div className="w-[98.5%] rounded-lg max-w-full overflow-x-auto border-3 m-2 border-palette-color5 flex items-center">
+                        <Gantt tasks={tasks} />
                     </div>
 
                     {/* Contact panel */}

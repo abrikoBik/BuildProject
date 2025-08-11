@@ -14,15 +14,19 @@
         "@tailwindcss/vite": "^4.1.11",
         "@uidotdev/usehooks": "^2.4.1",
         "axios": "^1.8.1",
-        "react": "^19.0.0",
+        "gantt-task-react": "^0.3.9",
+        "react": "^19.1.1",
         "react-cookie": "^8.0.1",
-        "react-dom": "^19.0.0",
+        "react-dom": "^19.1.1",
+        "react-google-charts": "^5.2.1",
         "react-router": "^7.2.0",
         "react-router-dom": "^7.2.0",
-        "tailwindcss": "^4.1.11"
+        "tailwindcss": "^4.1.11",
+        "wx-react-gantt": "^1.3.1"
     },
     "devDependencies": {
         "@eslint/js": "^9.21.0",
+        "@types/frappe-gantt": "^0.9.0",
         "@types/react": "^19.0.10",
         "@types/react-dom": "^19.0.4",
         "@vitejs/plugin-react": "^4.3.4",
