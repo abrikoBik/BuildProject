@@ -26,7 +26,8 @@ func GetWorker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var worker models.Worker
-	worker.Get(db.Database, user.Worker.ID)
+	// using util.Check as a temporary solution
+	util.Check(worker.Get(db.Database, user.Worker.ID))
 	util.Debug(getWorkerTag, "worker", worker)
 	response := models.WorkerResponse{Worker: &worker, RegisteredAt: worker.CreatedAt.String()}
 	if err := jsonEncode(w, response, "public"); err != nil {

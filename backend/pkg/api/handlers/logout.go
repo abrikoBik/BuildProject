@@ -11,7 +11,7 @@ import (
 	// "gorm.io/gorm"
 )
 
-const logoutTag = "api:Logout"
+// const logoutTag = "api:Logout"
 
 // Removes the database entry for a session.
 // TODO: rewrite

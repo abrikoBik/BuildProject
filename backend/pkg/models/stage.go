@@ -15,10 +15,10 @@ type Stage struct {
 	Description string
 	StartTime   pq.NullTime
 	EndTime     pq.NullTime
-	Status      bool `gorm:"not null;default:false"`
-	GroupID     uint `gorm:"not null"`
-	Index       int  `gorm:"not null"`
-	Workers     []Worker
+	Status      bool     `gorm:"not null;default:false"`
+	GroupID     uint     `gorm:"not null"`
+	Index       int      `gorm:"not null"`
+	Workers     []Worker `gorm:"many2many:stage_workers"`
 }
 
 type StageRequest struct {

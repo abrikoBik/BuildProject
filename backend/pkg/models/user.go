@@ -64,14 +64,14 @@ func (user *User) Patch(db *gorm.DB, request UserRequest) (err error) {
 			return
 		}
 	}
-	if len(request.User.Email) > 0 {
-		if _, err = mail.ParseAddress(request.User.Email); err != nil {
+	if len(request.Email) > 0 {
+		if _, err = mail.ParseAddress(request.Email); err != nil {
 			return util.InvalidEmailError
 		}
-		user.Email = request.User.Email
+		user.Email = request.Email
 	}
-	if len(request.User.Name) > 0 {
-		user.Name = cases.Title(language.Russian).String(request.User.Name)
+	if len(request.Name) > 0 {
+		user.Name = cases.Title(language.Russian).String(request.Name)
 	}
 	return db.Save(&user).Error
 }
@@ -89,7 +89,7 @@ func (user User) VerifyPassword(password string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return (bytes.Compare(user.Hash, hash) == 0), nil
+	return (bytes.Equal(user.Hash, hash)), nil
 }
 
 func (user User) VerifyToken(db *gorm.DB, token jwt.Token) (result bool, err error) {

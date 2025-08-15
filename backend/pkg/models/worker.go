@@ -11,7 +11,8 @@ type Worker struct {
 	gorm.Model
 	Role   string `json:"role" groups:"public" gorm:"not null"`
 	UserID uint
-	User   *User `gorm:"foreignKey:UserID"`
+	Stages []Stage `gorm:"many2many:stage_workers"`
+	User   *User   `gorm:"foreignKey:UserID"`
 }
 
 type WorkerRequest struct {

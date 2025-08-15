@@ -8,7 +8,7 @@ import (
 
 func Migrate(callback func()) {
 	util.Info("db", "running migrations")
-	toMigrate := map[string]interface{}{
+	toMigrate := map[string]any{
 		"user":    models.User{},
 		"session": models.Session{},
 		"worker":  models.Worker{},

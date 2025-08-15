@@ -19,6 +19,9 @@ func GenerateJWT(name string, password []byte, key []byte) (string, error) {
 		return "", err
 	}
 	hash, err := GenerateHash(password, salt)
+	if err != nil {
+		return "", err
+	}
 	now := time.Now()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
 		"iss":  JWTIssuer,
@@ -36,7 +39,7 @@ func GenerateJWT(name string, password []byte, key []byte) (string, error) {
 
 // Validates a JWT based on current time.
 func ValidateJWT(token string, key []byte) jwt.Token {
-	parsed, _ := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+	parsed, _ := jwt.Parse(token, func(token *jwt.Token) (any, error) {
 		return key, nil
 	},
 		jwt.WithIssuer(JWTIssuer),
