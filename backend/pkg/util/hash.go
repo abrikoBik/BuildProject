@@ -2,6 +2,7 @@ package util
 
 import (
 	"crypto/rand"
+	"crypto/sha256"
 	"math/big"
 	"time"
 
@@ -27,4 +28,13 @@ func GenerateHash(password []byte, salt []byte) ([]byte, error) {
 	}
 	time.Sleep(time.Millisecond * time.Duration(toSleep.Int64()))
 	return argon2.IDKey(password, salt, 3, 12288, 1, 40), nil
+}
+
+func GenerateChecksum(data []byte) ([]byte, error) {
+	hash := sha256.New()
+	_, err := hash.Write(data)
+	if err != nil {
+		return nil, err
+	}
+	return hash.Sum(nil), nil
 }

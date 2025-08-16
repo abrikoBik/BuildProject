@@ -15,6 +15,7 @@ type Project struct {
 	UserID      uint        `gorm:"not null"`
 	Description string
 	Groups      []Group
+	Attachments []Attachment
 }
 
 type ProjectRequest struct {

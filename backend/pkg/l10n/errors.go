@@ -30,4 +30,6 @@ const (
 
 	WorkerExists = "Рабочий уже существует"
 	OutOfBounds  = "Индекс вне диапазона"
+
+	AttachmentSize = "Файл слишком большой"
 )

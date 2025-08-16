@@ -17,6 +17,7 @@ var (
 	UserNotFoundError     = errors.New(l10n.UserNotFound)
 	WorkerExistsError     = errors.New(l10n.WorkerExists)
 	OutOfBoundsError      = errors.New(l10n.OutOfBounds)
+	AttachmentSizeError   = errors.New(l10n.AttachmentSize)
 )
 
 func Check(errs ...error) {
