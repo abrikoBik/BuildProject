@@ -26,10 +26,11 @@ const Login = () => {
     };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        const userAgent = window.navigator.userAgent;
         event.preventDefault();
         try {
             const session: AxiosResponse<SessionResponse> = await axios.post(
-                "http://0.0.0.0:3000/sessions",
+                userAgent.includes("Windows") ? "http://localhost:3000/sessions" : "http://0.0.0.0:3000/sessions",
                 sessionRequest,
                 { withCredentials: true },
             );
@@ -40,7 +41,7 @@ const Login = () => {
             });
 
             const user: AxiosResponse<UserResponse> = await axios.get(
-                `http://0.0.0.0:3000/users/${session.data.userID}`,
+                userAgent.includes("Windows") ? `http://localhost:3000/users/${session.data.userID}` : `http://0.0.0.0:3000/users/${session.data.userID}`,
             );
             if (user.status != 200) {
                 alert(user.data);
