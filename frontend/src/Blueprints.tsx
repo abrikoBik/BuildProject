@@ -161,6 +161,18 @@ const Blueprints = () => {
 
         const imgElement = card?.querySelector("img.image") as HTMLImageElement;
 
+        let scale : number = 1;
+        const scrollSpeed : number = 0.1;
+        const maxScale : number = 9;
+        const minScale : number = 0.5;
+
+        let startX : number;
+        let startY : number;
+        let curX : number = 0;
+        let curY : number = 0;
+
+        let isMouseDown : boolean = false;
+
         if (imgElement?.src) {
             console.log("Image src:", imgElement.src);
             
@@ -196,12 +208,16 @@ const Blueprints = () => {
             const exitIcon = document.createElement('span');
             exitIcon.className = 'material-symbols-outlined';
             exitIcon.textContent = 'close';
+            exitIcon.style.userSelect = 'none';
+            exitIcon.style.pointerEvents = 'none';
 
             const zoomedImg = new Image();
             zoomedImg.src = imgElement.src;
-            zoomedImg.style.maxWidth = '90vw';
-            zoomedImg.style.maxHeight = '90vh';
             zoomedImg.style.objectFit = 'contain';
+            zoomedImg.style.width = '100px';
+            zoomedImg.style.height = '100px';
+            zoomedImg.style.userSelect = 'none';
+            zoomedImg.style.pointerEvents = 'none';
 
             exitButton.appendChild(exitIcon);
             overlay.appendChild(zoomedImg);
@@ -213,6 +229,35 @@ const Blueprints = () => {
               document.body.removeChild(overlay);
               document.body.style.overflow = '';
             };
+
+            overlay.addEventListener("wheel", function(event) {
+                scale += event.deltaY > 0 ? -scrollSpeed : scrollSpeed;
+                scale = Math.min(Math.max(scale, minScale), maxScale);
+
+                zoomedImg.style.width = `${100 * scale}px`;
+                zoomedImg.style.height = `${100 * scale}px`;
+            });
+
+            overlay.addEventListener("mousedown", function(event) {
+
+                startX = event.clientX;
+                startY = event.clientY;
+                isMouseDown = true;
+            });
+
+            overlay.addEventListener("mouseup", function() {
+                isMouseDown = false;
+            });
+
+            overlay.addEventListener("mousemove", function(event) {
+                if(isMouseDown) {
+                    curX += event.clientX - startX;
+                    curY += event.clientY - startY;
+                    startX = event.clientX;
+                    startY = event.clientY;
+                    zoomedImg.style.transform = `translate(${curX}px, ${curY}px)`;
+                }
+            });
         }
     };  
 
@@ -297,10 +342,10 @@ const Blueprints = () => {
                 <></>
             }
 
-            <div className="flex flex-row flex-1">
+            <div className={`flex flex-row flex-1 min-h-0 ${editVisible ? "overflow-hidden" : "overflow-auto"}`}>
                 <Sidebar show={true} choice={3}/>
                 <main className="w-[83%] ml-[17%] pr-5">
-                    <h1 className="text-[#1D3266] text-4xl font-bold mt-5">Чертежи и планы</h1>
+                    <h1 className="text-[#1D3266] text-4xl font-bold mt-5 ">Чертежи и планы</h1>
                     <div className="flex flex-row gap-10 mb-5">
                         <h3 className="text-lg">Заказчик: Иванов И. С.</h3>
                         <h3 className="text-lg">Объект: Московкая д. 68</h3>
