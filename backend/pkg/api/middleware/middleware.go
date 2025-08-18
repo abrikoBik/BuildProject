@@ -8,4 +8,6 @@ const (
 	WorkerID
 	ProjectID
 	StageID
+	// Type: uuid.UUID
+	AttachmentUUID
 )

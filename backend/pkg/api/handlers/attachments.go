@@ -1,11 +1,17 @@
 package handlers
 
 import (
+	"errors"
+	"mp1/pkg/api/middleware"
 	"mp1/pkg/db"
+	"mp1/pkg/l10n"
 	"mp1/pkg/models"
 	"mp1/pkg/util"
 	"net/http"
 	"path"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 const (
@@ -15,9 +21,27 @@ const (
 	deleteAttachmentTag = "api:DeleteAttachment"
 )
 
-// TODO
 func GetAttachment(w http.ResponseWriter, r *http.Request) {
+	// jank
+	contextUUID := r.Context().Value(middleware.AttachmentUUID).(uuid.UUID)
 
+	var attachment models.Attachment
+	result := attachment.Get(db.Database, contextUUID)
+	if errors.Is(result, gorm.ErrRecordNotFound) {
+		http.Error(w, l10n.AttachmentNotFound, http.StatusNotFound)
+		return
+	}
+
+	response := models.AttachmentResponse{
+		Name: attachment.Name,
+		Size: attachment.Size,
+	}
+	if err := jsonEncode(w, response, "public"); err != nil {
+		util.Error(getAttachmentTag, err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	util.Info(getAttachmentTag, "%s returned", attachment.UUID.String())
 }
 
 func CreateAttachment(w http.ResponseWriter, r *http.Request) {
@@ -30,15 +54,15 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 		util.Error(createAttachmentTag, err)
 		return
 	}
-	uuid := attachment.UUID.String()
-	util.Info(createAttachmentTag, "%s created", uuid)
-	response := models.AttachmentResponse{UUID: uuid}
+	attachmentUUID := attachment.UUID.String()
+	util.Info(createAttachmentTag, "%s created", attachmentUUID)
+	response := models.AttachmentResponse{UUID: attachmentUUID}
 	if err := jsonEncode(w, response, "register"); err != nil {
 		util.Error(createAttachmentTag, err)
 		return
 	}
 	// not sure if that's the correct way to do it
-	http.Redirect(w, r, path.Join("/attachments", uuid), http.StatusPermanentRedirect)
+	http.Redirect(w, r, path.Join("/attachments", attachmentUUID), http.StatusPermanentRedirect)
 }
 
 // TODO
