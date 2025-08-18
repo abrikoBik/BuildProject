@@ -6,6 +6,7 @@ import (
 	"mp1/pkg/l10n"
 )
 
+//nolint:all
 var (
 	InsecurePasswordError = errors.New(l10n.InsecurePassword)
 	WrongPasswordError    = errors.New(l10n.WrongPassword)
