@@ -16,7 +16,9 @@ const (
 )
 
 // TODO
-func GetAttachment(w http.ResponseWriter, r *http.Request)
+func GetAttachment(w http.ResponseWriter, r *http.Request) {
+
+}
 
 func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 	var request models.AttachmentRequest
@@ -40,7 +42,11 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 }
 
 // TODO
-func UploadAttachment(w http.ResponseWriter, r *http.Request)
+func UploadAttachment(w http.ResponseWriter, r *http.Request) {
+
+}
 
 // TODO
-func DeleteAttachment(w http.ResponseWriter, r *http.Request)
+func DeleteAttachment(w http.ResponseWriter, r *http.Request) {
+
+}
