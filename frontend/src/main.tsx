@@ -10,6 +10,9 @@ import Estimates from "./Estimates.tsx";
 import Projects from "./Projects.tsx";
 import Blueprints from "./Blueprints.tsx";
 
+{/* DEV */}
+import GanttChart from "./Gantt.tsx";
+
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
         <CookiesProvider>
@@ -21,6 +24,7 @@ createRoot(document.getElementById("root")!).render(
                     <Route path="/estimates" element={<Estimates />} />
                     <Route path="/blueprints" element={<Blueprints />} />
                     <Route path="/projects" element={<Projects />}/>
+                    <Route path="/ganttDEV" element={<GanttChart />}/>
                 </Routes>
             </Router>
         </CookiesProvider>

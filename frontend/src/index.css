@@ -50,9 +50,9 @@
         "opsz" 24;
 }
 
-html {
+/*html {
     background-color: #e8ebe4;
-}
+}*/
 
 * {
     font-family: "Open Sans", "San Francisco", Arial, Helvetica, sans-serif;
@@ -66,7 +66,6 @@ label {
 input[type="text"] {
     user-select: none;
     height: 40px;
-    background-color: #e8ebe4;
     border-bottom-width: 2px;
     border-color: #37515f;
     color: #37515f;
@@ -76,7 +75,6 @@ input[type="password"] {
     user-select: none;
     height: 40px;
     width: 90%;
-    background-color: #e8ebe4;
     border-bottom-width: 2px;
     border-color: #37515f;
     color: #37515f;

@@ -6,6 +6,7 @@ import { useWindowSize } from "@uidotdev/usehooks";
 
 import BlueprintsIcon from "./assets/BlueprintIcon.svg";
 import SmetaIcon from "./assets/SmetaIcon.svg";
+import GanttChart from "./Gantt";
 
 const Home = () => {
 
@@ -181,6 +182,7 @@ const Home = () => {
                     </div>
                     
                     <div className="w-[98.5%] rounded-lg max-w-full overflow-x-auto border-3 m-2 border-palette-color5 flex items-center">
+                        <GanttChart />
                     </div>
 
                     {/* Contact panel */}
