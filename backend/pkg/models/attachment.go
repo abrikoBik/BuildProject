@@ -1,6 +1,9 @@
 package models
 
 import (
+	"crypto/sha256"
+	"io"
+	"mime/multipart"
 	"mp1/pkg/util"
 	"os"
 
@@ -17,12 +20,6 @@ type Attachment struct {
 	Checksum []byte    `gorm:"not null"`
 }
 
-type AttachmentRequest struct {
-	Name string `json:"name"`
-	// Should be provided via a follow-up request.
-	contents []byte
-}
-
 type AttachmentResponse struct {
 	Name string `json:"name" groups:"public"`
 	Size int    `json:"size" groups:"public"`
@@ -33,29 +30,33 @@ func (attachment *Attachment) Get(db *gorm.DB, id uuid.UUID) error {
 	return db.Where("uuid = ?", id).Take(&attachment).Error
 }
 
-func (attachment *Attachment) File(db *gorm.DB, contents []byte) error {
+func (attachment *Attachment) Create(db *gorm.DB, file multipart.File, header *multipart.FileHeader) error {
+	attachment.Name = header.Filename
+	attachment.UUID = uuid.New()
 	attachmentPath, err := util.MakeStoragePath(attachment.UUID.String())
 	if err != nil {
 		return err
 	}
-	if err := os.WriteFile(attachmentPath, contents, 0644); err != nil {
-		return err
-	}
-	sum, err := util.GenerateChecksum(contents)
+	attachmentFile, err := os.OpenFile(attachmentPath, os.O_CREATE, 0644)
 	if err != nil {
 		return err
 	}
-	attachment.Checksum = sum
-	attachment.Size = len(contents)
+	defer attachmentFile.Close()
+	// should be ok?
+	_, err = io.Copy(attachmentFile, file)
+	if err != nil {
+		return err
+	}
+	hash := sha256.New()
+	_, err = io.Copy(hash, file)
+	if err != nil {
+		return err
+	}
+	attachment.Checksum = hash.Sum(nil)
+	attachment.Size = int(header.Size)
 	if (attachment.Size) > util.MaxAttachmentSize {
 		return util.AttachmentSizeError
 	}
-	return db.Save(&attachment).Error
-}
-
-func (attachment *Attachment) Create(db *gorm.DB, request AttachmentRequest) error {
-	attachment.Name = request.Name
-	attachment.UUID = uuid.New()
 	return db.Create(&attachment).Error
 }
 

@@ -8,7 +8,6 @@ import (
 	"mp1/pkg/models"
 	"mp1/pkg/util"
 	"net/http"
-	"path"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -17,21 +16,18 @@ import (
 const (
 	getAttachmentTag    = "api:GetAttachment"
 	createAttachmentTag = "api:CreateAttachment"
-	uploadAttachmentTag = "api:UploadAttachment"
 	deleteAttachmentTag = "api:DeleteAttachment"
 )
 
 func GetAttachment(w http.ResponseWriter, r *http.Request) {
 	// jank
 	contextUUID := r.Context().Value(middleware.AttachmentUUID).(uuid.UUID)
-
 	var attachment models.Attachment
 	result := attachment.Get(db.Database, contextUUID)
 	if errors.Is(result, gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.AttachmentNotFound, http.StatusNotFound)
 		return
 	}
-
 	response := models.AttachmentResponse{
 		Name: attachment.Name,
 		Size: attachment.Size,
@@ -45,12 +41,15 @@ func GetAttachment(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateAttachment(w http.ResponseWriter, r *http.Request) {
-	var request models.AttachmentRequest
-	if !jsonDecode(w, r, &request) {
+	r.ParseMultipartForm(util.MaxAttachmentSize)
+	file, header, err := r.FormFile(util.FormKey)
+	if err != nil {
+		util.Error(createAttachmentTag, err)
 		return
 	}
+	defer file.Close()
 	var attachment models.Attachment
-	if err := attachment.Create(db.Database, request); err != nil {
+	if err := attachment.Create(db.Database, file, header); err != nil {
 		util.Error(createAttachmentTag, err)
 		return
 	}
@@ -61,13 +60,7 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 		util.Error(createAttachmentTag, err)
 		return
 	}
-	// not sure if that's the correct way to do it
-	http.Redirect(w, r, path.Join("/attachments", attachmentUUID), http.StatusPermanentRedirect)
-}
-
-// TODO
-func UploadAttachment(w http.ResponseWriter, r *http.Request) {
-
+	w.WriteHeader(http.StatusCreated)
 }
 
 // TODO
