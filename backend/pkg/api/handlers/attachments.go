@@ -63,7 +63,19 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-// TODO
 func DeleteAttachment(w http.ResponseWriter, r *http.Request) {
-
+	// jank
+	contextUUID := r.Context().Value(middleware.AttachmentUUID).(uuid.UUID)
+	var attachment models.Attachment
+	result := attachment.Get(db.Database, contextUUID)
+	if errors.Is(result, gorm.ErrRecordNotFound) {
+		http.Error(w, l10n.AttachmentNotFound, http.StatusNotFound)
+		return
+	}
+	if err := attachment.Delete(db.Database); err != nil {
+		util.Error(deleteAttachmentTag, err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	util.Info(deleteAttachmentTag, "%s deleted", attachment.UUID.String())
 }
