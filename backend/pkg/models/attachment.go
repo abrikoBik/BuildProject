@@ -6,6 +6,7 @@ import (
 	"mime/multipart"
 	"mp1/pkg/util"
 	"os"
+	"sync"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -42,17 +43,33 @@ func (attachment *Attachment) Create(db *gorm.DB, file multipart.File, header *m
 		return err
 	}
 	defer attachmentFile.Close()
-	// should be ok?
-	_, err = io.Copy(attachmentFile, file)
-	if err != nil {
-		return err
+	// TODO: decide if a waitgroup is needed
+	var (
+		fileErr, hashErr chan error
+		wg               sync.WaitGroup
+	)
+	defer close(fileErr)
+	defer close(hashErr)
+	wg.Add(2)
+	go func() {
+		_, err := io.Copy(attachmentFile, file)
+		fileErr <- err
+		wg.Done()
+	}()
+	go func() {
+		hash := sha256.New()
+		_, err := io.Copy(hash, file)
+		hashErr <- err
+		attachment.Checksum = hash.Sum(nil)
+		wg.Done()
+	}()
+	wg.Wait()
+	if <-fileErr != nil {
+		return <-fileErr
 	}
-	hash := sha256.New()
-	_, err = io.Copy(hash, file)
-	if err != nil {
-		return err
+	if <-hashErr != nil {
+		return <-hashErr
 	}
-	attachment.Checksum = hash.Sum(nil)
 	attachment.Size = int(header.Size)
 	if (attachment.Size) > util.MaxAttachmentSize {
 		return util.AttachmentSizeError
