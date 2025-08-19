@@ -38,38 +38,27 @@ func (attachment *Attachment) Create(db *gorm.DB, file multipart.File, header *m
 	if err != nil {
 		return err
 	}
-	attachmentFile, err := os.OpenFile(attachmentPath, os.O_CREATE, 0644)
+	attachmentFile, err := os.OpenFile(attachmentPath, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
 		return err
 	}
 	defer util.Check(attachmentFile.Close())
 	// TODO: decide if a waitgroup is needed
-	var (
-		fileErr, hashErr chan error
-		wg               sync.WaitGroup
-	)
-	defer close(fileErr)
-	defer close(hashErr)
+	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
 		_, err := io.Copy(attachmentFile, file)
-		fileErr <- err
+		util.Check(err)
 		wg.Done()
 	}()
 	go func() {
 		hash := sha256.New()
 		_, err := io.Copy(hash, file)
-		hashErr <- err
+		util.Check(err)
 		attachment.Checksum = hash.Sum(nil)
 		wg.Done()
 	}()
 	wg.Wait()
-	if <-fileErr != nil {
-		return <-fileErr
-	}
-	if <-hashErr != nil {
-		return <-hashErr
-	}
 	attachment.Size = int(header.Size)
 	if (attachment.Size) > util.MaxAttachmentSize {
 		return util.AttachmentSizeError

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"mp1/pkg/api/middleware"
 	"mp1/pkg/util"
@@ -23,7 +24,9 @@ func init() {
 		panic("JWT_KEY not found in environment")
 	}
 	jwtKey = []byte(keyString)
-	util.Check(os.Mkdir(util.StoragePath, 0644))
+	if err := os.Mkdir(util.StoragePath, 0644); !errors.Is(err, os.ErrExist) && !errors.Is(err, os.ErrNotExist) {
+		panic("could not create directory " + util.StoragePath)
+	}
 }
 
 func Init(hostname string, port uint) *http.Server {
