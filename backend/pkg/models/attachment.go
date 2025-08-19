@@ -42,7 +42,7 @@ func (attachment *Attachment) Create(db *gorm.DB, file multipart.File, header *m
 	if err != nil {
 		return err
 	}
-	defer attachmentFile.Close()
+	defer util.Check(attachmentFile.Close())
 	// TODO: decide if a waitgroup is needed
 	var (
 		fileErr, hashErr chan error

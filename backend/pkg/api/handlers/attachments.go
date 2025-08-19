@@ -41,13 +41,13 @@ func GetAttachment(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateAttachment(w http.ResponseWriter, r *http.Request) {
-	r.ParseMultipartForm(util.MaxAttachmentSize)
+	util.Check(r.ParseMultipartForm(util.MaxAttachmentSize))
 	file, header, err := r.FormFile(util.FormKey)
 	if err != nil {
 		util.Error(createAttachmentTag, err)
 		return
 	}
-	defer file.Close()
+	defer util.Check(file.Close())
 	var attachment models.Attachment
 	if err := attachment.Create(db.Database, file, header); err != nil {
 		util.Error(createAttachmentTag, err)
