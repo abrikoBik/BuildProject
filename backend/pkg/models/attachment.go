@@ -16,14 +16,14 @@ type Attachment struct {
 	gorm.Model
 	Name string `gorm:"not null"`
 	// Size in bytes.
-	Size     int       `gorm:"not null"`
+	Size     int64     `gorm:"not null"`
 	UUID     uuid.UUID `gorm:"type:uuid;default:gen_random_uuid()"`
 	Checksum []byte    `gorm:"not null"`
 }
 
 type AttachmentResponse struct {
 	Name string `json:"name" groups:"public"`
-	Size int    `json:"size" groups:"public"`
+	Size int64  `json:"size" groups:"public"`
 	UUID string `json:"uuid" groups:"register"`
 }
 
@@ -59,7 +59,7 @@ func (attachment *Attachment) Create(db *gorm.DB, file multipart.File, header *m
 		wg.Done()
 	}()
 	wg.Wait()
-	attachment.Size = int(header.Size)
+	attachment.Size = header.Size
 	if (attachment.Size) > util.MaxAttachmentSize {
 		return util.AttachmentSizeError
 	}
