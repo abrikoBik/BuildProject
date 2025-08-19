@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"mp1/pkg/api/middleware"
+	"mp1/pkg/util"
 	"net/http"
 	"os"
 
@@ -22,6 +23,7 @@ func init() {
 		panic("JWT_KEY not found in environment")
 	}
 	jwtKey = []byte(keyString)
+	util.Check(os.Mkdir(util.StoragePath, 0644))
 }
 
 func Init(hostname string, port uint) *http.Server {
