@@ -45,6 +45,7 @@ func Init(hostname string, port uint) *http.Server {
 	addSessions(r)
 	addUsers(r)
 	addProjects(r)
+	addAttachments(r)
 
 	return &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", hostname, port),
