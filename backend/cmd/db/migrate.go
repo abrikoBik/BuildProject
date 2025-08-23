@@ -9,11 +9,12 @@ import (
 func Migrate(callback func()) {
 	util.Info("db", "running migrations")
 	toMigrate := map[string]any{
-		"user":    models.User{},
-		"session": models.Session{},
-		"worker":  models.Worker{},
-		"stage":   models.Stage{},
-		"project": models.Project{},
+		"user":       models.User{},
+		"session":    models.Session{},
+		"worker":     models.Worker{},
+		"stage":      models.Stage{},
+		"project":    models.Project{},
+		"attachment": models.Attachment{},
 	}
 	for name, model := range toMigrate {
 		util.Check(db.Database.Debug().AutoMigrate(&model))

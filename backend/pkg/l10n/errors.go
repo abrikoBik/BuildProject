@@ -1,6 +1,5 @@
 package l10n
 
-// TODO: reorder
 const (
 	// Invalid request errors
 	InvalidID         = "Некорректный ID"
@@ -17,17 +16,20 @@ const (
 	EmptyPassword = "Пароль не может быть пустым"
 
 	// "X not found" errors
-	UserNotFound   = "Пользователь не найден"
-	WorkerNotFound = "Рабочий не найден"
-	TokenNotFound  = "Токен не найден"
-	StageNotFound  = "Стадия не найдена"
+	UserNotFound       = "Пользователь не найден"
+	WorkerNotFound     = "Рабочий не найден"
+	TokenNotFound      = "Токен не найден"
+	StageNotFound      = "Стадия не найдена"
+	AttachmentNotFound = "Файл не найден"
 
 	// Generic errors
-	RegisterError = "Ошибка регистрации"
-	PatchError    = "Ошибка редактирования"
-	LoginError    = "Не удалось войти"
-	LogoutError   = "Не удалось выйти"
+	RegisterError   = "Ошибка регистрации"
+	PatchError      = "Ошибка редактирования"
+	AttachmentError = "Ошибка чертежа"
+	LoginError      = "Не удалось войти"
+	LogoutError     = "Не удалось выйти"
 
-	WorkerExists = "Рабочий уже существует"
-	OutOfBounds  = "Индекс вне диапазона"
+	WorkerExists   = "Рабочий уже существует"
+	OutOfBounds    = "Индекс вне диапазона"
+	AttachmentSize = "Файл слишком большой"
 )

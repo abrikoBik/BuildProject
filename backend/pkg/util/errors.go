@@ -6,6 +6,7 @@ import (
 	"mp1/pkg/l10n"
 )
 
+//nolint:all
 var (
 	InsecurePasswordError = errors.New(l10n.InsecurePassword)
 	WrongPasswordError    = errors.New(l10n.WrongPassword)
@@ -17,6 +18,7 @@ var (
 	UserNotFoundError     = errors.New(l10n.UserNotFound)
 	WorkerExistsError     = errors.New(l10n.WorkerExists)
 	OutOfBoundsError      = errors.New(l10n.OutOfBounds)
+	AttachmentSizeError   = errors.New(l10n.AttachmentSize)
 )
 
 func Check(errs ...error) {

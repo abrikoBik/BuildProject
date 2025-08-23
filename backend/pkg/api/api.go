@@ -38,13 +38,14 @@ func Init(hostname string, port uint) *http.Server {
 		chiMiddleware.RequestID,
 		chiMiddleware.Logger,
 		chiMiddleware.AllowContentEncoding("gzip", "deflate"),
-		chiMiddleware.AllowContentType("application/json"),
+		chiMiddleware.AllowContentType("application/json", "multipart/form-data"),
 		middleware.AddHeaders,
 	)
 
 	addSessions(r)
 	addUsers(r)
 	addProjects(r)
+	addAttachments(r)
 
 	return &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", hostname, port),
