@@ -36,7 +36,6 @@ const Register = () => {
     };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        const userAgent = window.navigator.userAgent;
         event.preventDefault();
         try {
 	    if(checkPass != userRequest.password)
@@ -45,7 +44,7 @@ const Register = () => {
 		return;
             }
             const { data, status } = await axios.post<UserRequest>(
-                userAgent.includes("Windows") ? "http://localhost:3000/users" : "http://0.0.0.0:3000/users",
+                "/api/users",
                 userRequest,
             );
             if (status != 200) {
