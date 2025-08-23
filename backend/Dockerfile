@@ -1,9 +1,11 @@
-FROM golang:alpine AS builder
+FROM golang AS builder
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 ENV GOCACHE=/root/.cache/go-build
+ENV CGO_ENABLED=0
+ENV GOOS=linux
 RUN --mount=type=cache,target="/root/.cache/go-build" go build -o ./mp1_backend
 
 FROM alpine AS runner
