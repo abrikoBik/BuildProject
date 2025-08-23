@@ -1,13 +1,12 @@
-FROM node:22-alpine AS builder
+FROM node:22 AS builder
 WORKDIR /src
-COPY package.json ./
+COPY package.json package-lock.json ./
 RUN npm install
 COPY . .
 RUN npm run lint && npm run build
 
-FROM node:22-alpine AS runner
+FROM node:22 AS runner
 WORKDIR /app
-RUN apk add --no-cache curl
 COPY --from=builder /src/. /app
 EXPOSE 5173
 EXPOSE 4173
