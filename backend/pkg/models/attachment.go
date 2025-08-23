@@ -1,6 +1,7 @@
 package models
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"io"
 	"mime/multipart"
@@ -33,6 +34,11 @@ func (attachment *Attachment) Get(db *gorm.DB, id uuid.UUID) error {
 }
 
 func (attachment *Attachment) Create(db *gorm.DB, file multipart.File, header *multipart.FileHeader) error {
+	// TODO: explore memory usage
+	buf := new(bytes.Buffer)
+	if _, err := io.Copy(buf, file); err != nil {
+		return err
+	}
 	attachment.Name = header.Filename
 	attachment.UUID = uuid.New()
 	attachmentPath, err := util.MakeStoragePath(attachment.UUID.String())
@@ -43,18 +49,19 @@ func (attachment *Attachment) Create(db *gorm.DB, file multipart.File, header *m
 	if err != nil {
 		return err
 	}
-	defer util.Check(attachmentFile.Close())
 	// TODO: decide if a waitgroup is needed
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go func() {
-		_, err := io.Copy(attachmentFile, file)
-		util.Check(err)
+		reader := bytes.NewReader(buf.Bytes())
+		_, err := io.Copy(attachmentFile, reader)
+		util.Check(err, attachmentFile.Close())
 		wg.Done()
 	}()
 	go func() {
+		reader := bytes.NewReader(buf.Bytes())
 		hash := sha256.New()
-		_, err := io.Copy(hash, file)
+		_, err := io.Copy(hash, reader)
 		util.Check(err)
 		attachment.Checksum = hash.Sum(nil)
 		wg.Done()
