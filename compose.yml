@@ -22,11 +22,9 @@ services:
     env_file: .env
     restart: always
     build: backend
-    ports:
-      - 3000:3000
     networks:
       - backend
-      - frontend
+      - proxy
     volumes:
       - attachment-volume:/var/lib/attachments
     links:
@@ -39,11 +37,8 @@ services:
     container_name: mp1_frontend
     restart: always
     build: frontend
-    ports:
-      - 5173:5173
-      - 4173:4173
     networks:
-      - frontend
+      - proxy
     links:
       - backend
     depends_on:
@@ -54,9 +49,26 @@ services:
           path: ./frontend
           target: /app
 
+  proxy:
+    image: nginx
+    container_name: mp1_proxy
+    restart: always
+    ports:
+      - 8000:80
+    networks:
+      - proxy
+    volumes:
+      - type: bind
+        source: ./proxy/nginx.conf
+        target: /etc/nginx/conf.d/default.conf
+        read_only: true
+    depends_on:
+      - backend
+      - frontend
+
 networks:
   backend:
-  frontend:
+  proxy:
 
 volumes:
   db-volume:

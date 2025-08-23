@@ -35,6 +35,7 @@ func Init(hostname string, port uint) *http.Server {
 			MaxAge:           86400,
 		}),
 		chiMiddleware.Heartbeat("/health"),
+		chiMiddleware.CleanPath,
 		chiMiddleware.RequestID,
 		chiMiddleware.Logger,
 		chiMiddleware.AllowContentEncoding("gzip", "deflate"),
