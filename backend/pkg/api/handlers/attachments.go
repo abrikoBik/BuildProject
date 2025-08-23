@@ -23,7 +23,6 @@ const (
 )
 
 func GetAttachment(w http.ResponseWriter, r *http.Request) {
-	// jank
 	contextUUID := r.Context().Value(middleware.AttachmentUUID).(uuid.UUID)
 	util.Debug("api.GetAttachment", "contextUUID", contextUUID)
 	var attachment models.Attachment
@@ -41,7 +40,7 @@ func GetAttachment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	mw := multipart.NewWriter(w)
-	fw, err := mw.CreateFormField(util.FormKey)
+	fw, err := mw.CreateFormFile(util.FormKey, attachment.Name)
 	if err != nil {
 		util.Debug("api.GetAttachment", "err", err)
 		http.Error(w, l10n.AttachmentError, http.StatusInternalServerError)
