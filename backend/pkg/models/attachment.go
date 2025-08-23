@@ -7,6 +7,7 @@ import (
 	"mime/multipart"
 	"mp1/pkg/util"
 	"os"
+	"path/filepath"
 	"sync"
 
 	"github.com/google/uuid"
@@ -41,10 +42,7 @@ func (attachment *Attachment) Create(db *gorm.DB, file multipart.File, header *m
 	}
 	attachment.Name = header.Filename
 	attachment.UUID = uuid.New()
-	attachmentPath, err := util.MakeStoragePath(attachment.UUID.String())
-	if err != nil {
-		return err
-	}
+	attachmentPath := filepath.Join(util.StoragePath, attachment.UUID.String())
 	attachmentFile, err := os.OpenFile(attachmentPath, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
 		return err
@@ -76,10 +74,7 @@ func (attachment *Attachment) Create(db *gorm.DB, file multipart.File, header *m
 
 func (attachment *Attachment) Delete(db *gorm.DB) error {
 	// might get very messy
-	attachmentPath, err := util.MakeStoragePath(attachment.UUID.String())
-	if err != nil {
-		return err
-	}
+	attachmentPath := filepath.Join(util.StoragePath, attachment.UUID.String())
 	if err := os.Remove(attachmentPath); err != nil {
 		return err
 	}

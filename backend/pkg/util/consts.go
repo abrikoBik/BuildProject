@@ -5,6 +5,6 @@ const (
 
 	// Should be around 128MB
 	MaxAttachmentSize = 1 << 27
-	StoragePath       = "attachments"
+	StoragePath       = "/var/lib/attachments"
 	FormKey           = "attachment"
 )

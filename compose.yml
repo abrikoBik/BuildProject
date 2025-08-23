@@ -27,6 +27,8 @@ services:
     networks:
       - backend
       - frontend
+    volumes:
+      - attachment-volume:/var/lib/attachments
     links:
       - db
     depends_on:
@@ -58,3 +60,4 @@ networks:
 
 volumes:
   db-volume:
+  attachment-volume:
