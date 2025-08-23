@@ -11,8 +11,8 @@ func addAttachments(r chi.Router) {
 	r.Route("/attachments", func(r chi.Router) {
 		r.With(middleware.JSONResponse).Post("/", handlers.CreateAttachment)
 		r.Route("/{attachmentUUID}", func(r chi.Router) {
-			r.Use(middleware.ParseID(middleware.AttachmentUUID, "attachmentUUID"))
-			r.With(middleware.JSONResponse, middleware.ValidateToken(jwtKey)).Get("/", handlers.GetAttachment)
+			r.Use(middleware.ParseUUID(middleware.AttachmentUUID, "attachmentUUID"))
+			r.With(middleware.ValidateToken(jwtKey)).Get("/", handlers.GetAttachment)
 			r.With(middleware.ValidateToken(jwtKey)).Delete("/", handlers.DeleteAttachment)
 		})
 	})

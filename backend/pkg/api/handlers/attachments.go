@@ -2,12 +2,15 @@ package handlers
 
 import (
 	"errors"
+	"mime/multipart"
 	"mp1/pkg/api/middleware"
 	"mp1/pkg/db"
 	"mp1/pkg/l10n"
 	"mp1/pkg/models"
 	"mp1/pkg/util"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -22,20 +25,34 @@ const (
 func GetAttachment(w http.ResponseWriter, r *http.Request) {
 	// jank
 	contextUUID := r.Context().Value(middleware.AttachmentUUID).(uuid.UUID)
+	util.Debug("api.GetAttachment", "contextUUID", contextUUID)
 	var attachment models.Attachment
 	result := attachment.Get(db.Database, contextUUID)
 	if errors.Is(result, gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.AttachmentNotFound, http.StatusNotFound)
 		return
 	}
-	response := models.AttachmentResponse{
-		Name: attachment.Name,
-		Size: attachment.Size,
-	}
-	if err := jsonEncode(w, response, "public"); err != nil {
-		util.Error(getAttachmentTag, err)
+
+	attachmentPath := filepath.Join(util.StoragePath, attachment.UUID.String())
+	contents, err := os.ReadFile(attachmentPath)
+	if err != nil {
+		util.Debug("api.GetAttachment", "err", err)
+		http.Error(w, l10n.AttachmentError, http.StatusInternalServerError)
 		return
 	}
+	mw := multipart.NewWriter(w)
+	fw, err := mw.CreateFormField(util.FormKey)
+	if err != nil {
+		util.Debug("api.GetAttachment", "err", err)
+		http.Error(w, l10n.AttachmentError, http.StatusInternalServerError)
+		return
+	}
+	if _, err := fw.Write(contents); err != nil {
+		util.Debug("api.GetAttachment", "err", err)
+		http.Error(w, l10n.AttachmentError, http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
 	util.Info(getAttachmentTag, "%s returned", attachment.UUID.String())
 }
