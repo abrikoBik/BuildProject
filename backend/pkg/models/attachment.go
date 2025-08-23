@@ -35,6 +35,10 @@ func (attachment *Attachment) Get(db *gorm.DB, id uuid.UUID) error {
 }
 
 func (attachment *Attachment) Create(db *gorm.DB, file multipart.File, header *multipart.FileHeader) error {
+	attachment.Size = header.Size
+	if (attachment.Size) > util.MaxAttachmentSize {
+		return util.AttachmentSizeError
+	}
 	// TODO: explore memory usage
 	buf := new(bytes.Buffer)
 	if _, err := io.Copy(buf, file); err != nil {
@@ -65,10 +69,6 @@ func (attachment *Attachment) Create(db *gorm.DB, file multipart.File, header *m
 		wg.Done()
 	}()
 	wg.Wait()
-	attachment.Size = header.Size
-	if (attachment.Size) > util.MaxAttachmentSize {
-		return util.AttachmentSizeError
-	}
 	return db.Create(&attachment).Error
 }
 
