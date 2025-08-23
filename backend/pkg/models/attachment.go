@@ -25,8 +25,6 @@ type Attachment struct {
 }
 
 type AttachmentResponse struct {
-	Name string `json:"name" groups:"public"`
-	Size int64  `json:"size" groups:"public"`
 	UUID string `json:"uuid" groups:"register"`
 }
 
