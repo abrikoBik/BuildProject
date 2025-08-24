@@ -33,7 +33,7 @@ func GetWorker(w http.ResponseWriter, r *http.Request) {
 	// using util.Check as a temporary solution
 	util.Check(worker.Get(db.Database, user.Worker.ID))
 	util.Debug(getWorkerTag, "worker", worker)
-	response := models.WorkerResponse{Worker: &worker, RegisteredAt: worker.CreatedAt.String()}
+	response := models.WorkerResponse{Worker: &worker, CreatedAt: worker.CreatedAt.String()}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		util.Error(getWorkerTag, err)
 		return
@@ -111,7 +111,7 @@ func PatchWorker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	util.Info(patchWorkerTag, "%s (id%d) patched", user.Name, worker.ID)
-	response := models.WorkerResponse{Worker: &worker, RegisteredAt: worker.CreatedAt.String()}
+	response := models.WorkerResponse{Worker: &worker, CreatedAt: worker.CreatedAt.String()}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		util.Error(patchWorkerTag, err)
 		return

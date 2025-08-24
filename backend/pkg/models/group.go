@@ -9,24 +9,22 @@ import (
 
 type Group struct {
 	gorm.Model
-	Name      string `gorm:"not null"`
-	ProjectID uint   `gorm:"not null"`
+	Name      string `json:"name" groups:"public" gorm:"not null"`
+	ProjectID uint   `json:"projectID" groups:"public" gorm:"not null"`
 	StartTime pq.NullTime
 	EndTime   pq.NullTime
 	Stages    []Stage
 }
 
 type GroupRequest struct {
-	Name      string `json:"name" groups:"public"`
-	ProjectID uint   `json:"projectID" groups:"public"`
+	*Group
 }
 
 type GroupResponse struct {
-	Name      string `json:"name" groups:"public"`
-	ProjectID uint   `json:"projectID" groups:"public"`
-	StartTime int64  `json:"startTime" groups:"public"`
-	EndTime   int64  `json:"endTime" groups:"public"`
-	CreatedAt int64  `json:"createdAt" groups:"public"`
+	*Group
+	StartTime int64 `json:"startTime" groups:"public"`
+	EndTime   int64 `json:"endTime" groups:"public"`
+	CreatedAt int64 `json:"createdAt" groups:"public"`
 }
 
 func (group *Group) Get(db *gorm.DB, id uint) error {

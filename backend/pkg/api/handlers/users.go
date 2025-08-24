@@ -25,7 +25,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
-	response := models.UserResponse{User: &user, RegisteredAt: user.CreatedAt.String()}
+	response := models.UserResponse{User: &user, CreatedAt: user.CreatedAt.String()}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		util.Error(getUserTag, err)
 		return
@@ -95,7 +95,7 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	util.Info(patchUserTag, "%s (id%d) patched", user.Name, user.ID)
-	response := models.UserResponse{User: &user, RegisteredAt: user.CreatedAt.String()}
+	response := models.UserResponse{User: &user, CreatedAt: user.CreatedAt.String()}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		util.Error(patchUserTag, err)
 		return

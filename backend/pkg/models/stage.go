@@ -12,34 +12,28 @@ import (
 
 type Stage struct {
 	gorm.Model
-	Name        string `gorm:"not null"`
-	Description string
+	Name        string `json:"name" groups:"public" gorm:"not null"`
+	Description string `json:"description" groups:"public"`
+	Status      bool   `json:"status" groups:"public" gorm:"not null;default:false"`
+	GroupID     uint   `json:"groupID" groups:"public" gorm:"not null"`
+	Index       int    `json:"index" groups:"public" gorm:"not null"`
 	StartTime   pq.NullTime
 	EndTime     pq.NullTime
-	Status      bool     `gorm:"not null;default:false"`
-	GroupID     uint     `gorm:"not null"`
-	Index       int      `gorm:"not null"`
 	Workers     []Worker `gorm:"many2many:stage_workers"`
 }
 
 type StageRequest struct {
-	Name        string `json:"name" groups:"public"`
-	Description string `json:"description" groups:"public"`
-	StartTime   int64  `json:"startTime" groups:"public"`
-	EndTime     int64  `json:"endTime" groups:"public"`
-	GroupID     uint   `json:"projectID" groups:"public"`
-	Index       int    `json:"index" groups:"public"`
+	*Stage
+	StartTime int64 `json:"startTime" groups:"public"`
+	EndTime   int64 `json:"endTime" groups:"public"`
 }
 
 type StageResponse struct {
-	Name        string `json:"name" groups:"public"`
-	Description string `json:"description" groups:"public"`
-	StartTime   int64  `json:"startTime" groups:"public"`
-	EndTime     int64  `json:"endTime" groups:"public"`
-	GroupID     uint   `json:"projectID" groups:"public"`
-	Index       int    `json:"index" groups:"public"`
-	CreatedAt   int64  `json:"createdAt" groups:"public"`
-	ID          uint   `json:"id" groups:"register"`
+	*Stage
+	StartTime int64 `json:"startTime" groups:"public"`
+	EndTime   int64 `json:"endTime" groups:"public"`
+	CreatedAt int64 `json:"createdAt" groups:"public"`
+	ID        uint  `json:"id" groups:"register"`
 }
 
 func (stage *Stage) Get(db *gorm.DB, id uint) error {

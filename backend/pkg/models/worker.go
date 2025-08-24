@@ -21,8 +21,8 @@ type WorkerRequest struct {
 
 type WorkerResponse struct {
 	*Worker
-	RegisteredAt string `json:"registeredAt" groups:"public"`
-	ID           uint   `json:"id" groups:"register"`
+	CreatedAt string `json:"registeredAt" groups:"public"`
+	ID        uint   `json:"id" groups:"register"`
 }
 
 func (worker *Worker) Get(db *gorm.DB, id uint) error {
