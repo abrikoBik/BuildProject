@@ -12,7 +12,11 @@ import (
 	"gorm.io/gorm"
 )
 
-const getWorkerTag = "api:GetWorker"
+const (
+	getWorkerTag    = "api:GetWorker"
+	createWorkerTag = "api:CreateWorker"
+	patchWorkerTag  = "api:PatchWorker"
+)
 
 func GetWorker(w http.ResponseWriter, r *http.Request) {
 	var user models.User
@@ -36,4 +40,81 @@ func GetWorker(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	util.Info(getWorkerTag, "id%d returned", worker.ID)
+}
+
+func CreateWorker(w http.ResponseWriter, r *http.Request) {
+	userID, err := middleware.GetID(middleware.UserID, r.Context())
+	if err != nil {
+		return
+	}
+	var worker models.Worker
+	request := models.WorkerRequest{
+		Worker: &worker,
+		UserID: userID,
+	}
+	if !jsonDecode(w, r, &request) {
+		return
+	}
+	if err := worker.Create(db.Database, request); err != nil {
+		util.Error(createWorkerTag, err)
+		switch err {
+		case util.WorkerExistsError:
+			http.Error(w, l10n.WorkerExists, http.StatusBadRequest)
+		case util.InvalidRoleError:
+			http.Error(w, l10n.InvalidRole, http.StatusBadRequest)
+		case util.InsecurePasswordError:
+			http.Error(w, l10n.InsecurePassword, http.StatusBadRequest)
+		case util.WrongPasswordError:
+			http.Error(w, l10n.WrongPassword, http.StatusForbidden)
+		case gorm.ErrDuplicatedKey:
+			http.Error(w, l10n.NameOrEmailTaken, http.StatusBadRequest)
+		default:
+			http.Error(w, l10n.RegisterError, http.StatusInternalServerError)
+		}
+		return
+	}
+	util.Info(createWorkerTag, "id%d registered", worker.ID)
+	response := models.WorkerResponse{ID: worker.ID}
+	if err := jsonEncode(w, response, "register"); err != nil {
+		util.Error(createWorkerTag, err)
+		return
+	}
+	w.WriteHeader(http.StatusCreated)
+}
+
+func PatchWorker(w http.ResponseWriter, r *http.Request) {
+	userID, err := middleware.GetID(middleware.UserID, r.Context())
+	if err != nil {
+		return
+	}
+	var user models.User
+	if user.Get(db.Database, userID) != nil {
+		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
+		return
+	}
+	util.Debug(patchWorkerTag, "user", user)
+	if !verifyUser(user, w, r) {
+		return
+	}
+	var worker models.Worker
+	if db.Database.Where("user_id = ?", userID).Take(&worker).Error != nil {
+		http.Error(w, l10n.WorkerNotFound, http.StatusNotFound)
+		return
+	}
+	var request models.WorkerRequest
+	if !jsonDecode(w, r, &request) {
+		return
+	}
+	if err := worker.Patch(db.Database, request); err != nil {
+		util.Error(patchWorkerTag, err)
+		http.Error(w, l10n.PatchError, http.StatusInternalServerError)
+		return
+	}
+	util.Info(patchWorkerTag, "%s (id%d) patched", user.Name, worker.ID)
+	response := models.WorkerResponse{Worker: &worker, RegisteredAt: worker.CreatedAt.String()}
+	if err := jsonEncode(w, response, "public"); err != nil {
+		util.Error(patchWorkerTag, err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }

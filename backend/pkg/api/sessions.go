@@ -9,7 +9,7 @@ import (
 
 func addSessions(r chi.Router) {
 	r.Route("/sessions", func(r chi.Router) {
-		r.With(middleware.JSONResponse).Post("/", handlers.Login)
-		r.Delete("/", handlers.Logout)
+		r.With(middleware.JSONResponse).Post("/", handlers.CreateSession)
+		r.Delete("/", handlers.DeleteSession)
 	})
 }

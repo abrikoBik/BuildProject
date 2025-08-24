@@ -9,7 +9,7 @@ import (
 
 func addUsers(r chi.Router) {
 	r.Route("/users", func(r chi.Router) {
-		r.With(middleware.JSONResponse).Post("/", handlers.RegisterUser)
+		r.With(middleware.JSONResponse).Post("/", handlers.CreateUser)
 		r.Route("/{userID}", func(r chi.Router) {
 			r.Use(middleware.ParseID(middleware.UserID, "userID"))
 			r.With(middleware.JSONResponse).Get("/", handlers.GetUser)
