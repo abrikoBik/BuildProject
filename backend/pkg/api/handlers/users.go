@@ -43,9 +43,9 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	if err := user.Create(db.Database, request); err != nil {
 		util.Error(createUserTag, err)
 		switch err {
-		case util.InsecurePasswordError:
+		case l10n.InsecurePasswordError:
 			http.Error(w, l10n.InsecurePassword, http.StatusBadRequest)
-		case util.InvalidEmailError:
+		case l10n.InvalidEmailError:
 			http.Error(w, l10n.InvalidEmail, http.StatusBadRequest)
 		case gorm.ErrDuplicatedKey:
 			http.Error(w, l10n.NameOrEmailTaken, http.StatusBadRequest)
@@ -83,14 +83,14 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 	if err := user.Patch(db.Database, request); err != nil {
 		util.Error(patchUserTag, err)
 		switch err {
-		case util.InsecurePasswordError:
+		case l10n.InsecurePasswordError:
 			http.Error(w, l10n.InsecurePassword, http.StatusBadRequest)
-		case util.InvalidEmailError:
+		case l10n.InvalidEmailError:
 			http.Error(w, l10n.InvalidEmail, http.StatusBadRequest)
 		case gorm.ErrDuplicatedKey:
 			http.Error(w, l10n.NameOrEmailTaken, http.StatusBadRequest)
 		default:
-			http.Error(w, l10n.GenericError, http.StatusInternalServerError)
+			http.Error(w, l10n.GenericUser, http.StatusInternalServerError)
 		}
 		return
 	}

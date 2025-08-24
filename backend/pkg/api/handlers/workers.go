@@ -58,13 +58,13 @@ func CreateWorker(w http.ResponseWriter, r *http.Request) {
 	if err := worker.Create(db.Database, request); err != nil {
 		util.Error(createWorkerTag, err)
 		switch err {
-		case util.WorkerExistsError:
+		case l10n.WorkerExistsError:
 			http.Error(w, l10n.WorkerExists, http.StatusBadRequest)
-		case util.InvalidRoleError:
+		case l10n.InvalidRoleError:
 			http.Error(w, l10n.InvalidRole, http.StatusBadRequest)
-		case util.InsecurePasswordError:
+		case l10n.InsecurePasswordError:
 			http.Error(w, l10n.InsecurePassword, http.StatusBadRequest)
-		case util.WrongPasswordError:
+		case l10n.WrongPasswordError:
 			http.Error(w, l10n.WrongPassword, http.StatusForbidden)
 		case gorm.ErrDuplicatedKey:
 			http.Error(w, l10n.NameOrEmailTaken, http.StatusBadRequest)
@@ -107,7 +107,7 @@ func PatchWorker(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := worker.Patch(db.Database, request); err != nil {
 		util.Error(patchWorkerTag, err)
-		http.Error(w, l10n.GenericError, http.StatusInternalServerError)
+		http.Error(w, l10n.GenericWorker, http.StatusInternalServerError)
 		return
 	}
 	util.Info(patchWorkerTag, "%s (id%d) patched", user.Name, worker.ID)

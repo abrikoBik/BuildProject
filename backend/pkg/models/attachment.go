@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"io"
 	"mime/multipart"
+	"mp1/pkg/l10n"
 	"mp1/pkg/util"
 	"os"
 	"path/filepath"
@@ -35,7 +36,7 @@ func (attachment *Attachment) Get(db *gorm.DB, id uuid.UUID) error {
 func (attachment *Attachment) Create(db *gorm.DB, file multipart.File, header *multipart.FileHeader) error {
 	attachment.Size = header.Size
 	if (attachment.Size) > util.MaxAttachmentSize {
-		return util.AttachmentSizeError
+		return l10n.AttachmentSizeError
 	}
 	// TODO: explore memory usage
 	buf := new(bytes.Buffer)

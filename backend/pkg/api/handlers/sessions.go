@@ -30,10 +30,10 @@ func CreateSession(w http.ResponseWriter, r *http.Request) {
 		util.Error(createSessionTag, err)
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			http.Error(w, l10n.UserNotFound, http.StatusNotFound)
-		} else if errors.Is(err, util.WrongPasswordError) {
+		} else if errors.Is(err, l10n.WrongPasswordError) {
 			http.Error(w, l10n.WrongPassword, http.StatusForbidden)
 		} else {
-			http.Error(w, l10n.LoginError, http.StatusInternalServerError)
+			http.Error(w, l10n.Login, http.StatusInternalServerError)
 		}
 		return
 	}

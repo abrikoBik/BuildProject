@@ -1,6 +1,7 @@
 package models
 
 import (
+	"mp1/pkg/l10n"
 	"mp1/pkg/util"
 
 	"gorm.io/gorm"
@@ -31,7 +32,7 @@ func (session *Session) Create(db *gorm.DB, request SessionRequest, jwtKey []byt
 		return err
 	}
 	if !match {
-		return util.WrongPasswordError
+		return l10n.WrongPasswordError
 	}
 	token, err := util.GenerateJWT(request.Login, []byte(request.Password), jwtKey)
 	if err != nil {

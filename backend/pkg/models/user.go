@@ -2,6 +2,7 @@ package models
 
 import (
 	"bytes"
+	"mp1/pkg/l10n"
 	"mp1/pkg/util"
 	"net/mail"
 	"sync"
@@ -41,11 +42,11 @@ func (user *User) Get(db *gorm.DB, id uint) error {
 
 func (user *User) Create(db *gorm.DB, request UserRequest) (err error) {
 	if _, err = mail.ParseAddress(request.Email); err != nil {
-		return util.InvalidEmailError
+		return l10n.InvalidEmailError
 	}
 	user.Email = request.Email
 	if len(request.Password) < util.MinPasswordLength {
-		return util.InsecurePasswordError
+		return l10n.InsecurePasswordError
 	}
 	if err = user.PreparePassword(request.Password); err != nil {
 		return
@@ -58,7 +59,7 @@ func (user *User) Create(db *gorm.DB, request UserRequest) (err error) {
 func (user *User) Patch(db *gorm.DB, request UserRequest) (err error) {
 	if len(request.Password) > 0 {
 		if len(request.Password) < util.MinPasswordLength {
-			return util.InsecurePasswordError
+			return l10n.InsecurePasswordError
 		}
 		if err = user.PreparePassword(request.Password); err != nil {
 			return
@@ -66,7 +67,7 @@ func (user *User) Patch(db *gorm.DB, request UserRequest) (err error) {
 	}
 	if len(request.Email) > 0 {
 		if _, err = mail.ParseAddress(request.Email); err != nil {
-			return util.InvalidEmailError
+			return l10n.InvalidEmailError
 		}
 		user.Email = request.Email
 	}

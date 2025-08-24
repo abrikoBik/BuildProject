@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"mp1/pkg/l10n"
 	"mp1/pkg/util"
 	"slices"
 
@@ -51,7 +52,7 @@ func (stage *Stage) Create(db *gorm.DB, request StageRequest) error {
 		return err
 	}
 	if request.Index < 0 || request.Index >= len(group.Stages) {
-		return util.OutOfBoundsError
+		return l10n.OutOfBoundsError
 	}
 	stage.Name = request.Name
 	stage.Description = request.Description
@@ -70,7 +71,7 @@ func (stage *Stage) Delete(db *gorm.DB) error {
 		return err
 	}
 	if stage.Index < 0 || stage.Index >= len(group.Stages) {
-		return util.OutOfBoundsError
+		return l10n.OutOfBoundsError
 	}
 	group.Stages = slices.Delete(group.Stages, stage.Index, stage.Index)
 	return errors.Join(group.CalculateTimes(db), db.Delete(&stage).Error)
@@ -104,7 +105,7 @@ func (stage *Stage) AddWorker(db *gorm.DB, worker Worker) error {
 
 func (stage *Stage) RemoveWorker(db *gorm.DB, index int) error {
 	if index < 0 || index >= len(stage.Workers) {
-		return util.OutOfBoundsError
+		return l10n.OutOfBoundsError
 	}
 	stage.Workers = slices.Delete(stage.Workers, index, index)
 	return db.Save(&stage).Error

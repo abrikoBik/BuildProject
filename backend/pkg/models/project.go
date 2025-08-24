@@ -1,6 +1,7 @@
 package models
 
 import (
+	"mp1/pkg/l10n"
 	"mp1/pkg/util"
 
 	"github.com/lib/pq"
@@ -43,7 +44,7 @@ func (project *Project) Get(db *gorm.DB, id uint) error {
 func (project *Project) Create(db *gorm.DB, request ProjectRequest) error {
 	var user User
 	if err := user.Get(db, request.UserID); err != nil {
-		return util.UserNotFoundError
+		return l10n.UserNotFoundError
 	}
 	project.UserID = user.ID
 	project.Name = request.Name

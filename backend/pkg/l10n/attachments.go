@@ -1,7 +1,15 @@
 package l10n
 
+import "errors"
+
 const (
+	GenericAttachment  = "Ошибка чертежа"
 	AttachmentSize     = "Файл слишком большой"
-	AttachmentError    = "Ошибка чертежа"
 	AttachmentNotFound = "Файл не найден"
+)
+
+var (
+	GenericAttachmentError  = errors.New(GenericAttachment)
+	AttachmentSizeError     = errors.New(AttachmentSize)
+	AttachmentNotFoundError = errors.New(AttachmentNotFound)
 )

@@ -2,9 +2,8 @@ package models
 
 import (
 	"errors"
-	"mp1/pkg/util"
-
 	"gorm.io/gorm"
+	"mp1/pkg/l10n"
 )
 
 type Worker struct {
@@ -32,14 +31,14 @@ func (worker *Worker) Get(db *gorm.DB, id uint) error {
 
 func (worker *Worker) Create(db *gorm.DB, request WorkerRequest) error {
 	if len(request.Role) == 0 {
-		return util.InvalidRoleError
+		return l10n.InvalidRoleError
 	}
 	var user User
 	if err := user.Get(db, request.UserID); err != nil {
 		return err
 	}
 	if user.Worker != nil {
-		return util.WorkerExistsError
+		return l10n.WorkerExistsError
 	}
 	worker.Role = request.Role
 	worker.User = &user
