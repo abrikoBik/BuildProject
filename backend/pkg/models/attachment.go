@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"io"
 	"mime/multipart"
+	"mp1/pkg/consts"
 	"mp1/pkg/l10n"
 	"mp1/pkg/util"
 	"os"
@@ -35,7 +36,7 @@ func (attachment *Attachment) Get(db *gorm.DB, id uuid.UUID) error {
 
 func (attachment *Attachment) Create(db *gorm.DB, file multipart.File, header *multipart.FileHeader) error {
 	attachment.Size = header.Size
-	if (attachment.Size) > util.MaxAttachmentSize {
+	if (attachment.Size) > consts.MaxAttachmentSize {
 		return l10n.AttachmentSizeError
 	}
 	// TODO: explore memory usage
@@ -45,7 +46,7 @@ func (attachment *Attachment) Create(db *gorm.DB, file multipart.File, header *m
 	}
 	attachment.Name = header.Filename
 	attachment.UUID = uuid.New()
-	attachmentPath := filepath.Join(util.StoragePath, attachment.UUID.String())
+	attachmentPath := filepath.Join(consts.AttachmentPath, attachment.UUID.String())
 	attachmentFile, err := os.OpenFile(attachmentPath, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
 		return err
@@ -73,7 +74,7 @@ func (attachment *Attachment) Create(db *gorm.DB, file multipart.File, header *m
 
 func (attachment *Attachment) Delete(db *gorm.DB) error {
 	// might get very messy
-	attachmentPath := filepath.Join(util.StoragePath, attachment.UUID.String())
+	attachmentPath := filepath.Join(consts.AttachmentPath, attachment.UUID.String())
 	if err := os.Remove(attachmentPath); err != nil {
 		return err
 	}
