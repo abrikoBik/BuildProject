@@ -33,7 +33,7 @@ func ValidateToken(jwtKey []byte) func(http.Handler) http.Handler {
 func GetToken(context context.Context) (jwt.Token, error) {
 	token, ok := context.Value(JWTKey).(jwt.Token)
 	if !ok {
-		return jwt.Token{}, util.InvalidTokenError
+		return jwt.Token{}, l10n.InvalidTokenError
 	}
 	return token, nil
 }

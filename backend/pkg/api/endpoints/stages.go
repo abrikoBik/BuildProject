@@ -1,4 +1,4 @@
-package api
+package endpoints
 
 import (
 	// "mp1/pkg/api/handlers"
@@ -7,7 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func addStages(r chi.Router) {
+func AddStages(r chi.Router, jwtKey []byte) {
 	r.Route("/stages", func(r chi.Router) {
 		// r.With(middleware.JSONResponse).Get("/", handlers.GetStages)
 		// r.With(middleware.JSONResponse).Post("/", handlers.CreateStage)

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"mime/multipart"
 	"mp1/pkg/api/middleware"
+	"mp1/pkg/consts"
 	"mp1/pkg/db"
 	"mp1/pkg/l10n"
 	"mp1/pkg/models"
@@ -32,23 +33,23 @@ func GetAttachment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	attachmentPath := filepath.Join(util.StoragePath, attachment.UUID.String())
+	attachmentPath := filepath.Join(consts.AttachmentPath, attachment.UUID.String())
 	contents, err := os.ReadFile(attachmentPath)
 	if err != nil {
 		util.Error(getAttachmentTag, err)
-		http.Error(w, l10n.AttachmentError, http.StatusInternalServerError)
+		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
 		return
 	}
 	mw := multipart.NewWriter(w)
-	fw, err := mw.CreateFormFile(util.FormKey, attachment.Name)
+	fw, err := mw.CreateFormFile(consts.AttachmentMultipartKey, attachment.Name)
 	if err != nil {
 		util.Error(getAttachmentTag, err)
-		http.Error(w, l10n.AttachmentError, http.StatusInternalServerError)
+		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
 		return
 	}
 	if _, err := fw.Write(contents); err != nil {
 		util.Error(getAttachmentTag, err)
-		http.Error(w, l10n.AttachmentError, http.StatusInternalServerError)
+		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
 		return
 	}
 
@@ -57,18 +58,18 @@ func GetAttachment(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateAttachment(w http.ResponseWriter, r *http.Request) {
-	util.Check(r.ParseMultipartForm(util.MaxAttachmentSize))
-	file, header, err := r.FormFile(util.FormKey)
+	util.Check(r.ParseMultipartForm(consts.MaxAttachmentSize))
+	file, header, err := r.FormFile(consts.AttachmentMultipartKey)
 	if err != nil {
 		util.Error(createAttachmentTag, err)
-		http.Error(w, l10n.AttachmentError, http.StatusInternalServerError)
+		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
 		return
 	}
 	defer util.Check(file.Close())
 	var attachment models.Attachment
 	if err := attachment.Create(db.Database, file, header); err != nil {
 		util.Error(createAttachmentTag, err)
-		http.Error(w, l10n.AttachmentError, http.StatusInternalServerError)
+		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
 		return
 	}
 	attachmentUUID := attachment.UUID.String()
@@ -76,7 +77,7 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 	response := models.AttachmentResponse{UUID: attachmentUUID}
 	if err := jsonEncode(w, response, "register"); err != nil {
 		util.Error(createAttachmentTag, err)
-		http.Error(w, l10n.AttachmentError, http.StatusInternalServerError)
+		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)

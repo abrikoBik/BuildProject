@@ -1,6 +1,7 @@
 package models
 
 import (
+	"mp1/pkg/l10n"
 	"mp1/pkg/util"
 
 	"github.com/lib/pq"
@@ -9,31 +10,27 @@ import (
 
 type Project struct {
 	gorm.Model
-	Name        string      `gorm:"not null"`
+	Name        string      `json:"name" groups:"public" gorm:"not null"`
+	UserID      uint        `json:"userID" groups:"public" gorm:"not null"`
+	Description string      `json:"description" groups:"public"`
 	StartTime   pq.NullTime `gorm:"not null"`
 	EndTime     pq.NullTime `gorm:"not null"`
-	UserID      uint        `gorm:"not null"`
-	Description string
 	Groups      []Group
 	Attachments []Attachment
 }
 
 type ProjectRequest struct {
-	Name        string `json:"name"`
-	StartTime   int64  `json:"startTime"`
-	EndTime     int64  `json:"endTime"`
-	UserID      uint   `json:"userID"`
-	Description string `json:"description"`
+	*Project
+	StartTime int64 `json:"startTime" groups:"public" gorm:"not null"`
+	EndTime   int64 `json:"endTime" groups:"public" gorm:"not null"`
 }
 
 type ProjectResponse struct {
-	Name        string `json:"name" groups:"public"`
-	StartTime   pq.NullTime
-	EndTime     pq.NullTime
-	UserID      uint   `json:"user" groups:"public"`
-	Description string `json:"description" groups:"public"`
-	CreatedAt   string `json:"createdAt" groups:"public"`
-	ID          uint   `json:"id" groups:"register"`
+	*Project
+	StartTime int64  `json:"startTime" groups:"public" gorm:"not null"`
+	EndTime   int64  `json:"endTime" groups:"public" gorm:"not null"`
+	CreatedAt string `json:"createdAt" groups:"public"`
+	ID        uint   `json:"id" groups:"register"`
 }
 
 func (project *Project) Get(db *gorm.DB, id uint) error {
@@ -43,7 +40,7 @@ func (project *Project) Get(db *gorm.DB, id uint) error {
 func (project *Project) Create(db *gorm.DB, request ProjectRequest) error {
 	var user User
 	if err := user.Get(db, request.UserID); err != nil {
-		return util.UserNotFoundError
+		return l10n.UserNotFoundError
 	}
 	project.UserID = user.ID
 	project.Name = request.Name

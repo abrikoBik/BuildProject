@@ -1,4 +1,4 @@
-package api
+package endpoints
 
 import (
 	"mp1/pkg/api/handlers"
@@ -7,7 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func addAttachments(r chi.Router) {
+func AddAttachments(r chi.Router, jwtKey []byte) {
 	r.Route("/attachments", func(r chi.Router) {
 		r.With(middleware.JSONResponse).Post("/", handlers.CreateAttachment)
 		r.Route("/{attachmentUUID}", func(r chi.Router) {
