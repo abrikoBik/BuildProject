@@ -107,7 +107,7 @@ func PatchWorker(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := worker.Patch(db.Database, request); err != nil {
 		util.Error(patchWorkerTag, err)
-		http.Error(w, l10n.PatchError, http.StatusInternalServerError)
+		http.Error(w, l10n.GenericError, http.StatusInternalServerError)
 		return
 	}
 	util.Info(patchWorkerTag, "%s (id%d) patched", user.Name, worker.ID)

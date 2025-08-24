@@ -90,7 +90,7 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 		case gorm.ErrDuplicatedKey:
 			http.Error(w, l10n.NameOrEmailTaken, http.StatusBadRequest)
 		default:
-			http.Error(w, l10n.PatchError, http.StatusInternalServerError)
+			http.Error(w, l10n.GenericError, http.StatusInternalServerError)
 		}
 		return
 	}
