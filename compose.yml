@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:alpine
+    image: postgres
     container_name: mp1_db
     env_file: .env
     restart: always

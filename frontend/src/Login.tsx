@@ -40,7 +40,7 @@ const Login = () => {
             });
 
             const user: AxiosResponse<UserResponse> = await axios.get(
-                "/api/users/${session.data.userID}",
+                `/api/users/${session.data.userID}`,
             );
             if (user.status != 200) {
                 alert(user.data);
