@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"mp1/pkg/api/endpoints"
 	"mp1/pkg/api/middleware"
 	"net/http"
 	"os"
@@ -43,10 +44,10 @@ func Init(hostname string, port uint) *http.Server {
 		middleware.AddHeaders,
 	)
 
-	addSessions(r)
-	addUsers(r)
-	addProjects(r)
-	addAttachments(r)
+	endpoints.AddSessions(r, jwtKey)
+	endpoints.AddUsers(r, jwtKey)
+	endpoints.AddProjects(r, jwtKey)
+	endpoints.AddAttachments(r, jwtKey)
 
 	return &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", hostname, port),

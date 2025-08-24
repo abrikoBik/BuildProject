@@ -1,4 +1,4 @@
-package api
+package endpoints
 
 import (
 	"mp1/pkg/api/handlers"
@@ -7,7 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func addSessions(r chi.Router) {
+func AddSessions(r chi.Router, jwtKey []byte) {
 	r.Route("/sessions", func(r chi.Router) {
 		r.With(middleware.JSONResponse).Post("/", handlers.CreateSession)
 		r.Delete("/", handlers.DeleteSession)
