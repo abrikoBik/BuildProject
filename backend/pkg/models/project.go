@@ -16,7 +16,7 @@ type Project struct {
 	StartTime   pq.NullTime `gorm:"not null"`
 	EndTime     pq.NullTime `gorm:"not null"`
 	Groups      []Group
-	Attachments []Attachment
+	Attachments []Attachment `gorm:"foreignKey:UUID"`
 }
 
 type ProjectRequest struct {

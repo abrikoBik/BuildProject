@@ -20,10 +20,9 @@ type Attachment struct {
 	gorm.Model
 	Name string `gorm:"not null"`
 	// Size in bytes.
-	Size      int64     `gorm:"not null"`
-	UUID      uuid.UUID `gorm:"type:uuid;default:gen_random_uuid()"`
-	Checksum  []byte    `gorm:"not null"`
-	ProjectID uint
+	Size     int64     `gorm:"not null"`
+	UUID     uuid.UUID `gorm:"type:uuid;default:gen_random_uuid()"`
+	Checksum []byte    `gorm:"not null"`
 }
 
 type AttachmentResponse struct {
