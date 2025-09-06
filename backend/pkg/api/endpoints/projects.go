@@ -10,11 +10,11 @@ import (
 func AddProjects(r chi.Router, jwtKey []byte) {
 	r.Route("/projects", func(r chi.Router) {
 		r.With(middleware.JSONResponse).Post("/", handlers.CreateProject)
-		r.Route("/{projectID}", func(idRouter chi.Router) {
-			idRouter.Use(middleware.ParseID(middleware.ProjectID, "projectID"))
+		r.Route("/{projectID}", func(r chi.Router) {
+			r.Use(middleware.ParseID(middleware.ProjectID, "projectID"))
 			r.With(middleware.JSONResponse).Get("/", handlers.GetProject)
-			AddStages(idRouter, jwtKey)
-			AddAttachments(idRouter, jwtKey)
+			AddStages(r, jwtKey)
+			AddAttachments(r, jwtKey)
 		})
 	})
 }
