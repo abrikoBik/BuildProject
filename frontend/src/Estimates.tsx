@@ -218,7 +218,7 @@ const Estimates = () => {
                                         <input onChange={handleChange} type="text" className="border-2 border-palette-color4 mb-2" id="price"/>
                                         <div className="self-center" id="cost">{formData.cost} р</div>
                                     </section>
-                                    <input onClick={handleAppending} type="reset" value="Добавить строку" className="w-40 h-10 hover:cursor-pointer bg-palette-color4 text-white rounded-lg"/>
+                                    <input onClick={handleAppending} type="reset" value="Добавить строку" className="w-40 h-10 min-h-10 hover:cursor-pointer bg-palette-color4 text-white rounded-lg"/>
                                 </form>
                             </section>
                             <ul className="flex flex-row bold-child relative items-center z-0 rounded-b-xl mt-[-40px] w-full h-10 border-2 border-x-0 border-b-0 border-palette-color4 px-[2%]">

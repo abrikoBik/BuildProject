@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useRef, ChangeEvent } from 'react';
+import axios from 'axios';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Img1 from '../src/assets/image-1.png?url';
@@ -81,6 +82,8 @@ const EditableCell = ({ value, onSave, onChange, inputStyle, textStyle, textArea
 };
 
 const Blueprints = () => {
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [currentBlueprint, setCurrentBlueprint] = useState({
         src: "",
@@ -286,6 +289,44 @@ const Blueprints = () => {
         setEditVisible(true);
     }
 
+    const handleFileInput = () => {
+        fileInputRef.current?.click();
+    }
+
+    const handleFileChange = async (event : ChangeEvent<HTMLInputElement>) => {
+        const selectedFiles = (event.currentTarget as HTMLInputElement).files;
+        if (selectedFiles) {
+            for(let i = 0; i < selectedFiles.length; i++)
+            {
+                const postData = new FormData();
+                postData.append("attachment", selectedFiles[i]);
+
+                try {
+                    const { data, status } = await axios.post(
+                        '/api/attachments', 
+                        postData, 
+                        {
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            }
+                    });
+                    if (status != 200) {
+                        alert(data);
+                        return;
+                    }
+
+                    alert("Файл успешно загружен!");
+                    console.log(data);
+
+                } catch (err : unknown) {
+                    console.log(err);
+                }
+
+                console.log(`File name: ${selectedFiles[i].name}. File size: ${selectedFiles[i].size}. File type: ${selectedFiles[i].type}`);
+            }
+        }
+    }
+
     return (
         <div className="flex flex-col h-screen">
             <div className='mb-5'></div>
@@ -353,12 +394,23 @@ const Blueprints = () => {
 
                     <section className="w-full h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {/* Кнопка загрузки - занимает одну ячейку */}
-                        <button
-                            className="h-90 flex bg-palette-color4 flex-col items-center justify-center rounded-xl font-semibold text-xl text-white hover:cursor-pointer"
-                        >
-                            <span className="material-symbols-outlined-huge text-4xl mb-2">upload</span>
-                            <div>Загрузить файлы</div>
-                        </button>
+                        <div>
+                            <input 
+                                type="file" 
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                                className="hidden absolute"
+                                multiple
+                                accept="image/png, image/jpeg, image/jpg"
+                            />
+                            <button
+                                onClick={handleFileInput}
+                                className="h-90 w-full flex bg-palette-color4 flex-col items-center justify-center rounded-xl font-semibold text-xl text-white hover:cursor-pointer"
+                            >
+                                <span className="material-symbols-outlined-huge text-4xl mb-2">upload</span>
+                                <div>Загрузить файлы</div>
+                            </button>
+                        </div>
 
                         {/* Карточки чертежей */}
                         {blueprintsArray.map((item, index) => (

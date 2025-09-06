@@ -6,7 +6,6 @@ const Projects = () => {
 
     return (
         <div className="flex flex-col h-screen">
-            <div className='mb-5'></div>
             <Header />
             <div className="flex flex-row flex-1">
                 <Sidebar show={true} choice={1} />
