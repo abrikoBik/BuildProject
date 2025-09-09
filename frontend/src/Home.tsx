@@ -4,8 +4,6 @@ import DonutChart from "./DonutChart";
 import PushNotification from "./PushNotication";
 import { useWindowSize } from "@uidotdev/usehooks";
 
-import BlueprintsIcon from "./assets/BlueprintIcon.svg";
-import SmetaIcon from "./assets/SmetaIcon.svg";
 import GanttChart from "./Gantt";
 import Header from "./Header";
 
