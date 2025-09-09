@@ -18,23 +18,24 @@ import (
 
 type Attachment struct {
 	gorm.Model
-	Name string `gorm:"not null"`
+	Name string `json:"name" groups:"public" gorm:"not null"`
 	// Size in bytes.
-	Size      int64     `gorm:"not null"`
+	Size      int64     `json:"size" groups:"public" gorm:"not null"`
 	UUID      uuid.UUID `gorm:"type:uuid;default:gen_random_uuid()"`
+	ProjectID uint      `gorm:"not null"`
 	Checksum  []byte    `gorm:"not null"`
-	ProjectID uint
 }
 
 type AttachmentResponse struct {
-	UUID string `json:"uuid" groups:"register"`
+	*Attachment
+	UUID string `json:"uuid" groups:"register,public"`
 }
 
 func (attachment *Attachment) Get(db *gorm.DB, id uuid.UUID) error {
 	return db.Where("uuid = ?", id).Take(&attachment).Error
 }
 
-func (attachment *Attachment) Create(db *gorm.DB, file multipart.File, header *multipart.FileHeader) error {
+func (attachment *Attachment) Create(db *gorm.DB, projectID uint, file multipart.File, header *multipart.FileHeader) error {
 	attachment.Size = header.Size
 	if (attachment.Size) > consts.MaxAttachmentSize {
 		return l10n.AttachmentSizeError
@@ -46,6 +47,7 @@ func (attachment *Attachment) Create(db *gorm.DB, file multipart.File, header *m
 	}
 	attachment.Name = header.Filename
 	attachment.UUID = uuid.New()
+	attachment.ProjectID = projectID
 	attachmentPath := filepath.Join(consts.AttachmentPath, attachment.UUID.String())
 	attachmentFile, err := os.OpenFile(attachmentPath, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {

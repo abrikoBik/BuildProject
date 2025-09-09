@@ -19,9 +19,15 @@ const (
 )
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
+	userID, err := middleware.GetID(middleware.UserID, r.Context())
+	if err != nil {
+		util.Error(getUserTag, err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
+	}
 	var user models.User
-	result := db.Database.Where("id = ?", r.Context().Value(middleware.UserID)).Take(&user)
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+	result := user.Get(db.Database, userID)
+	if errors.Is(result, gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
@@ -65,12 +71,14 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 func PatchUser(w http.ResponseWriter, r *http.Request) {
 	id, err := middleware.GetID(middleware.UserID, r.Context())
+	if err != nil {
+		util.Error(patchUserTag, err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
+	}
 	var user models.User
 	if user.Get(db.Database, id) != nil {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
-		return
-	}
-	if err != nil {
 		return
 	}
 	if !verifyUser(user, w, r) {

@@ -13,7 +13,7 @@ import (
 
 const (
 	createSessionTag = "api:CreateSession"
-	deleteSessionTag = "api:DeleteSession"
+	// deleteSessionTag = "api:DeleteSession"
 )
 
 func CreateSession(w http.ResponseWriter, r *http.Request) {

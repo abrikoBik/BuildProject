@@ -13,7 +13,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -24,10 +23,14 @@ const (
 )
 
 func GetAttachment(w http.ResponseWriter, r *http.Request) {
-	contextUUID := r.Context().Value(middleware.AttachmentUUID).(uuid.UUID)
-	util.Debug("api.GetAttachment", "contextUUID", contextUUID)
+	attachmentUUID, err := middleware.GetUUID(middleware.ProjectID, r.Context())
+	if err != nil {
+		util.Error(getAttachmentTag, err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
+	}
 	var attachment models.Attachment
-	result := attachment.Get(db.Database, contextUUID)
+	result := attachment.Get(db.Database, attachmentUUID)
 	if errors.Is(result, gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.AttachmentNotFound, http.StatusNotFound)
 		return
@@ -58,6 +61,18 @@ func GetAttachment(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateAttachment(w http.ResponseWriter, r *http.Request) {
+	projectID, err := middleware.GetID(middleware.ProjectID, r.Context())
+	if err != nil {
+		util.Error(createAttachmentTag, err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
+	}
+	var project models.Project
+	if project.Get(db.Database, projectID) != nil {
+		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
+		return
+	}
+
 	util.Check(r.ParseMultipartForm(consts.MaxAttachmentSize))
 	file, header, err := r.FormFile(consts.AttachmentMultipartKey)
 	if err != nil {
@@ -67,11 +82,20 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 	}
 	defer util.Check(file.Close())
 	var attachment models.Attachment
-	if err := attachment.Create(db.Database, file, header); err != nil {
+	if err := attachment.Create(db.Database, projectID, file, header); err != nil {
 		util.Error(createAttachmentTag, err)
 		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
 		return
 	}
+
+	project.Attachments = append(project.Attachments, attachment)
+	if err := db.Database.Save(&project).Error; err != nil {
+		util.Error(createAttachmentTag, err)
+		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
+		return
+	}
+	util.Info(createAttachmentTag, "id%d saved", project.ID)
+
 	attachmentUUID := attachment.UUID.String()
 	util.Info(createAttachmentTag, "%s created", attachmentUUID)
 	response := models.AttachmentResponse{UUID: attachmentUUID}
@@ -84,10 +108,14 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteAttachment(w http.ResponseWriter, r *http.Request) {
-	// jank
-	contextUUID := r.Context().Value(middleware.AttachmentUUID).(uuid.UUID)
+	attachmentUUID, err := middleware.GetUUID(middleware.ProjectID, r.Context())
+	if err != nil {
+		util.Error(deleteAttachmentTag, err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
+	}
 	var attachment models.Attachment
-	result := attachment.Get(db.Database, contextUUID)
+	result := attachment.Get(db.Database, attachmentUUID)
 	if errors.Is(result, gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.AttachmentNotFound, http.StatusNotFound)
 		return

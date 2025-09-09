@@ -47,7 +47,6 @@ func Init(hostname string, port uint) *http.Server {
 	endpoints.AddSessions(r, jwtKey)
 	endpoints.AddUsers(r, jwtKey)
 	endpoints.AddProjects(r, jwtKey)
-	endpoints.AddAttachments(r, jwtKey)
 
 	return &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", hostname, port),

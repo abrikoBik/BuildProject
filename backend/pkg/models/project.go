@@ -34,7 +34,7 @@ type ProjectResponse struct {
 }
 
 func (project *Project) Get(db *gorm.DB, id uint) error {
-	return db.Preload("Groups").Where("id = ?", id).Take(&project).Error
+	return db.Preload("Groups").Preload("Attachments").Where("id = ?", id).Take(&project).Error
 }
 
 func (project *Project) Create(db *gorm.DB, request ProjectRequest) error {
@@ -45,6 +45,8 @@ func (project *Project) Create(db *gorm.DB, request ProjectRequest) error {
 	project.UserID = user.ID
 	project.Name = request.Name
 	project.Description = request.Description
+	project.StartTime = util.UnmarshalTime(request.StartTime)
+	project.EndTime = util.UnmarshalTime(request.EndTime)
 	project.Groups = make([]Group, 0)
 	return db.Create(&project).Error
 }

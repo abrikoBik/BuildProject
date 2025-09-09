@@ -19,8 +19,14 @@ const (
 )
 
 func GetWorker(w http.ResponseWriter, r *http.Request) {
+	userID, err := middleware.GetID(middleware.UserID, r.Context())
+	if err != nil {
+		util.Error(getWorkerTag, err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
+	}
 	var user models.User
-	if errors.Is(user.Get(db.Database, r.Context().Value(middleware.UserID).(uint)), gorm.ErrRecordNotFound) {
+	if errors.Is(user.Get(db.Database, userID), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
@@ -30,8 +36,11 @@ func GetWorker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var worker models.Worker
-	// using util.Check as a temporary solution
-	util.Check(worker.Get(db.Database, user.Worker.ID))
+	if worker.Get(db.Database, user.Worker.ID) != nil {
+		util.Error(getWorkerTag, err)
+		http.Error(w, l10n.GenericWorker, http.StatusInternalServerError)
+		return
+	}
 	util.Debug(getWorkerTag, "worker", worker)
 	response := models.WorkerResponse{Worker: &worker, CreatedAt: worker.CreatedAt.String()}
 	if err := jsonEncode(w, response, "public"); err != nil {
@@ -45,6 +54,8 @@ func GetWorker(w http.ResponseWriter, r *http.Request) {
 func CreateWorker(w http.ResponseWriter, r *http.Request) {
 	userID, err := middleware.GetID(middleware.UserID, r.Context())
 	if err != nil {
+		util.Error(createWorkerTag, err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
 		return
 	}
 	var worker models.Worker
@@ -85,6 +96,8 @@ func CreateWorker(w http.ResponseWriter, r *http.Request) {
 func PatchWorker(w http.ResponseWriter, r *http.Request) {
 	userID, err := middleware.GetID(middleware.UserID, r.Context())
 	if err != nil {
+		util.Error(patchWorkerTag, err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
 		return
 	}
 	var user models.User
