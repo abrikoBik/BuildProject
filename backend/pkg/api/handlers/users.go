@@ -20,6 +20,7 @@ const (
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	var user models.User
+	// TODO: replace with middleware.GetID
 	result := db.Database.Where("id = ?", r.Context().Value(middleware.UserID)).Take(&user)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)

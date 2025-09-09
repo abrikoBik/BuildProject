@@ -24,6 +24,7 @@ const (
 )
 
 func GetAttachment(w http.ResponseWriter, r *http.Request) {
+	// TODO: replace with middleware.GetUUID
 	contextUUID := r.Context().Value(middleware.AttachmentUUID).(uuid.UUID)
 	util.Debug("api.GetAttachment", "contextUUID", contextUUID)
 	var attachment models.Attachment
@@ -58,6 +59,18 @@ func GetAttachment(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateAttachment(w http.ResponseWriter, r *http.Request) {
+	projectID, err := middleware.GetID(middleware.ProjectID, r.Context())
+	if err != nil {
+		util.Error(createAttachmentTag, err)
+		http.Error(w, l10n.GenericProject, http.StatusInternalServerError)
+		return
+	}
+	var project models.Project
+	if project.Get(db.Database, projectID) != nil {
+		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
+		return
+	}
+
 	util.Check(r.ParseMultipartForm(consts.MaxAttachmentSize))
 	file, header, err := r.FormFile(consts.AttachmentMultipartKey)
 	if err != nil {
@@ -67,11 +80,20 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 	}
 	defer util.Check(file.Close())
 	var attachment models.Attachment
-	if err := attachment.Create(db.Database, file, header); err != nil {
+	if err := attachment.Create(db.Database, projectID, file, header); err != nil {
 		util.Error(createAttachmentTag, err)
 		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
 		return
 	}
+
+	project.Attachments = append(project.Attachments, attachment)
+	if err := db.Database.Save(&project).Error; err != nil {
+		util.Error(createAttachmentTag, err)
+		http.Error(w, l10n.GenericProject, http.StatusInternalServerError)
+		return
+	}
+	util.Info(createAttachmentTag, "id%d saved", project.ID)
+
 	attachmentUUID := attachment.UUID.String()
 	util.Info(createAttachmentTag, "%s created", attachmentUUID)
 	response := models.AttachmentResponse{UUID: attachmentUUID}
@@ -84,7 +106,7 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteAttachment(w http.ResponseWriter, r *http.Request) {
-	// jank
+	// TODO: replace with middleware.GetUUID
 	contextUUID := r.Context().Value(middleware.AttachmentUUID).(uuid.UUID)
 	var attachment models.Attachment
 	result := attachment.Get(db.Database, contextUUID)

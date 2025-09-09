@@ -16,7 +16,7 @@ type Project struct {
 	StartTime   pq.NullTime `gorm:"not null"`
 	EndTime     pq.NullTime `gorm:"not null"`
 	Groups      []Group
-	Attachments []Attachment `gorm:"foreignKey:UUID"`
+	Attachments []Attachment
 }
 
 type ProjectRequest struct {
@@ -34,7 +34,7 @@ type ProjectResponse struct {
 }
 
 func (project *Project) Get(db *gorm.DB, id uint) error {
-	return db.Preload("Groups").Where("id = ?", id).Take(&project).Error
+	return db.Preload("Groups").Preload("Attachments").Where("id = ?", id).Take(&project).Error
 }
 
 func (project *Project) Create(db *gorm.DB, request ProjectRequest) error {

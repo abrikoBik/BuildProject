@@ -16,6 +16,8 @@ const (
 	getProjectTag    = "api:GetProject"
 	createProjectTag = "api:CreateProject"
 	patchProjectTag  = "api:PatchProject"
+
+	listProjectAttachmentsTag = "api:ListProjectAttachments"
 )
 
 func GetProject(w http.ResponseWriter, r *http.Request) {
@@ -98,6 +100,36 @@ func PatchProject(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		util.Error(getProjectTag, err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func ListProjectAttachments(w http.ResponseWriter, r *http.Request) {
+	id, err := middleware.GetID(middleware.ProjectID, r.Context())
+	if err != nil {
+		util.Error(getProjectTag, err)
+		http.Error(w, l10n.GenericProject, http.StatusInternalServerError)
+		return
+	}
+	var project models.Project
+	if project.Get(db.Database, id) != nil {
+		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
+		return
+	}
+	var response []models.AttachmentResponse
+	for _, a := range project.Attachments {
+		toAppend := models.AttachmentResponse{
+			Attachment: &models.Attachment{
+				Name: a.Name,
+				Size: a.Size,
+			},
+			UUID: a.UUID.String(),
+		}
+		response = append(response, toAppend)
+	}
+	if err := jsonEncode(w, response, "public"); err != nil {
+		util.Error(listProjectAttachmentsTag, err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
