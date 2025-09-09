@@ -52,6 +52,7 @@ const Login = () => {
                 localStorage.getItem("user")!,
             );
             alert(`Добро пожаловать, ${storedUser.name}!`);
+            window.location.href = '/';
         } catch (err: unknown) {
             errors.axiosError(err);
         }
