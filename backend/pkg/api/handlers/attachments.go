@@ -13,7 +13,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -24,11 +23,14 @@ const (
 )
 
 func GetAttachment(w http.ResponseWriter, r *http.Request) {
-	// TODO: replace with middleware.GetUUID
-	contextUUID := r.Context().Value(middleware.AttachmentUUID).(uuid.UUID)
-	util.Debug("api.GetAttachment", "contextUUID", contextUUID)
+	attachmentUUID, err := middleware.GetUUID(middleware.ProjectID, r.Context())
+	if err != nil {
+		util.Error(getAttachmentTag, err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
+	}
 	var attachment models.Attachment
-	result := attachment.Get(db.Database, contextUUID)
+	result := attachment.Get(db.Database, attachmentUUID)
 	if errors.Is(result, gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.AttachmentNotFound, http.StatusNotFound)
 		return
@@ -62,7 +64,7 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 	projectID, err := middleware.GetID(middleware.ProjectID, r.Context())
 	if err != nil {
 		util.Error(createAttachmentTag, err)
-		http.Error(w, l10n.GenericProject, http.StatusInternalServerError)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
 		return
 	}
 	var project models.Project
@@ -89,7 +91,7 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 	project.Attachments = append(project.Attachments, attachment)
 	if err := db.Database.Save(&project).Error; err != nil {
 		util.Error(createAttachmentTag, err)
-		http.Error(w, l10n.GenericProject, http.StatusInternalServerError)
+		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
 		return
 	}
 	util.Info(createAttachmentTag, "id%d saved", project.ID)
@@ -106,10 +108,14 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteAttachment(w http.ResponseWriter, r *http.Request) {
-	// TODO: replace with middleware.GetUUID
-	contextUUID := r.Context().Value(middleware.AttachmentUUID).(uuid.UUID)
+	attachmentUUID, err := middleware.GetUUID(middleware.ProjectID, r.Context())
+	if err != nil {
+		util.Error(deleteAttachmentTag, err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
+	}
 	var attachment models.Attachment
-	result := attachment.Get(db.Database, contextUUID)
+	result := attachment.Get(db.Database, attachmentUUID)
 	if errors.Is(result, gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.AttachmentNotFound, http.StatusNotFound)
 		return

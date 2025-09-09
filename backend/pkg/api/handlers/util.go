@@ -18,7 +18,7 @@ func init() {
 	jwtKey = []byte(os.Getenv("JWT_KEY"))
 }
 
-func jsonDecode(w http.ResponseWriter, r *http.Request, dst interface{}) bool {
+func jsonDecode(w http.ResponseWriter, r *http.Request, dst any) bool {
 	if err := json.NewDecoder(r.Body).Decode(&dst); err != nil {
 		http.Error(w, "bad json request", http.StatusBadRequest)
 		return false
@@ -26,7 +26,7 @@ func jsonDecode(w http.ResponseWriter, r *http.Request, dst interface{}) bool {
 	return true
 }
 
-func jsonEncode(w http.ResponseWriter, src interface{}, groups ...string) error {
+func jsonEncode(w http.ResponseWriter, src any, groups ...string) error {
 	toEncode, err := sheriff.Marshal(&sheriff.Options{Groups: groups}, src)
 	if err != nil {
 		http.Error(w, "error generating response", http.StatusInternalServerError)

@@ -2,7 +2,7 @@ package handlers
 
 import "net/http"
 
-const getStageTag = "api:GetStage"
+// const getStageTag = "api:GetStage"
 
 func GetStage(w http.ResponseWriter, r *http.Request) {
 	// var stage models.Stage

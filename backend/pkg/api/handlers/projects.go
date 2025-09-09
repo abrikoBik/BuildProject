@@ -24,7 +24,7 @@ func GetProject(w http.ResponseWriter, r *http.Request) {
 	id, err := middleware.GetID(middleware.ProjectID, r.Context())
 	if err != nil {
 		util.Error(getProjectTag, err)
-		http.Error(w, l10n.GenericProject, http.StatusInternalServerError)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
 		return
 	}
 	var project models.Project
@@ -70,8 +70,8 @@ func CreateProject(w http.ResponseWriter, r *http.Request) {
 func PatchProject(w http.ResponseWriter, r *http.Request) {
 	id, err := middleware.GetID(middleware.ProjectID, r.Context())
 	if err != nil {
-		util.Error(getProjectTag, err)
-		http.Error(w, l10n.GenericProject, http.StatusInternalServerError)
+		util.Error(patchProjectTag, err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
 		return
 	}
 	var project models.Project
@@ -99,7 +99,7 @@ func PatchProject(w http.ResponseWriter, r *http.Request) {
 		CreatedAt: project.CreatedAt.String(),
 	}
 	if err := jsonEncode(w, response, "public"); err != nil {
-		util.Error(getProjectTag, err)
+		util.Error(patchProjectTag, err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -108,8 +108,8 @@ func PatchProject(w http.ResponseWriter, r *http.Request) {
 func ListProjectAttachments(w http.ResponseWriter, r *http.Request) {
 	id, err := middleware.GetID(middleware.ProjectID, r.Context())
 	if err != nil {
-		util.Error(getProjectTag, err)
-		http.Error(w, l10n.GenericProject, http.StatusInternalServerError)
+		util.Error(listProjectAttachmentsTag, err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
 		return
 	}
 	var project models.Project
