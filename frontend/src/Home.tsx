@@ -7,12 +7,13 @@ import { useWindowSize } from "@uidotdev/usehooks";
 import BlueprintsIcon from "./assets/BlueprintIcon.svg";
 import SmetaIcon from "./assets/SmetaIcon.svg";
 import GanttChart from "./Gantt";
+import Header from "./Header";
 
 const Home = () => {
 
     const [chartData, setChartData] = useState([
         { value: 0, color: "#37515f" },
-        { value: 4, color: "#d2d5dd" },
+        { value: 6, color: "#d2d5dd" },
     ]);
 
     const [userName, setUserName] = useState("");
@@ -32,12 +33,12 @@ const Home = () => {
     }
 
     const checkInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const chartMaxValue = chartData[0].value + chartData[1].value;
         const checked = event.currentTarget.checked;
         const newData = [...chartData];
         newData[0].value += checked ? 1 : -1;
-        newData[1].value = 4 - newData[0].value;
+        newData[1].value = chartMaxValue - newData[0].value;
         setChartData(newData);
-        console.log(`1: ${chartData[0].value} 2: ${chartData[1].value}`);
     };
 
     const emailCopy = () => {
@@ -85,10 +86,11 @@ const Home = () => {
 
     return (
         <main className="relative">
+            <Header />
             {/* TODO: fix notification laggy animation and make it more stable */}
             <PushNotification text={pushNotificationText}/>
 
-            <section className="flex flex-row w-[85%] h-[100vh] text-2xl ml-[15%]">
+            <section className="flex flex-row w-[85vw]  h-[100vh] text-2xl ml-[15%]">
                 <Sidebar show={showSidebar} choice={0}/>
                 {/* Move to Sidebar component */}
                 <button
@@ -98,7 +100,7 @@ const Home = () => {
                     {showSidebar ? ">" : "<"}
                 </button>
 
-                <div className="w-[80%] max-lg:w-[100vw] text-center">
+                <div className="w-[85vw] mt-20 max-lg:w-[100vw] text-center">
                     {/* Header info */}
                     <div className="flex flex-row m-2 items-center rounded-lg border-3 p-2 border-palette-color5">
                         <section className="justify-self-start text-left ml-5">
@@ -178,6 +180,24 @@ const Home = () => {
                                 />
                                 <label htmlFor="4">Устройство террасы</label>
                             </li>
+                            <li>
+                                <input
+                                    onChange={checkInput}
+                                    type="checkbox"
+                                    id="5"
+                                    className="mr-2"
+                                />
+                                <label htmlFor="5">Устройство террасы</label>
+                            </li>
+                            <li>
+                                <input
+                                    onChange={checkInput}
+                                    type="checkbox"
+                                    id="6"
+                                    className="mr-2"
+                                />
+                                <label htmlFor="6">Устройство террасы</label>
+                            </li>
                         </ul>
                     </div>
                     
@@ -219,25 +239,6 @@ const Home = () => {
                     {/* Empty div */}
                     <div className="w-full h-5"></div>
                 </div>
-
-		        <div className="flex flex-col w-[20%] h-screen p-2 gap-2">
-		            <a href="/estimates" className="flex flex-col w-full h-1/3 border-3 border-palette-color5 justify-center items-center rounded-lg">
-		                <div className="flex items-center justify-center w-[60%] h-[60%] bg-palette-color2 rounded-full">
-		            	    <img src={SmetaIcon} className="max-w-[55%] max-h-[55%]"/>  
-		            	</div>
-		        	<div className="mt-5 font-semibold font-[#1d3266]">Создать смету</div>
-		            </a>
-		            <a href="/blueprints" className="flex flex-col w-full h-1/3 border-3 border-palette-color5 justify-center items-center rounded-lg">
-		                <div className="flex items-center justify-center w-[60%] h-[60%] bg-palette-color2 rounded-full">
-		            	    <img src={BlueprintsIcon} className="max-w-[55%] max-h-[55%]"/>  
-		            	</div>
-		        	<div className="mt-5 font-semibold font-[#1d3266]">Открыть чертежи</div>
-		            </a>
-		            <a href="/projects" className="flex flex-col w-full h-1/3 border-3 border-palette-color5 justify-center items-center rounded-lg">
-		                <span className="material-symbols-outlined-huge">settings</span>
-		        	<div className="mt-5 font-semibold font-[#1d3266]">Открыть проекты</div>
-		            </a>
-		        </div>
             </section>
         </main>
     );

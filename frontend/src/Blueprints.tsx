@@ -56,7 +56,7 @@ const EditableCell = ({ value, onSave, onChange, inputStyle, textStyle, textArea
                     onKeyDown={handleEditEnd}
                     autoFocus
                     className={inputStyle}
-                    rows={4} // Добавляем строки для textarea
+                    rows={4}
                 />
             ) : (
                 <input
@@ -189,7 +189,7 @@ const Blueprints = () => {
             overlay.style.display = 'flex';
             overlay.style.justifyContent = 'center';
             overlay.style.alignItems = 'center';
-            overlay.style.zIndex = '50';
+            overlay.style.zIndex = '150';
             overlay.style.cursor = 'grab';
 
             const exitButton = document.createElement('a');
@@ -329,11 +329,10 @@ const Blueprints = () => {
 
     return (
         <div className="flex flex-col h-screen">
-            <div className='mb-5'></div>
             <Header />
 
             { editVisible ? 
-                <section className="fixed left-0 top-0 w-screen h-screen bg-[rgba(0,0,0,0.4)] z-50">
+                <section className="fixed left-0 top-0 w-screen h-screen bg-[rgba(0,0,0,0.4)] z-150">
                     <div className="flex flex-col relative left-1/2 top-1/2 -translate-1/2 w-[60%] h-[80%] rounded-xl border-2 border-palette-color4 bg-palette-color1">
                         <button onClick={() => setEditVisible(false)} type="button" className="hover:cursor-pointer hover:text-red-700 w-7 h-7 flex items-center justify-center self-end">
                             <span className="material-symbols-outlined">

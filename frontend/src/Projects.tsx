@@ -2,12 +2,12 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 
 const Projects = () => {
-    const projects = Array.from({ length: 500 }, (_, i) => i + 1);
+    const projects = Array.from({ length: 50 }, (_, i) => i + 1);
 
     return (
         <div className="flex flex-col h-screen">
             <Header />
-            <div className="flex flex-row flex-1">
+            <div className="flex flex-row flex-1 mt-20">
                 <Sidebar show={true} choice={1} />
                 <main className="w-[83%] ml-[17%] pr-5">
                     <h1 className="text-[#1D3266] text-4xl font-bold my-5">Мои проекты</h1>
