@@ -47,6 +47,7 @@ func (attachment *Attachment) Create(db *gorm.DB, projectID uint, file multipart
 	}
 	attachment.Name = header.Filename
 	attachment.UUID = uuid.New()
+	// TODO: check if a project exists
 	attachment.ProjectID = projectID
 	attachmentPath := filepath.Join(consts.AttachmentPath, attachment.UUID.String())
 	attachmentFile, err := os.OpenFile(attachmentPath, os.O_CREATE|os.O_RDWR, 0644)

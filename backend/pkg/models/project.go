@@ -17,6 +17,7 @@ type Project struct {
 	EndTime     pq.NullTime `gorm:"not null"`
 	Groups      []Group
 	Attachments []Attachment
+	Estimates   []Estimate
 }
 
 type ProjectRequest struct {
@@ -48,12 +49,24 @@ func (project *Project) Create(db *gorm.DB, request ProjectRequest) error {
 	project.StartTime = util.UnmarshalTime(request.StartTime)
 	project.EndTime = util.UnmarshalTime(request.EndTime)
 	project.Groups = make([]Group, 0)
+	project.Attachments = make([]Attachment, 0)
+	project.Estimates = make([]Estimate, 0)
 	return db.Create(&project).Error
 }
 
 func (project *Project) Delete(db *gorm.DB) error {
 	for _, group := range project.Groups {
 		if err := group.Delete(db); err != nil {
+			return err
+		}
+	}
+	for _, attachment := range project.Attachments {
+		if err := attachment.Delete(db); err != nil {
+			return err
+		}
+	}
+	for _, estimate := range project.Estimates {
+		if err := estimate.Delete(db); err != nil {
 			return err
 		}
 	}
