@@ -12,8 +12,18 @@ const Projects = () => {
                 <main className="w-[83%] ml-[17%] pr-5">
                     <h1 className="text-[#1D3266] text-4xl font-bold my-5">Мои проекты</h1>
                     <ul className="flex flex-row w-full gap-5 flex-wrap">
+                        <li key={0} className="flex flex-col w-[20em] h-[30em]">
+                            <button
+                                className="h-full w-full flex bg-palette-color4 flex-col items-center justify-center rounded-xl font-semibold text-xl text-white hover:cursor-pointer"
+                            >
+                                <span className="text-9xl mb-2">+</span>
+                                <div>Создать проект</div>
+                            </button>
+                        </li>
+
+                        {/* Projects dipslay */}
                         {projects.map((i) => (
-                            <li key={i} className="flex flex-col w-[20em] h-[30em]">
+                            <li key={i + 1} className="flex flex-col w-[20em] h-[30em]">
                                 <div
                                     style={{
                                         backgroundColor: `rgba(${Math.min(200 + i, 255)}, 0, ${Math.min(50 + i, 255)}, 1)`

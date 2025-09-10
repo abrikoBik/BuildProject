@@ -37,6 +37,7 @@ const Login = () => {
                 path: "/",
                 sameSite: "none",
                 secure: true,
+                maxAge: 3600 * 24 * 7 * 5
             });
 
             const user: AxiosResponse<UserResponse> = await axios.get(
