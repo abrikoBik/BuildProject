@@ -30,6 +30,7 @@ func GetProject(w http.ResponseWriter, r *http.Request) {
 	var project models.Project
 	if errors.Is(project.Get(db.Database, id), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
+		return
 	}
 	response := models.ProjectResponse{
 		Project:   &project,
