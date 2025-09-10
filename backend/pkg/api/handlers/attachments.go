@@ -23,7 +23,8 @@ const (
 )
 
 func GetAttachment(w http.ResponseWriter, r *http.Request) {
-	attachmentUUID, err := middleware.GetUUID(middleware.ProjectID, r.Context())
+	attachmentUUID, err := middleware.GetUUID(middleware.AttachmentUUID, r.Context())
+	util.Debug(getAttachmentTag, "attachmentUUID", attachmentUUID, "err", err)
 	if err != nil {
 		util.Error(getAttachmentTag, err)
 		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
@@ -108,7 +109,7 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteAttachment(w http.ResponseWriter, r *http.Request) {
-	attachmentUUID, err := middleware.GetUUID(middleware.ProjectID, r.Context())
+	attachmentUUID, err := middleware.GetUUID(middleware.AttachmentUUID, r.Context())
 	if err != nil {
 		util.Error(deleteAttachmentTag, err)
 		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
