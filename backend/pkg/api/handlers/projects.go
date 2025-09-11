@@ -28,7 +28,7 @@ func GetProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var project models.Project
-	if errors.Is(project.Get(db.Database, id), gorm.ErrRecordNotFound) {
+	if errors.Is(project.Get(db.Database, id, []string{}), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
 		return
 	}
@@ -76,7 +76,7 @@ func PatchProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var project models.Project
-	if project.Get(db.Database, id) != nil {
+	if project.Get(db.Database, id, []string{}) != nil {
 		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
 		return
 	}
@@ -114,7 +114,7 @@ func ListProjectAttachments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var project models.Project
-	if project.Get(db.Database, id) != nil {
+	if project.Get(db.Database, id, []string{"Attachments"}) != nil {
 		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
 		return
 	}

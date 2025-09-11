@@ -33,7 +33,7 @@ func (group *Group) Get(db *gorm.DB, id uint) error {
 
 func (group *Group) Create(db *gorm.DB, request GroupRequest) error {
 	var project Project
-	if err := project.Get(db, request.ProjectID); err != nil {
+	if err := project.Get(db, request.ProjectID, []string{"Groups"}); err != nil {
 		return err
 	}
 	group.Name = request.Name

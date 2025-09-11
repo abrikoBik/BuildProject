@@ -13,6 +13,8 @@ type Project struct {
 	Name        string      `json:"name" groups:"public" gorm:"not null"`
 	UserID      uint        `json:"userID" groups:"public" gorm:"not null"`
 	Description string      `json:"description" groups:"public"`
+	Latitude    float32     `json:"latitude" groups:"public" gorm:"not null"`
+	Longitude   float32     `json:"longitude" groups:"public" gorm:"not null"`
 	StartTime   pq.NullTime `gorm:"not null"`
 	EndTime     pq.NullTime `gorm:"not null"`
 	Groups      []Group
@@ -34,8 +36,12 @@ type ProjectResponse struct {
 	ID        uint   `json:"id" groups:"register"`
 }
 
-func (project *Project) Get(db *gorm.DB, id uint) error {
-	return db.Preload("Groups").Preload("Attachments").Where("id = ?", id).Take(&project).Error
+func (project *Project) Get(db *gorm.DB, id uint, preloads []string) error {
+	tx := db
+	for _, preload := range preloads {
+		tx = tx.Preload(preload)
+	}
+	return tx.Where("id = ?", id).Take(&project).Error
 }
 
 func (project *Project) Create(db *gorm.DB, request ProjectRequest) error {
@@ -46,6 +52,8 @@ func (project *Project) Create(db *gorm.DB, request ProjectRequest) error {
 	project.UserID = user.ID
 	project.Name = request.Name
 	project.Description = request.Description
+	project.Latitude = request.Latitude
+	project.Longitude = request.Longitude
 	project.StartTime = util.UnmarshalTime(request.StartTime)
 	project.EndTime = util.UnmarshalTime(request.EndTime)
 	project.Groups = make([]Group, 0)
