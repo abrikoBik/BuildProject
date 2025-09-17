@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/base64"
 	"errors"
 	"io"
 	"mp1/pkg/api/middleware"
@@ -39,13 +40,15 @@ func GetAttachment(w http.ResponseWriter, r *http.Request) {
 
 	attachmentPath := filepath.Join(consts.AttachmentPath, attachment.UUID.String())
 	f, err := os.Open(attachmentPath)
-	defer f.Close()
 	if err != nil {
 		util.Error(getAttachmentTag, err)
 		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
 		return
 	}
-	if _, err = io.Copy(w, f); err != nil {
+	defer f.Close()
+	encoder := base64.NewEncoder(base64.StdEncoding, w)
+	defer encoder.Close()
+	if _, err = io.Copy(encoder, f); err != nil {
 		util.Error(getAttachmentTag, err)
 		return
 	}
