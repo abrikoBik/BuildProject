@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"errors"
-	"mime/multipart"
+	"io"
 	"mp1/pkg/api/middleware"
 	"mp1/pkg/consts"
 	"mp1/pkg/db"
@@ -38,22 +38,15 @@ func GetAttachment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	attachmentPath := filepath.Join(consts.AttachmentPath, attachment.UUID.String())
-	contents, err := os.ReadFile(attachmentPath)
+	f, err := os.Open(attachmentPath)
+	defer f.Close()
 	if err != nil {
 		util.Error(getAttachmentTag, err)
 		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
 		return
 	}
-	mw := multipart.NewWriter(w)
-	fw, err := mw.CreateFormFile(consts.AttachmentMultipartKey, attachment.Name)
-	if err != nil {
+	if _, err = io.Copy(w, f); err != nil {
 		util.Error(getAttachmentTag, err)
-		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
-		return
-	}
-	if _, err := fw.Write(contents); err != nil {
-		util.Error(getAttachmentTag, err)
-		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
 		return
 	}
 
