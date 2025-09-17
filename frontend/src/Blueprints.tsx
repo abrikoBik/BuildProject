@@ -1,5 +1,5 @@
 import { useState, useRef, ChangeEvent, useEffect } from 'react';
-import { BlueprintProp } from './types/blueprint';
+import { BlueprintProp } from './types/blueprint.ts';
 import axios from 'axios';
 import Header from './Header';
 import Sidebar from './Sidebar';
@@ -205,30 +205,46 @@ const Blueprints = () => {
         }
     };
 
-    const getImages = (blueprints : BlueprintProp[]) => {
-        const currentImages : string[] = [];
-        blueprints.map(async (item) => {
-            try {
-                const { data } = await axios.get(
-                    `/api/projects/2/attachments/${item.uuid}`,
-                    {
-                        headers: {
-                            "Authorization": `Bearer ${token}`,
-                            'Content-Type': 'multipart/form-data'
-                        }
+    const getImages = async (blueprints: BlueprintProp[]) => {
+    const imagePromises = blueprints.map(async (item, index) => {
+        try {
+            const { data } = await axios.get(
+                `/api/projects/2/attachments/${item.uuid}`,
+                {
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
                     }
-                );
+                }
+            );
 
-                const imageData = data.slice(dataStart, dataEnd);
-                console.log(imageData);
-            }  
-            catch (err : unknown) {
-                currentImages.push("");
-                console.warn(`${err}`);
+            let mimeType = 'image/png';
+            if (data.charAt(0) === '/') {
+                mimeType = 'image/jpeg';
+            } else if (data.charAt(0) === 'i') {
+                mimeType = 'image/png';
             }
-        });
-        setCurrentImages(currentImages);
-    }
+
+            return {
+                index,
+                url: `data:${mimeType};base64,${data}`
+            };
+        } catch (err) {
+            console.warn(`Ошибка загрузки изображения ${item.uuid}:`, err);
+            return {
+                index,
+                url: ""
+            };
+        }
+    });
+    const results = await Promise.all(imagePromises);
+
+    const orderedImages = Array(blueprints.length).fill("");
+    results.forEach(result => {
+        orderedImages[result.index] = result.url;
+    });
+
+    setCurrentImages(orderedImages);
+};
 
     const loadBlueprints = async () => {
         try {
@@ -249,7 +265,7 @@ const Blueprints = () => {
                 alert(`${status}`);
             }
 
-            getImages(data);
+            await getImages(data);
         }
         catch (err : unknown) {
             console.warn(`${err}`);
