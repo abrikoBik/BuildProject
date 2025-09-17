@@ -47,6 +47,7 @@ func GetAttachment(w http.ResponseWriter, r *http.Request) {
 	}
 	defer f.Close()
 	encoder := base64.NewEncoder(base64.StdEncoding, w)
+	defer encoder.Close()
 	if _, err = io.Copy(encoder, f); err != nil {
 		util.Error(getAttachmentTag, err)
 		return
