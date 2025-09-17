@@ -3,9 +3,14 @@ import Sidebar from "./Sidebar";
 import DonutChart from "./DonutChart";
 import PushNotification from "./PushNotication";
 import { useWindowSize } from "@uidotdev/usehooks";
+import Calendar from "react-calendar";
 
 import GanttChart from "./Gantt";
 import Header from "./Header";
+
+type ValuePiece = Date | null;
+
+type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 const Home = () => {
 
@@ -13,6 +18,8 @@ const Home = () => {
         { value: 0, color: "#37515f" },
         { value: 6, color: "#d2d5dd" },
     ]);
+
+    const [date, setDate] = useState<Value>(new Date());
 
     const [userName, setUserName] = useState("");
     const [showSidebar, setSidebar] = useState(true);
@@ -199,8 +206,11 @@ const Home = () => {
                         </ul>
                     </div>
                     
-                    <div className="w-[98.5%] rounded-lg max-w-full overflow-x-auto border-3 m-2 border-palette-color5 flex items-center">
-                        <GanttChart />
+                    <div className="flex-row w-[98.5%] rounded-lg max-w-full overflow-x-auto border-3 m-2 border-palette-color5 flex items-center">
+                        <div className="flex flex-row w-[75%]">
+                            <GanttChart />
+                        </div>
+                        <Calendar onChange={setDate} value={date}/>
                     </div>
 
                     {/* Contact panel */}

@@ -219,9 +219,9 @@ const Blueprints = () => {
                     }
                 );
 
-                console.log(data);
-
-            }
+                const imageData = data.slice(dataStart, dataEnd);
+                console.log(imageData);
+            }  
             catch (err : unknown) {
                 currentImages.push("");
                 console.warn(`${err}`);
