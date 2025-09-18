@@ -33,12 +33,12 @@ func (group *StageGroup) Get(db *gorm.DB, id uint) error {
 
 func (group *StageGroup) Create(db *gorm.DB, request StageGroupRequest) error {
 	var project Project
-	if err := project.Get(db, request.ProjectID, []string{"Groups"}); err != nil {
+	if err := project.Get(db, request.ProjectID, []string{"StageGroups"}); err != nil {
 		return err
 	}
 	group.Name = request.Name
 	group.ProjectID = project.ID
-	project.Groups = append(project.Groups, *group)
+	project.StageGroups = append(project.StageGroups, *group)
 	return errors.Join(db.Save(&project).Error, db.Create(&group).Error)
 }
 

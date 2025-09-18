@@ -10,16 +10,16 @@ import (
 
 type Project struct {
 	gorm.Model
-	Name        string      `json:"name" groups:"public" gorm:"not null"`
-	UserID      uint        `json:"userID" groups:"public" gorm:"not null"`
-	Description string      `json:"description" groups:"public"`
-	Latitude    float32     `json:"latitude" groups:"public" gorm:"not null"`
-	Longitude   float32     `json:"longitude" groups:"public" gorm:"not null"`
-	StartTime   pq.NullTime `gorm:"not null"`
-	EndTime     pq.NullTime `gorm:"not null"`
-	Groups      []StageGroup
-	Attachments []Attachment
-	Estimates   []Estimate
+	Name           string      `json:"name" groups:"public" gorm:"not null"`
+	UserID         uint        `json:"userID" groups:"public" gorm:"not null"`
+	Description    string      `json:"description" groups:"public"`
+	Latitude       float32     `json:"latitude" groups:"public" gorm:"not null"`
+	Longitude      float32     `json:"longitude" groups:"public" gorm:"not null"`
+	StartTime      pq.NullTime `gorm:"not null"`
+	EndTime        pq.NullTime `gorm:"not null"`
+	StageGroups    []StageGroup
+	Attachments    []Attachment
+	EstimateGroups []EstimateGroup
 }
 
 type ProjectRequest struct {
@@ -56,14 +56,14 @@ func (project *Project) Create(db *gorm.DB, request ProjectRequest) error {
 	project.Longitude = request.Longitude
 	project.StartTime = util.UnmarshalTime(request.StartTime)
 	project.EndTime = util.UnmarshalTime(request.EndTime)
-	project.Groups = make([]StageGroup, 0)
+	project.StageGroups = make([]StageGroup, 0)
 	project.Attachments = make([]Attachment, 0)
-	project.Estimates = make([]Estimate, 0)
+	project.EstimateGroups = make([]EstimateGroup, 0)
 	return db.Create(&project).Error
 }
 
 func (project *Project) Delete(db *gorm.DB) error {
-	for _, group := range project.Groups {
+	for _, group := range project.StageGroups {
 		if err := group.Delete(db); err != nil {
 			return err
 		}
@@ -73,8 +73,13 @@ func (project *Project) Delete(db *gorm.DB) error {
 			return err
 		}
 	}
-	for _, estimate := range project.Estimates {
-		if err := estimate.Delete(db); err != nil {
+	for _, sg := range project.StageGroups {
+		if err := sg.Delete(db); err != nil {
+			return err
+		}
+	}
+	for _, eg := range project.EstimateGroups {
+		if err := eg.Delete(db); err != nil {
 			return err
 		}
 	}
@@ -97,7 +102,12 @@ func (project *Project) Patch(db *gorm.DB, request ProjectRequest) error {
 	return db.Save(&project).Error
 }
 
-func (project *Project) AddGroup(db *gorm.DB, group StageGroup) error {
-	project.Groups = append(project.Groups, group)
+func (project *Project) AddStageGroup(db *gorm.DB, group StageGroup) error {
+	project.StageGroups = append(project.StageGroups, group)
+	return db.Save(&project).Error
+}
+
+func (project *Project) AddEstimateGroup(db *gorm.DB, group EstimateGroup) error {
+	project.EstimateGroups = append(project.EstimateGroups, group)
 	return db.Save(&project).Error
 }
