@@ -105,7 +105,7 @@ func (stage *Stage) RemoveWorker(db *gorm.DB, index int) error {
 	return db.Save(&stage).Error
 }
 
-func (stage Stage) GetGroup(db *gorm.DB) (group *Group, err error) {
+func (stage Stage) GetGroup(db *gorm.DB) (group *StageGroup, err error) {
 	err = group.Get(db, stage.GroupID)
 	return
 }

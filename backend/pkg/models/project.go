@@ -17,7 +17,7 @@ type Project struct {
 	Longitude   float32     `json:"longitude" groups:"public" gorm:"not null"`
 	StartTime   pq.NullTime `gorm:"not null"`
 	EndTime     pq.NullTime `gorm:"not null"`
-	Groups      []Group
+	Groups      []StageGroup
 	Attachments []Attachment
 	Estimates   []Estimate
 }
@@ -56,7 +56,7 @@ func (project *Project) Create(db *gorm.DB, request ProjectRequest) error {
 	project.Longitude = request.Longitude
 	project.StartTime = util.UnmarshalTime(request.StartTime)
 	project.EndTime = util.UnmarshalTime(request.EndTime)
-	project.Groups = make([]Group, 0)
+	project.Groups = make([]StageGroup, 0)
 	project.Attachments = make([]Attachment, 0)
 	project.Estimates = make([]Estimate, 0)
 	return db.Create(&project).Error
@@ -97,7 +97,7 @@ func (project *Project) Patch(db *gorm.DB, request ProjectRequest) error {
 	return db.Save(&project).Error
 }
 
-func (project *Project) AddGroup(db *gorm.DB, group Group) error {
+func (project *Project) AddGroup(db *gorm.DB, group StageGroup) error {
 	project.Groups = append(project.Groups, group)
 	return db.Save(&project).Error
 }

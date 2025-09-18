@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type Group struct {
+type StageGroup struct {
 	gorm.Model
 	Name      string `json:"name" groups:"public" gorm:"not null"`
 	ProjectID uint   `json:"projectID" groups:"public" gorm:"not null"`
@@ -16,22 +16,22 @@ type Group struct {
 	Stages    []Stage
 }
 
-type GroupRequest struct {
-	*Group
+type StageGroupRequest struct {
+	*StageGroup
 }
 
-type GroupResponse struct {
-	*Group
+type StageGroupResponse struct {
+	*StageGroup
 	StartTime int64 `json:"startTime" groups:"public"`
 	EndTime   int64 `json:"endTime" groups:"public"`
 	CreatedAt int64 `json:"createdAt" groups:"public"`
 }
 
-func (group *Group) Get(db *gorm.DB, id uint) error {
+func (group *StageGroup) Get(db *gorm.DB, id uint) error {
 	return db.Preload("Stages").Where("id = ?", id).Take(&group).Error
 }
 
-func (group *Group) Create(db *gorm.DB, request GroupRequest) error {
+func (group *StageGroup) Create(db *gorm.DB, request StageGroupRequest) error {
 	var project Project
 	if err := project.Get(db, request.ProjectID, []string{"Groups"}); err != nil {
 		return err
@@ -42,7 +42,7 @@ func (group *Group) Create(db *gorm.DB, request GroupRequest) error {
 	return errors.Join(db.Save(&project).Error, db.Create(&group).Error)
 }
 
-func (group *Group) Delete(db *gorm.DB) error {
+func (group *StageGroup) Delete(db *gorm.DB) error {
 	for _, stage := range group.Stages {
 		if err := stage.Delete(db); err != nil {
 			return err
@@ -51,7 +51,7 @@ func (group *Group) Delete(db *gorm.DB) error {
 	return db.Delete(&group).Error
 }
 
-func (group *Group) CalculateTimes(db *gorm.DB) error {
+func (group *StageGroup) CalculateTimes(db *gorm.DB) error {
 	if len(group.Stages) == 0 {
 		return nil
 	}
