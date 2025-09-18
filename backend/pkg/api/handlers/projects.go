@@ -8,6 +8,7 @@ import (
 	"mp1/pkg/models"
 	"mp1/pkg/util"
 	"net/http"
+	"sort"
 
 	"gorm.io/gorm"
 )
@@ -128,6 +129,9 @@ func ListProjectAttachments(w http.ResponseWriter, r *http.Request) {
 		}
 		response = append(response, toAppend)
 	}
+	sort.Slice(response, func(i, j int) bool {
+		return response[i].UpdatedAt.UnixMilli() > response[j].UpdatedAt.UnixMilli()
+	})
 	if err := jsonEncode(w, response, "public"); err != nil {
 		util.Error(listProjectAttachmentsTag, err)
 		return
