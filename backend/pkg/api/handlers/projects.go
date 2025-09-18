@@ -118,6 +118,9 @@ func ListProjectAttachments(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
 		return
 	}
+	sort.Slice(project.Attachments, func(i, j int) bool {
+		return project.Attachments[i].UpdatedAt.UnixMilli() > project.Attachments[j].UpdatedAt.UnixMilli()
+	})
 	var response []models.AttachmentResponse
 	for _, a := range project.Attachments {
 		toAppend := models.AttachmentResponse{
@@ -129,9 +132,6 @@ func ListProjectAttachments(w http.ResponseWriter, r *http.Request) {
 		}
 		response = append(response, toAppend)
 	}
-	sort.Slice(response, func(i, j int) bool {
-		return response[i].UpdatedAt.UnixMilli() > response[j].UpdatedAt.UnixMilli()
-	})
 	if err := jsonEncode(w, response, "public"); err != nil {
 		util.Error(listProjectAttachmentsTag, err)
 		return
