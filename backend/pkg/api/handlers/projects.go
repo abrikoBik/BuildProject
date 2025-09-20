@@ -52,12 +52,22 @@ func CreateProject(w http.ResponseWriter, r *http.Request) {
 	if !jsonDecode(w, r, &request) {
 		return
 	}
+	var user models.User
+	if user.Get(db.Database, request.UserID) != nil {
+		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
+		return
+	}
 	if err := project.Create(db.Database, request); err != nil {
 		util.Error(createProjectTag, err)
 		switch err {
 		default:
 			http.Error(w, l10n.GenericProject, http.StatusInternalServerError)
 		}
+	}
+	user.Projects = append(user.Projects, project)
+	if err := db.Database.Save(user).Error; err != nil {
+		util.Error(createProjectTag, err)
+		http.Error(w, l10n.GenericUser, http.StatusInternalServerError)
 	}
 	util.Info(createProjectTag, "%s (id%d) created", project.Name, project.ID)
 	response := models.ProjectResponse{ID: project.ID}

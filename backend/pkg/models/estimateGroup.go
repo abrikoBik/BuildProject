@@ -53,7 +53,7 @@ func (group *EstimateGroup) CalculateCost(db *gorm.DB) error {
 	}
 	group.TotalCost = 0
 	for _, estimate := range group.Estimates {
-		group.TotalCost += float64(estimate.Cost) * float64(estimate.Count)
+		group.TotalCost += estimate.Cost * float64(estimate.Count)
 	}
 	return db.Save(&group).Error
 }

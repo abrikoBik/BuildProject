@@ -4,11 +4,12 @@ import "gorm.io/gorm"
 
 type Estimate struct {
 	gorm.Model
-	Name      string  `json:"name" groups:"public" gorm:"not null"`
-	Cost      float32 `json:"cost" groups:"public" gorm:"not null"`
-	Count     uint    `json:"count" groups:"public" gorm:"not null"`
-	Unit      string  `json:"unit" groups:"public" gorm:"not null"`
-	ProjectID uint
+	Name            string  `json:"name" groups:"public" gorm:"not null"`
+	Cost            float64 `json:"cost" groups:"public" gorm:"not null"`
+	Count           uint    `json:"count" groups:"public" gorm:"not null"`
+	Unit            string  `json:"unit" groups:"public" gorm:"not null"`
+	EstimateGroupID uint    `json:"groupID" groups:"public" gorm:"not null"`
+	ProjectID       uint
 }
 
 type EstimateResponse struct {

@@ -11,14 +11,15 @@ import (
 type Project struct {
 	gorm.Model
 	Name           string      `json:"name" groups:"public" gorm:"not null"`
-	UserID         uint        `json:"userID" groups:"public" gorm:"not null"`
 	Description    string      `json:"description" groups:"public"`
-	Latitude       float32     `json:"latitude" groups:"public" gorm:"not null"`
-	Longitude      float32     `json:"longitude" groups:"public" gorm:"not null"`
+	Latitude       float64     `json:"latitude" groups:"public" gorm:"not null"`
+	Longitude      float64     `json:"longitude" groups:"public" gorm:"not null"`
 	StartTime      pq.NullTime `gorm:"not null"`
 	EndTime        pq.NullTime `gorm:"not null"`
-	StageGroups    []StageGroup
+	UserID         uint        `json:"userID" groups:"public" gorm:"not null"`
+	Workers        []Worker    `gorm:"many2many:project_workers"`
 	Attachments    []Attachment
+	StageGroups    []StageGroup
 	EstimateGroups []EstimateGroup
 }
 
@@ -93,12 +94,28 @@ func (project *Project) Patch(db *gorm.DB, request ProjectRequest) error {
 	if len(request.Description) > 0 {
 		project.Description = request.Description
 	}
+	if request.Latitude != 0 {
+		project.Latitude = request.Latitude
+	}
+	if request.Longitude != 0 {
+		project.Longitude = request.Longitude
+	}
 	if request.StartTime != 0 {
 		project.StartTime = util.UnmarshalTime(request.StartTime)
 	}
 	if request.EndTime != 0 {
 		project.EndTime = util.UnmarshalTime(request.EndTime)
 	}
+	return db.Save(&project).Error
+}
+
+func (project *Project) AddWorker(db *gorm.DB, worker Worker) error {
+	project.Workers = append(project.Workers, worker)
+	return db.Save(&project).Error
+}
+
+func (project *Project) AddAttachment(db *gorm.DB, attachment Attachment) error {
+	project.Attachments = append(project.Attachments, attachment)
 	return db.Save(&project).Error
 }
 
