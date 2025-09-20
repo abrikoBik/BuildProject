@@ -8,10 +8,10 @@ import (
 
 type Worker struct {
 	gorm.Model
-	Role   string `json:"role" groups:"public" gorm:"not null"`
-	UserID uint
+	Role   string  `json:"role" groups:"public" gorm:"not null"`
 	Stages []Stage `gorm:"many2many:stage_workers"`
-	User   *User   `gorm:"foreignKey:UserID"`
+	User   User    `gorm:"foreignKey:UserID"`
+	UserID uint
 }
 
 type WorkerRequest struct {
@@ -26,7 +26,7 @@ type WorkerResponse struct {
 }
 
 func (worker *Worker) Get(db *gorm.DB, id uint) error {
-	return db.Preload("Users").Where("id = ?", id).Take(&worker).Error
+	return db.Where("id = ?", id).Take(&worker).Error
 }
 
 func (worker *Worker) Create(db *gorm.DB, request WorkerRequest) error {
@@ -41,7 +41,7 @@ func (worker *Worker) Create(db *gorm.DB, request WorkerRequest) error {
 		return l10n.WorkerExistsError
 	}
 	worker.Role = request.Role
-	worker.User = &user
+	worker.User = user
 	worker.UserID = user.ID
 	err := db.Save(&user).Error
 	return errors.Join(err, db.Create(&worker).Error)
