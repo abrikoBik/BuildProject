@@ -34,7 +34,7 @@ func (worker *Worker) Create(db *gorm.DB, request WorkerRequest) error {
 		return l10n.InvalidRoleError
 	}
 	var user User
-	if err := user.Get(db, request.UserID); err != nil {
+	if err := user.Get(db, request.UserID, []string{"Workers"}); err != nil {
 		return err
 	}
 	if user.Worker != nil {

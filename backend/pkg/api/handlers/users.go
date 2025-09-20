@@ -8,14 +8,16 @@ import (
 	"mp1/pkg/models"
 	"mp1/pkg/util"
 	"net/http"
+	"sort"
 
 	"gorm.io/gorm"
 )
 
 const (
-	getUserTag    = "api:GetUser"
-	createUserTag = "api:CreateUser"
-	patchUserTag  = "api:PatchUser"
+	getUserTag      = "api:GetUser"
+	createUserTag   = "api:CreateUser"
+	patchUserTag    = "api:PatchUser"
+	listProjectsTag = "api:ListProjects"
 )
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +28,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var user models.User
-	result := user.Get(db.Database, userID)
+	result := user.Get(db.Database, userID, []string{})
 	if errors.Is(result, gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
@@ -77,7 +79,7 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var user models.User
-	if user.Get(db.Database, id) != nil {
+	if user.Get(db.Database, id, []string{}) != nil {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
@@ -106,6 +108,38 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 	response := models.UserResponse{User: &user, CreatedAt: user.CreatedAt.String()}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		util.Error(patchUserTag, err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func ListProjects(w http.ResponseWriter, r *http.Request) {
+	id, err := middleware.GetID(middleware.UserID, r.Context())
+	if err != nil {
+		util.Error(listProjectsTag, err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
+	}
+	var user models.User
+	if user.Get(db.Database, id, []string{"Projects"}) != nil {
+		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
+		return
+	}
+	sort.Slice(user.Projects, func(i, j int) bool {
+		return user.Projects[i].UpdatedAt.UnixMilli() > user.Projects[j].UpdatedAt.UnixMilli()
+	})
+	var response []models.ProjectResponse
+	for _, p := range user.Projects {
+		toAppend := models.ProjectResponse{
+			Project:   &p,
+			StartTime: util.MarshalTime(p.StartTime),
+			EndTime:   util.MarshalTime(p.EndTime),
+			CreatedAt: p.CreatedAt.String(),
+		}
+		response = append(response, toAppend)
+	}
+	if err := jsonEncode(w, response, "public"); err != nil {
+		util.Error(listProjectsTag, err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
