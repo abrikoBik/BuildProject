@@ -42,7 +42,7 @@ func (worker *Worker) Create(db *gorm.DB, request WorkerRequest) error {
 	}
 	worker.Role = request.Role
 	worker.User = user
-	// worker.UserID = user.ID
+	worker.UserID = user.ID
 	err := db.Save(&user).Error
 	return errors.Join(err, db.Create(&worker).Error)
 }
