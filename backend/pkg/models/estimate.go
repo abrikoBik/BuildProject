@@ -26,12 +26,15 @@ func (estimate *Estimate) Get(db *gorm.DB, id uint) error {
 }
 
 func (estimate *Estimate) Create(db *gorm.DB, request EstimateRequest, projectID uint) error {
+	var project Project
+	if err := project.Get(db, request.ProjectID, []string{}); err != nil {
+		return err
+	}
+	estimate.ProjectID = projectID
 	estimate.Name = request.Name
 	estimate.Cost = request.Cost
 	estimate.Count = request.Count
 	estimate.Unit = request.Unit
-	// TODO: check if a project exists
-	estimate.ProjectID = projectID
 	return db.Create(&estimate).Error
 }
 

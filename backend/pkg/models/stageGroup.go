@@ -28,12 +28,12 @@ type StageGroupResponse struct {
 }
 
 func (group *StageGroup) Get(db *gorm.DB, id uint) error {
-	return db.Preload("Stages").Where("id = ?", id).Take(&group).Error
+	return db.Preload("Stage").Where("id = ?", id).Take(&group).Error
 }
 
 func (group *StageGroup) Create(db *gorm.DB, request StageGroupRequest) error {
 	var project Project
-	if err := project.Get(db, request.ProjectID, []string{"StageGroups"}); err != nil {
+	if err := project.Get(db, request.ProjectID, []string{"StageGroup"}); err != nil {
 		return err
 	}
 	group.Name = request.Name
