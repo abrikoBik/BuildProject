@@ -143,8 +143,8 @@ const Blueprints = () => {
             const zoomedImg = new Image();
             zoomedImg.src = imgElement.src;
             zoomedImg.style.objectFit = 'contain';
-            zoomedImg.style.width = '100px';
-            zoomedImg.style.height = '100px';
+            zoomedImg.style.width = '40vw';
+            zoomedImg.style.height = '40vh';
             zoomedImg.style.userSelect = 'none';
             zoomedImg.style.pointerEvents = 'none';
 
@@ -163,8 +163,8 @@ const Blueprints = () => {
                 scale += event.deltaY > 0 ? -scrollSpeed : scrollSpeed;
                 scale = Math.min(Math.max(scale, minScale), maxScale);
 
-                zoomedImg.style.width = `${100 * scale}px`;
-                zoomedImg.style.height = `${100 * scale}px`;
+                zoomedImg.style.width = `${40 * scale}vw`;
+                zoomedImg.style.height = `${40 * scale}vh`;
             });
 
             overlay.addEventListener("mousedown", function(event) {
