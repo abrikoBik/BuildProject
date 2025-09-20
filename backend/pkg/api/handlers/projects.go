@@ -54,7 +54,7 @@ func CreateProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var user models.User
-	if user.Get(db.Database, request.UserID) != nil {
+	if user.Get(db.Database, request.UserID, []string{"Projects"}) != nil {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}

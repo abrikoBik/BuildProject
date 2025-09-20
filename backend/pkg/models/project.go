@@ -47,7 +47,7 @@ func (project *Project) Get(db *gorm.DB, id uint, preloads []string) error {
 
 func (project *Project) Create(db *gorm.DB, request ProjectRequest) error {
 	var user User
-	if err := user.Get(db, request.UserID); err != nil {
+	if err := user.Get(db, request.UserID, []string{"Projects"}); err != nil {
 		return l10n.UserNotFoundError
 	}
 	project.UserID = user.ID

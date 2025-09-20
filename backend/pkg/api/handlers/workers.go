@@ -26,7 +26,7 @@ func GetWorker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var user models.User
-	if errors.Is(user.Get(db.Database, userID), gorm.ErrRecordNotFound) {
+	if errors.Is(user.Get(db.Database, userID, []string{"Workers"}), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
@@ -101,7 +101,7 @@ func PatchWorker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var user models.User
-	if user.Get(db.Database, userID) != nil {
+	if user.Get(db.Database, userID, []string{"Workers"}) != nil {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
