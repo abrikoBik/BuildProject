@@ -8,6 +8,7 @@ import (
 	"mp1/pkg/models"
 	"mp1/pkg/util"
 	"net/http"
+	"sort"
 
 	"gorm.io/gorm"
 )
@@ -128,6 +129,9 @@ func ListProjectAttachments(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
 		return
 	}
+	sort.Slice(project.Attachments, func(i, j int) bool {
+		return project.Attachments[i].UpdatedAt.UnixMilli() > project.Attachments[j].UpdatedAt.UnixMilli()
+	})
 	var response []models.AttachmentResponse
 	for _, a := range project.Attachments {
 		toAppend := models.AttachmentResponse{

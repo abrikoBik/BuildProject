@@ -89,7 +89,7 @@ const Estimates = () => {
       setFormData(prev => {
         const newData = { ...prev, [id]: numericValue };
         if (id === 'price' || id === 'amount') {
-          newData.cost = newData.price * newData.amount;
+            newData.cost = newData.price * newData.amount;
         }
         return newData;
       });
@@ -118,6 +118,13 @@ const Estimates = () => {
         }
     }
 
+    const recalculateTotalCost = () => {
+        setTotalCost(0);
+        lineArray.map((item) => {
+            setTotalCost(totalCost + item.cost);
+        })  
+    }
+
     {/* TODO: fix buttons size when add new estimation line */}
     return (
         <main className="flex flex-col h-screen">
@@ -126,7 +133,7 @@ const Estimates = () => {
             <div className="flex flex-row flex-1">
                 <Sidebar show={true} choice={2}/>
 
-                <main className="w-[83%] ml-[17%] pr-5">
+                <main className="w-[83%] ml-[17%] mt-20 pr-5">
                     {/* Selected estimate group */}
                     <section className="w-full h-[60%]">
                         <section className="w-full h-20 flex flex-row">
@@ -175,6 +182,7 @@ const Estimates = () => {
                                               onSave={(newValue) => {
                                                 const updated = [...lineArray];
                                                 updated[index].amount = parseFloat(newValue) ?? 0;
+                                                recalculateTotalCost();
                                                 setLineArray(updated);
                                               }}
                                               onChange={(newValue) => {
@@ -188,6 +196,7 @@ const Estimates = () => {
                                               onSave={(newValue) => {
                                                 const updated = [...lineArray];
                                                 updated[index].price = parseFloat(newValue) ?? 0;
+                                                recalculateTotalCost();
                                                 setLineArray(updated);
                                               }}
                                               onChange={(newValue) => {
@@ -218,7 +227,7 @@ const Estimates = () => {
                                         <input onChange={handleChange} type="text" className="border-2 border-palette-color4 mb-2" id="price"/>
                                         <div className="self-center" id="cost">{formData.cost} р</div>
                                     </section>
-                                    <input onClick={handleAppending} type="reset" value="Добавить строку" className="w-40 h-10 hover:cursor-pointer bg-palette-color4 text-white rounded-lg"/>
+                                    <input onClick={handleAppending} type="reset" value="Добавить строку" className="w-40 h-10 min-h-10 hover:cursor-pointer bg-palette-color4 text-white rounded-lg"/>
                                 </form>
                             </section>
                             <ul className="flex flex-row bold-child relative items-center z-0 rounded-b-xl mt-[-40px] w-full h-10 border-2 border-x-0 border-b-0 border-palette-color4 px-[2%]">

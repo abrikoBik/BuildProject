@@ -168,19 +168,49 @@ input:focus {
 
 @keyframes infoBoxFadeIn {
     from {
-        margin-top: -5%;
+        opacity: 0;
     }
     to {
-        margin-top: 0;
+        opacity: 1;
     }
 }
 
 @keyframes infoBoxFadeOut {
     from {
-        margin-top: 0;
+        opacity: 1;
     }
     to {
-        margin-top: -5%;
+        opacity: 0;
+    }
+}
+
+/* Userinfo dropbox animation */
+
+.dropBoxAnimationIn {
+    animation: dropBoxFadeIn 1s forwards;
+    overflow: hidden;
+}
+
+.dropBoxAnimationOut {
+    animation: dropBoxFadeOut 1s forwards;
+    overflow: hidden;
+}
+
+@keyframes dropBoxFadeIn {
+    from {
+        height: 0;
+    }
+    to {
+        height: 40vh;
+    }
+}
+
+@keyframes dropBoxFadeOut {
+    from {
+        height: 40vh;
+    }
+    to {
+        height: 0;
     }
 }
 

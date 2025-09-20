@@ -38,10 +38,10 @@ const Register = () => {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
-	    if(checkPass != userRequest.password)
-	    {
-		alert("Пароли не совпадают!");
-		return;
+	        if(checkPass != userRequest.password)
+	        {
+		        alert("Пароли не совпадают!");
+		        return;
             }
             const { data, status } = await axios.post<UserRequest>(
                 "/api/users",

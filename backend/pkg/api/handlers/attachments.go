@@ -1,8 +1,9 @@
 package handlers
 
 import (
+	"encoding/base64"
 	"errors"
-	"mime/multipart"
+	"io"
 	"mp1/pkg/api/middleware"
 	"mp1/pkg/consts"
 	"mp1/pkg/db"
@@ -23,7 +24,8 @@ const (
 )
 
 func GetAttachment(w http.ResponseWriter, r *http.Request) {
-	attachmentUUID, err := middleware.GetUUID(middleware.ProjectID, r.Context())
+	attachmentUUID, err := middleware.GetUUID(middleware.AttachmentUUID, r.Context())
+	util.Debug(getAttachmentTag, "attachmentUUID", attachmentUUID, "err", err)
 	if err != nil {
 		util.Error(getAttachmentTag, err)
 		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
@@ -37,22 +39,17 @@ func GetAttachment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	attachmentPath := filepath.Join(consts.AttachmentPath, attachment.UUID.String())
-	contents, err := os.ReadFile(attachmentPath)
+	f, err := os.Open(attachmentPath)
 	if err != nil {
 		util.Error(getAttachmentTag, err)
 		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
 		return
 	}
-	mw := multipart.NewWriter(w)
-	fw, err := mw.CreateFormFile(consts.AttachmentMultipartKey, attachment.Name)
-	if err != nil {
+	defer f.Close()
+	encoder := base64.NewEncoder(base64.StdEncoding, w)
+	defer encoder.Close()
+	if _, err = io.Copy(encoder, f); err != nil {
 		util.Error(getAttachmentTag, err)
-		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
-		return
-	}
-	if _, err := fw.Write(contents); err != nil {
-		util.Error(getAttachmentTag, err)
-		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
 		return
 	}
 
@@ -108,7 +105,7 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteAttachment(w http.ResponseWriter, r *http.Request) {
-	attachmentUUID, err := middleware.GetUUID(middleware.ProjectID, r.Context())
+	attachmentUUID, err := middleware.GetUUID(middleware.AttachmentUUID, r.Context())
 	if err != nil {
 		util.Error(deleteAttachmentTag, err)
 		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
