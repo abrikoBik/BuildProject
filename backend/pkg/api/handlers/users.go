@@ -47,6 +47,10 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	if !jsonDecode(w, r, &request) {
 		return
 	}
+	if !errors.Is(db.Database.Where("login = ? OR email = ?", request.Name, request.Email).Take(&models.User{}).Error, gorm.ErrRecordNotFound) {
+		http.Error(w, l10n.NameOrEmailTaken, http.StatusBadRequest)
+		return
+	}
 	var user models.User
 	if err := user.Create(db.Database, request); err != nil {
 		lCreateUser.Error(err)
@@ -55,8 +59,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, l10n.InsecurePassword, http.StatusBadRequest)
 		case l10n.InvalidEmailError:
 			http.Error(w, l10n.InvalidEmail, http.StatusBadRequest)
-		case gorm.ErrDuplicatedKey:
-			http.Error(w, l10n.NameOrEmailTaken, http.StatusBadRequest)
 		default:
 			http.Error(w, l10n.RegisterError, http.StatusInternalServerError)
 		}
