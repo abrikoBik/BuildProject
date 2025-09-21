@@ -24,12 +24,12 @@ type EstimateGroupRequest struct {
 }
 
 func (group *EstimateGroup) Get(db *gorm.DB, id uint) error {
-	return db.Preload("Estimates").Where("id = ?", id).Take(&group).Error
+	return db.Preload("Estimate").Where("id = ?", id).Take(&group).Error
 }
 
 func (group *EstimateGroup) Create(db *gorm.DB, request EstimateGroupRequest, projectID uint) error {
 	var project Project
-	if err := project.Get(db, request.ProjectID, []string{"EstimateGroups"}); err != nil {
+	if err := project.Get(db, request.ProjectID, []string{"EstimateGroup"}); err != nil {
 		return err
 	}
 	group.Name = request.Name

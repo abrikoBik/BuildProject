@@ -54,7 +54,7 @@ func CreateProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var user models.User
-	if user.Get(db.Database, request.UserID, []string{"Projects"}) != nil {
+	if user.Get(db.Database, request.UserID, []string{"Project"}) != nil {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
@@ -125,7 +125,7 @@ func ListProjectAttachments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var project models.Project
-	if project.Get(db.Database, id, []string{"Attachments"}) != nil {
+	if project.Get(db.Database, id, []string{"Attachment"}) != nil {
 		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
 		return
 	}
