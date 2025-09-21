@@ -10,8 +10,8 @@ import (
 
 type Project struct {
 	gorm.Model
-	Name           string      `json:"name" groups:"public" gorm:"not null"`
-	Description    string      `json:"description" groups:"public"`
+	Name           string      `json:"name" groups:"public,list" gorm:"not null"`
+	Description    string      `json:"description" groups:"public,list"`
 	Latitude       float64     `json:"latitude" groups:"public" gorm:"not null"`
 	Longitude      float64     `json:"longitude" groups:"public" gorm:"not null"`
 	StartTime      pq.NullTime `gorm:"not null"`
@@ -34,7 +34,7 @@ type ProjectResponse struct {
 	StartTime int64  `json:"startTime" groups:"public" gorm:"not null"`
 	EndTime   int64  `json:"endTime" groups:"public" gorm:"not null"`
 	CreatedAt string `json:"createdAt" groups:"public"`
-	ID        uint   `json:"id" groups:"register"`
+	ID        uint   `json:"id" groups:"register,list"`
 }
 
 func (project *Project) Get(db *gorm.DB, id uint, preloads ...string) error {

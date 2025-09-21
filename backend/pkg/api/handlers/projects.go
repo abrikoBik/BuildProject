@@ -146,7 +146,7 @@ func ListProjectAttachments(w http.ResponseWriter, r *http.Request) {
 		}
 		response = append(response, toAppend)
 	}
-	if err := jsonEncode(w, response, "public"); err != nil {
+	if err := jsonEncode(w, response, "list"); err != nil {
 		lListProjectAttachments.Error(err)
 		return
 	}

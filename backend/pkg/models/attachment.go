@@ -18,7 +18,7 @@ import (
 
 type Attachment struct {
 	gorm.Model
-	Name string `json:"name" groups:"public" gorm:"not null"`
+	Name string `json:"name" groups:"public,list" gorm:"not null"`
 	// Size in bytes.
 	Size      int64     `json:"size" groups:"public" gorm:"not null"`
 	UUID      uuid.UUID `gorm:"type:uuid;default:gen_random_uuid()"`
@@ -28,7 +28,7 @@ type Attachment struct {
 
 type AttachmentResponse struct {
 	*Attachment
-	UUID string `json:"uuid" groups:"register,public"`
+	UUID string `json:"uuid" groups:"register,list"`
 }
 
 func (attachment *Attachment) Get(db *gorm.DB, id uuid.UUID) error {

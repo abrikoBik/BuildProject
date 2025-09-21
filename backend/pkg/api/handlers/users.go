@@ -133,15 +133,12 @@ func ListProjects(w http.ResponseWriter, r *http.Request) {
 	var response []models.ProjectResponse
 	for _, p := range user.Projects {
 		toAppend := models.ProjectResponse{
-			Project:   &p,
-			StartTime: util.MarshalTime(p.StartTime),
-			EndTime:   util.MarshalTime(p.EndTime),
-			CreatedAt: p.CreatedAt.String(),
-			ID:        p.ID,
+			Project: &p,
+			ID:      p.ID,
 		}
 		response = append(response, toAppend)
 	}
-	if err := jsonEncode(w, response, "public", "register"); err != nil {
+	if err := jsonEncode(w, response, "list"); err != nil {
 		lListProjects.Error(err)
 		return
 	}
