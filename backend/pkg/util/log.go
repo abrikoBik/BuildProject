@@ -1,29 +1,33 @@
 package util
 
 import (
-	"errors"
 	"fmt"
-	"log/slog"
 	"strings"
+
+	"github.com/mattn/go-colorable"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
-// Sets the log level to one of these:
-// - debug
-// - warn
-// - info
-func LogLevel(level string) error {
-	allowedLevels := map[string]slog.Level{
-		"debug": slog.LevelDebug,
-		"warn":  slog.LevelWarn,
-		"info":  slog.LevelInfo,
+type Logger struct {
+	Service string
+	Logger  zap.SugaredLogger
+}
+
+func CreateLogger(service string) Logger {
+	// TODO: switch to production loggers
+	config := zap.NewDevelopmentEncoderConfig()
+	config.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	l := zap.New(zapcore.NewCore(
+		zapcore.NewConsoleEncoder(config),
+		zapcore.AddSync(colorable.NewColorableStdout()),
+		zapcore.DebugLevel,
+	))
+	defer l.Sync()
+	return Logger{
+		Service: service,
+		Logger:  *l.Sugar(),
 	}
-	for name, value := range allowedLevels {
-		if strings.Compare(level, name) == 0 {
-			slog.SetLogLoggerLevel(value)
-			return nil
-		}
-	}
-	return errors.New("unknown log level")
 }
 
 // +1 for an extra space
@@ -39,24 +43,24 @@ func addServicePrefix(builder *strings.Builder, service string) {
 	builder.WriteString("] ")
 }
 
-func Info(service string, format string, elements ...any) {
+func (l Logger) Info(format string, elements ...any) {
 	var builder strings.Builder
-	addServicePrefix(&builder, service)
+	addServicePrefix(&builder, l.Service)
 	builder.WriteString(fmt.Sprintf(format, elements...))
-	slog.Info(builder.String())
+	l.Logger.Infof(builder.String())
 }
 
-func Error(service string, err error) {
+func (l Logger) Error(err error) {
 	var builder strings.Builder
 	builder.Grow(errorLen)
 	builder.WriteString("!!! ")
-	addServicePrefix(&builder, service)
+	addServicePrefix(&builder, l.Service)
 	builder.WriteString(err.Error())
-	slog.Error(builder.String())
+	l.Logger.Errorln(builder.String())
 }
 
-func Debug(service string, elements ...any) {
+func (l Logger) Debug(elements ...any) {
 	var builder strings.Builder
-	addServicePrefix(&builder, service)
-	slog.Debug(builder.String(), elements...)
+	addServicePrefix(&builder, l.Service)
+	l.Logger.Debugw(builder.String(), elements...)
 }

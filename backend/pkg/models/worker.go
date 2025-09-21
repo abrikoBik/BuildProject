@@ -2,8 +2,10 @@ package models
 
 import (
 	"errors"
-	"gorm.io/gorm"
 	"mp1/pkg/l10n"
+	"mp1/pkg/util"
+
+	"gorm.io/gorm"
 )
 
 type Worker struct {
@@ -11,7 +13,7 @@ type Worker struct {
 	Role   string  `json:"role" groups:"public" gorm:"not null"`
 	Stages []Stage `gorm:"many2many:stage_workers"`
 	User   User    `gorm:"foreignKey:UserID"`
-	UserID uint
+	UserID uint    `json:"userID" groups:"list"`
 }
 
 type WorkerRequest struct {
@@ -25,12 +27,8 @@ type WorkerResponse struct {
 	ID        uint   `json:"id" groups:"register"`
 }
 
-func (worker *Worker) Get(db *gorm.DB, id uint, preloads []string) error {
-	tx := db
-	for _, preload := range preloads {
-		tx = tx.Preload(preload)
-	}
-	return tx.Where("id = ?", id).Take(&worker).Error
+func (worker *Worker) Get(db *gorm.DB, id uint, preloads ...string) error {
+	return util.Preload(db, preloads...).Where("id = ?", id).Take(&worker).Error
 }
 
 func (worker *Worker) Create(db *gorm.DB, request WorkerRequest) error {
@@ -38,7 +36,7 @@ func (worker *Worker) Create(db *gorm.DB, request WorkerRequest) error {
 		return l10n.InvalidRoleError
 	}
 	var user User
-	if err := user.Get(db, request.UserID, []string{"Worker"}); err != nil {
+	if err := user.Get(db, request.UserID, "Worker"); err != nil {
 		return err
 	}
 	if user.Worker != nil {

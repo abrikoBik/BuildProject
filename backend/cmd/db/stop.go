@@ -3,8 +3,8 @@ package db
 import "mp1/pkg/util"
 
 func Stop(callback func()) {
-	util.Info("db", "stopping")
+	dbLogger.Info("stopping")
 	util.Check(sqlDatabase.Close())
-	util.Info("db", "stopped")
+	dbLogger.Info("stopped")
 	callback()
 }

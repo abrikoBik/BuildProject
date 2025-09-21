@@ -6,11 +6,11 @@ import (
 )
 
 func Start(hostname string, port uint, name string, callback func()) {
-	util.Info("db", "connecting to %s @ %s:%d", name, hostname, port)
+	dbLogger.Info("connecting to %s @ %s:%d", name, hostname, port)
 	util.Check(db.Open(hostname, port, name))
 	var err error
 	sqlDatabase, err = db.Database.DB()
 	util.Check(err)
-	util.Info("db", "connected")
+	dbLogger.Info("connected")
 	callback()
 }

@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"mp1/pkg/util"
 
 	"gorm.io/gorm"
 )
@@ -23,13 +24,13 @@ type EstimateGroupRequest struct {
 	*EstimateGroup
 }
 
-func (group *EstimateGroup) Get(db *gorm.DB, id uint) error {
-	return db.Preload("Estimate").Where("id = ?", id).Take(&group).Error
+func (group *EstimateGroup) Get(db *gorm.DB, id uint, preloads ...string) error {
+	return util.Preload(db, preloads...).Where("id = ?", id).Take(&group).Error
 }
 
 func (group *EstimateGroup) Create(db *gorm.DB, request EstimateGroupRequest, projectID uint) error {
 	var project Project
-	if err := project.Get(db, request.ProjectID, []string{"EstimateGroup"}); err != nil {
+	if err := project.Get(db, request.ProjectID, "EstimateGroups"); err != nil {
 		return err
 	}
 	group.Name = request.Name

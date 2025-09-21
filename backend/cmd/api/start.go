@@ -10,12 +10,12 @@ import (
 
 func Start(hostname string, port uint, callback func()) {
 	server = api.Init(hostname, port)
-	util.Info("api", "starting @ %s", server.Addr)
+	apiLogger.Info("starting @ %s", server.Addr)
 	listener, err := net.Listen("tcp", server.Addr)
 	util.Check(err)
-	util.Info("api", "started")
+	apiLogger.Info("started")
 	callback()
 	if err := server.Serve(listener); !errors.Is(err, http.ErrServerClosed) {
-		util.Error("api", err)
+		apiLogger.Error(err)
 	}
 }

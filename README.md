@@ -21,12 +21,12 @@ $ docker compose build
 > Перед запуском миграций необходимо запустить контейнеры `backend` и `db`.
 
 ```shell
-$ docker compose exec backend ./mp1_backend -migrate -db-hostname db
+$ docker compose exec backend ./mp1_backend -migrate
 ```
 
 ## Запуск проекта
 > [!IMPORTANT]
-> Необходимо запустить миграцию после каждого изменения моделей в `backend/models/`, либо перед первым запуском.
+> Необходимо запустить миграцию после каждого изменения моделей в `backend/pkg/models/`, либо перед первым запуском.
 
 ```shell
 $ docker compose up

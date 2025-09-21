@@ -13,8 +13,8 @@ func AddAttachments(r chi.Router, jwtKey []byte) {
 		r.With(middleware.JSONResponse).Post("/", handlers.CreateAttachment)
 		r.Route("/{attachmentUUID}", func(r chi.Router) {
 			r.Use(middleware.ParseUUID(middleware.AttachmentUUID, "attachmentUUID"))
-			r.With(middleware.ValidateToken(jwtKey)).Get("/", handlers.GetAttachment)
-			r.With(middleware.ValidateToken(jwtKey)).Delete("/", handlers.DeleteAttachment)
+			r.Get("/", handlers.GetAttachment)
+			r.Delete("/", handlers.DeleteAttachment)
 		})
 	})
 }

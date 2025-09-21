@@ -7,7 +7,8 @@ import (
 )
 
 func Migrate(callback func()) {
-	util.Info("db", "running migrations")
+	migrationLogger := util.CreateLogger("db:Migrate")
+	migrationLogger.Info("running migrations")
 	toMigrate := map[string]any{
 		"user":       models.User{},
 		"session":    models.Session{},
@@ -17,9 +18,10 @@ func Migrate(callback func()) {
 		"attachment": models.Attachment{},
 	}
 	for name, model := range toMigrate {
+		migrationLogger.Info("(%s) running migrations", name)
 		util.Check(db.Database.Debug().AutoMigrate(&model))
-		util.Debug("db", "model", name)
+		migrationLogger.Info("(%s) done", name)
 	}
-	util.Info("db", "migrations complete")
+	migrationLogger.Info("migrations complete")
 	callback()
 }

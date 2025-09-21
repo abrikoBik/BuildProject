@@ -10,8 +10,8 @@ import (
 
 type Project struct {
 	gorm.Model
-	Name           string      `json:"name" groups:"public" gorm:"not null"`
-	Description    string      `json:"description" groups:"public"`
+	Name           string      `json:"name" groups:"public,list" gorm:"not null"`
+	Description    string      `json:"description" groups:"public,list"`
 	Latitude       float64     `json:"latitude" groups:"public" gorm:"not null"`
 	Longitude      float64     `json:"longitude" groups:"public" gorm:"not null"`
 	StartTime      pq.NullTime `gorm:"not null"`
@@ -34,20 +34,16 @@ type ProjectResponse struct {
 	StartTime int64  `json:"startTime" groups:"public" gorm:"not null"`
 	EndTime   int64  `json:"endTime" groups:"public" gorm:"not null"`
 	CreatedAt string `json:"createdAt" groups:"public"`
-	ID        uint   `json:"id" groups:"register"`
+	ID        uint   `json:"id" groups:"register,list"`
 }
 
-func (project *Project) Get(db *gorm.DB, id uint, preloads []string) error {
-	tx := db
-	for _, preload := range preloads {
-		tx = tx.Preload(preload)
-	}
-	return tx.Where("id = ?", id).Take(&project).Error
+func (project *Project) Get(db *gorm.DB, id uint, preloads ...string) error {
+	return util.Preload(db, preloads...).Where("id = ?", id).Take(&project).Error
 }
 
 func (project *Project) Create(db *gorm.DB, request ProjectRequest) error {
 	var user User
-	if err := user.Get(db, request.UserID, []string{"Project"}); err != nil {
+	if err := user.Get(db, request.UserID, "Projects"); err != nil {
 		return l10n.UserNotFoundError
 	}
 	project.UserID = user.ID

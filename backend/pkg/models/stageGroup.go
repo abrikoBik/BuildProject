@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"mp1/pkg/util"
 
 	"github.com/lib/pq"
 	"gorm.io/gorm"
@@ -27,13 +28,13 @@ type StageGroupResponse struct {
 	CreatedAt int64 `json:"createdAt" groups:"public"`
 }
 
-func (group *StageGroup) Get(db *gorm.DB, id uint) error {
-	return db.Preload("Stage").Where("id = ?", id).Take(&group).Error
+func (group *StageGroup) Get(db *gorm.DB, id uint, preloads ...string) error {
+	return util.Preload(db, preloads...).Where("id = ?", id).Take(&group).Error
 }
 
 func (group *StageGroup) Create(db *gorm.DB, request StageGroupRequest) error {
 	var project Project
-	if err := project.Get(db, request.ProjectID, []string{"StageGroup"}); err != nil {
+	if err := project.Get(db, request.ProjectID, "StageGroups"); err != nil {
 		return err
 	}
 	group.Name = request.Name
