@@ -12,14 +12,14 @@ import (
 
 type Stage struct {
 	gorm.Model
-	Name        string `json:"name" groups:"public" gorm:"not null"`
-	Description string `json:"description" groups:"public"`
-	Status      bool   `json:"status" groups:"public" gorm:"not null;default:false"`
-	GroupID     uint   `json:"groupID" groups:"public" gorm:"not null"`
-	Index       int    `json:"index" groups:"public" gorm:"not null"`
-	StartTime   pq.NullTime
-	EndTime     pq.NullTime
-	Workers     []Worker `gorm:"many2many:stage_workers"`
+	Name         string `json:"name" groups:"public" gorm:"not null"`
+	Description  string `json:"description" groups:"public"`
+	Status       bool   `json:"status" groups:"public" gorm:"not null;default:false"`
+	StageGroupID uint   `json:"groupID" groups:"public" gorm:"not null"`
+	Index        int    `json:"index" groups:"public" gorm:"not null"`
+	StartTime    pq.NullTime
+	EndTime      pq.NullTime
+	Workers      []Worker `gorm:"many2many:stage_workers"`
 }
 
 type StageRequest struct {
@@ -36,8 +36,8 @@ type StageResponse struct {
 	ID        uint  `json:"id" groups:"register"`
 }
 
-func (stage *Stage) Get(db *gorm.DB, id uint) error {
-	return db.Preload("Workers").Where("id = ?", id).Take(&stage).Error
+func (stage *Stage) Get(db *gorm.DB, id uint, preloads ...string) error {
+	return util.Preload(db, preloads...).Where("id = ?", id).Take(&stage).Error
 }
 
 func (stage *Stage) Create(db *gorm.DB, request StageRequest) error {
@@ -52,7 +52,7 @@ func (stage *Stage) Create(db *gorm.DB, request StageRequest) error {
 	stage.Description = request.Description
 	stage.StartTime = util.UnmarshalTime(request.StartTime)
 	stage.EndTime = util.UnmarshalTime(request.EndTime)
-	stage.GroupID = group.ID
+	stage.StageGroupID = group.ID
 	stage.Index = request.Index
 	stage.Workers = make([]Worker, 0)
 	group.Stages = slices.Insert(group.Stages, stage.Index, *stage)
@@ -67,7 +67,7 @@ func (stage *Stage) Delete(db *gorm.DB) error {
 	if stage.Index < 0 || stage.Index >= len(group.Stages) {
 		return l10n.OutOfBoundsError
 	}
-	group.Stages = slices.Delete(group.Stages, stage.Index, stage.Index)
+	group.Stages = slices.Delete(group.Stages, stage.Index, stage.Index+1)
 	return errors.Join(group.CalculateTimes(db), db.Delete(&stage).Error)
 }
 
@@ -101,12 +101,12 @@ func (stage *Stage) RemoveWorker(db *gorm.DB, index int) error {
 	if index < 0 || index >= len(stage.Workers) {
 		return l10n.OutOfBoundsError
 	}
-	stage.Workers = slices.Delete(stage.Workers, index, index)
+	stage.Workers = slices.Delete(stage.Workers, index, index+1)
 	return db.Save(&stage).Error
 }
 
-func (stage Stage) GetGroup(db *gorm.DB) (group *Group, err error) {
-	err = group.Get(db, stage.GroupID)
+func (stage Stage) GetGroup(db *gorm.DB) (group *StageGroup, err error) {
+	err = group.Get(db, stage.StageGroupID)
 	return
 }
 

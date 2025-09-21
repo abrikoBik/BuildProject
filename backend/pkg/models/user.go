@@ -37,8 +37,8 @@ type UserResponse struct {
 	ID        uint   `json:"id" groups:"register"`
 }
 
-func (user *User) Get(db *gorm.DB, id uint) error {
-	return db.Preload("Sessions").Preload("Worker").Where("id = ?", id).Take(&user).Error
+func (user *User) Get(db *gorm.DB, id uint, preloads ...string) error {
+	return util.Preload(db, preloads...).Where("id = ?", id).Take(&user).Error
 }
 
 func (user *User) Create(db *gorm.DB, request UserRequest) (err error) {
