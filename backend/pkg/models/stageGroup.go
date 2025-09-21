@@ -2,7 +2,9 @@ package models
 
 import (
 	"errors"
+	"mp1/pkg/l10n"
 	"mp1/pkg/util"
+	"slices"
 
 	"github.com/lib/pq"
 	"gorm.io/gorm"
@@ -10,7 +12,7 @@ import (
 
 type StageGroup struct {
 	gorm.Model
-	Name      string `json:"name" groups:"public" gorm:"not null"`
+	Name      string `json:"name" groups:"public,list" gorm:"not null"`
 	ProjectID uint   `json:"projectID" groups:"public" gorm:"not null"`
 	StartTime pq.NullTime
 	EndTime   pq.NullTime
@@ -26,6 +28,7 @@ type StageGroupResponse struct {
 	StartTime int64 `json:"startTime" groups:"public"`
 	EndTime   int64 `json:"endTime" groups:"public"`
 	CreatedAt int64 `json:"createdAt" groups:"public"`
+	ID        uint  `json:"id" groups:"register,list"`
 }
 
 func (group *StageGroup) Get(db *gorm.DB, id uint, preloads ...string) error {
@@ -50,6 +53,19 @@ func (group *StageGroup) Delete(db *gorm.DB) error {
 		}
 	}
 	return db.Delete(&group).Error
+}
+
+func (group *StageGroup) AddStage(db *gorm.DB, stage Stage) error {
+	group.Stages = append(group.Stages, stage)
+	return db.Save(&group).Error
+}
+
+func (group *StageGroup) RemoveStage(db *gorm.DB, index int) error {
+	if index < 0 || index >= len(group.Stages) {
+		return l10n.OutOfBoundsError
+	}
+	group.Stages = slices.Delete(group.Stages, index, index+1)
+	return db.Save(&group).Error
 }
 
 func (group *StageGroup) CalculateTimes(db *gorm.DB) error {

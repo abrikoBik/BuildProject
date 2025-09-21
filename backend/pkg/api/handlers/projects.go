@@ -64,6 +64,7 @@ func CreateProject(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, l10n.GenericProject, http.StatusInternalServerError)
 		}
 	}
+	// TODO: user.AddProject
 	user.Projects = append(user.Projects, project)
 	if err := db.Database.Save(user).Error; err != nil {
 		lCreateProject.Error(err)

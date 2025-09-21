@@ -1,41 +1,54 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"errors"
+
+	"gorm.io/gorm"
+)
 
 type Estimate struct {
 	gorm.Model
-	Name            string  `json:"name" groups:"public" gorm:"not null"`
-	Cost            float64 `json:"cost" groups:"public" gorm:"not null"`
-	Count           uint    `json:"count" groups:"public" gorm:"not null"`
-	Unit            string  `json:"unit" groups:"public" gorm:"not null"`
-	EstimateGroupID uint    `json:"groupID" groups:"public" gorm:"not null"`
-	ProjectID       uint
-}
-
-type EstimateResponse struct {
-	*Estimate
-	ID uint `json:"id" groups:"register"`
+	Name            string  `json:"name" groups:"public,list" gorm:"not null"`
+	Cost            float64 `json:"cost" groups:"public,list" gorm:"not null"`
+	Count           uint    `json:"count" groups:"public,list" gorm:"not null"`
+	Unit            string  `json:"unit" groups:"public,list" gorm:"not null"`
+	Index           uint    `json:"index" groups:"public,list" gorm:"not null"`
+	EstimateGroupID uint    `json:"groupID" gorm:"not null"`
+	ProjectID       uint    `json:"projectID" gorm:"not null"`
 }
 
 type EstimateRequest struct {
 	*Estimate
 }
 
+type EstimateResponse struct {
+	*Estimate
+	ID uint `json:"id" groups:"register,list"`
+}
+
 func (estimate *Estimate) Get(db *gorm.DB, id uint) error {
 	return db.Where("id = ?", id).Take(&estimate).Error
 }
 
-func (estimate *Estimate) Create(db *gorm.DB, request EstimateRequest, projectID uint) error {
-	var project Project
-	if err := project.Get(db, request.ProjectID); err != nil {
+func (estimate *Estimate) Create(db *gorm.DB, request EstimateRequest) error {
+	var estimateGroup EstimateGroup
+	if err := estimateGroup.Get(db, request.EstimateGroupID, "Estimates"); err != nil {
 		return err
 	}
-	estimate.ProjectID = projectID
+	estimate.EstimateGroupID = request.EstimateGroupID
+	estimate.Index = uint(len(estimateGroup.Estimates) + 1)
+	var project Project
+	if err := project.Get(db, request.ProjectID, "EstimatesGroup"); err != nil {
+		return err
+	}
+	estimate.ProjectID = request.ProjectID
 	estimate.Name = request.Name
 	estimate.Cost = request.Cost
 	estimate.Count = request.Count
 	estimate.Unit = request.Unit
-	return db.Create(&estimate).Error
+	estimateGroup.AddEstimate(db, *estimate)
+	project.AddEstimateGroup(db, estimateGroup)
+	return errors.Join(db.Create(&estimate).Error, db.Save(&estimateGroup).Error, db.Save(&project).Error)
 }
 
 func (estimate *Estimate) Patch(db *gorm.DB, request EstimateRequest) error {

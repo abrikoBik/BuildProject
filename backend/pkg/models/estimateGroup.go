@@ -2,7 +2,9 @@ package models
 
 import (
 	"errors"
+	"mp1/pkg/l10n"
 	"mp1/pkg/util"
+	"slices"
 
 	"gorm.io/gorm"
 )
@@ -15,28 +17,27 @@ type EstimateGroup struct {
 	Estimates []Estimate
 }
 
-type EstimateGroupResponse struct {
-	*EstimateGroup
-	ID uint `json:"id" groups:"register"`
-}
-
 type EstimateGroupRequest struct {
 	*EstimateGroup
+}
+
+type EstimateGroupResponse struct {
+	*EstimateGroup
+	ID uint `json:"id" groups:"register,list"`
 }
 
 func (group *EstimateGroup) Get(db *gorm.DB, id uint, preloads ...string) error {
 	return util.Preload(db, preloads...).Where("id = ?", id).Take(&group).Error
 }
 
-func (group *EstimateGroup) Create(db *gorm.DB, request EstimateGroupRequest, projectID uint) error {
+func (group *EstimateGroup) Create(db *gorm.DB, request EstimateGroupRequest) error {
 	var project Project
-	if err := project.Get(db, request.ProjectID, "EstimateGroups"); err != nil {
+	if err := project.Get(db, request.ProjectID, "EstimateGroups.Estimates"); err != nil {
 		return err
 	}
 	group.Name = request.Name
 	group.ProjectID = project.ID
-	project.EstimateGroups = append(project.EstimateGroups, *group)
-	return errors.Join(db.Save(&project).Error, db.Create(&group).Error)
+	return errors.Join(db.Create(&group).Error, project.AddEstimateGroup(db, *group))
 }
 
 func (group *EstimateGroup) Delete(db *gorm.DB) error {
@@ -46,6 +47,19 @@ func (group *EstimateGroup) Delete(db *gorm.DB) error {
 		}
 	}
 	return db.Delete(&group).Error
+}
+
+func (group *EstimateGroup) AddEstimate(db *gorm.DB, estimate Estimate) error {
+	group.Estimates = append(group.Estimates, estimate)
+	return db.Save(&group).Error
+}
+
+func (group *EstimateGroup) RemoveEstimate(db *gorm.DB, index int) error {
+	if index < 0 || index >= len(group.Estimates) {
+		return l10n.OutOfBoundsError
+	}
+	group.Estimates = slices.Delete(group.Estimates, index, index+1)
+	return db.Save(&group).Error
 }
 
 func (group *EstimateGroup) CalculateCost(db *gorm.DB) error {
