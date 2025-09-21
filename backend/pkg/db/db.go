@@ -29,6 +29,7 @@ func init() {
 // Opens a PostgreSQL database with the name dbname at hostname:port.
 func Open(hostname string, port uint, dbname string) error {
 	connStr := fmt.Sprintf(
+		// TODO: remove sslmode=disable
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		hostname,
 		port,
@@ -36,7 +37,12 @@ func Open(hostname string, port uint, dbname string) error {
 		password,
 		dbname,
 	)
-	database, err := gorm.Open(postgres.Open(connStr), &gorm.Config{TranslateError: true})
+	opt := &gorm.Config{
+		PrepareStmt:          true,
+		DisableAutomaticPing: true,
+		TranslateError:       true,
+	}
+	database, err := gorm.Open(postgres.Open(connStr), opt)
 	if err != nil {
 		return err
 	}

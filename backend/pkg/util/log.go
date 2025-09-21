@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/mattn/go-colorable"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 type Logger struct {
@@ -13,7 +15,13 @@ type Logger struct {
 }
 
 func CreateLogger(service string) Logger {
-	l := zap.Must(zap.NewDevelopment())
+	config := zap.NewDevelopmentEncoderConfig()
+	config.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	l := zap.New(zapcore.NewCore(
+		zapcore.NewConsoleEncoder(config),
+		zapcore.AddSync(colorable.NewColorableStdout()),
+		zapcore.DebugLevel,
+	))
 	defer l.Sync()
 	return Logger{
 		Service: service,
