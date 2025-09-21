@@ -4,7 +4,6 @@ import (
 	"flag"
 	"mp1/cmd/api"
 	"mp1/cmd/db"
-	"mp1/pkg/util"
 	"os"
 	"os/signal"
 	"sync"
@@ -22,10 +21,8 @@ func main() {
 		apiHostname = flag.String("api-hostname", "0.0.0.0", "Hostname for the API to listen to")
 		apiPort     = flag.Uint("api-port", 3000, "Port for the API to listen to")
 		migrate     = flag.Bool("migrate", false, "Run migrations (exits after successful migrations)")
-		logLevel    = flag.String("log-level", "info", "General log level (debug, warn, info)")
 	)
 	flag.Parse()
-	util.Check(util.LogLevel(*logLevel))
 
 	servicesWg.Add(SERVICES_COUNT)
 	go db.Start(*dbHostname, *dbPort, *dbName, servicesWg.Done)

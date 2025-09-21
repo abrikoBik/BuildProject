@@ -11,9 +11,9 @@ import (
 	"gorm.io/gorm"
 )
 
-const (
-	createSessionTag = "api:CreateSession"
-	// deleteSessionTag = "api:DeleteSession"
+var (
+	lCreateSession = util.CreateLogger("api:CreateSession")
+	// lDeleteSession = util.CreateLogger("api:DeleteSession")
 )
 
 func CreateSession(w http.ResponseWriter, r *http.Request) {
@@ -27,7 +27,7 @@ func CreateSession(w http.ResponseWriter, r *http.Request) {
 	}
 	var session models.Session
 	if err := session.Create(db.Database, request, jwtKey); err != nil {
-		util.Error(createSessionTag, err)
+		lCreateSession.Error(err)
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		} else if errors.Is(err, l10n.WrongPasswordError) {
@@ -37,10 +37,10 @@ func CreateSession(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	util.Info(createSessionTag, "id%d logged in", session.UserID)
+	lCreateSession.Info("id%d logged in", session.UserID)
 	response := models.SessionResponse{Session: &session}
 	if err := jsonEncode(w, response, "public"); err != nil {
-		util.Error(createSessionTag, err)
+		lCreateSession.Error(err)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)

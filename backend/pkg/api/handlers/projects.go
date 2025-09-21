@@ -13,18 +13,17 @@ import (
 	"gorm.io/gorm"
 )
 
-const (
-	getProjectTag    = "api:GetProject"
-	createProjectTag = "api:CreateProject"
-	patchProjectTag  = "api:PatchProject"
-
-	listProjectAttachmentsTag = "api:ListProjectAttachments"
+var (
+	lGetProject             = util.CreateLogger("api:GetProject")
+	lCreateProject          = util.CreateLogger("api:CreateProject")
+	lPatchProject           = util.CreateLogger("api:PatchProject")
+	lListProjectAttachments = util.CreateLogger("api:ListProjectAttachments")
 )
 
 func GetProject(w http.ResponseWriter, r *http.Request) {
 	id, err := middleware.GetID(middleware.ProjectID, r.Context())
 	if err != nil {
-		util.Error(getProjectTag, err)
+		lGetProject.Error(err)
 		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
 		return
 	}
@@ -40,11 +39,11 @@ func GetProject(w http.ResponseWriter, r *http.Request) {
 		CreatedAt: project.CreatedAt.String(),
 	}
 	if err := jsonEncode(w, response, "public"); err != nil {
-		util.Error(getProjectTag, err)
+		lGetProject.Error(err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	util.Info(getProjectTag, "id%d returned", project.ID)
+	lGetProject.Info("id%d returned", project.ID)
 }
 
 func CreateProject(w http.ResponseWriter, r *http.Request) {
@@ -59,7 +58,7 @@ func CreateProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := project.Create(db.Database, request); err != nil {
-		util.Error(createProjectTag, err)
+		lCreateProject.Error(err)
 		switch err {
 		default:
 			http.Error(w, l10n.GenericProject, http.StatusInternalServerError)
@@ -67,13 +66,13 @@ func CreateProject(w http.ResponseWriter, r *http.Request) {
 	}
 	user.Projects = append(user.Projects, project)
 	if err := db.Database.Save(user).Error; err != nil {
-		util.Error(createProjectTag, err)
+		lCreateProject.Error(err)
 		http.Error(w, l10n.GenericUser, http.StatusInternalServerError)
 	}
-	util.Info(createProjectTag, "%s (id%d) created", project.Name, project.ID)
+	lCreateProject.Info("%s (id%d) created", project.Name, project.ID)
 	response := models.ProjectResponse{ID: project.ID}
 	if err := jsonEncode(w, response, "register"); err != nil {
-		util.Error(createProjectTag, err)
+		lCreateProject.Error(err)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
@@ -82,7 +81,7 @@ func CreateProject(w http.ResponseWriter, r *http.Request) {
 func PatchProject(w http.ResponseWriter, r *http.Request) {
 	id, err := middleware.GetID(middleware.ProjectID, r.Context())
 	if err != nil {
-		util.Error(patchProjectTag, err)
+		lPatchProject.Error(err)
 		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
 		return
 	}
@@ -96,14 +95,14 @@ func PatchProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := project.Patch(db.Database, request); err != nil {
-		util.Error(patchProjectTag, err)
+		lPatchProject.Error(err)
 		switch err {
 		default:
 			http.Error(w, l10n.GenericProject, http.StatusInternalServerError)
 		}
 		return
 	}
-	util.Info(patchProjectTag, "%s (id%d) patched", project.Name, project.ID)
+	lPatchProject.Info("%s (id%d) patched", project.Name, project.ID)
 	response := models.ProjectResponse{
 		Project:   &project,
 		StartTime: util.MarshalTime(project.StartTime),
@@ -111,7 +110,7 @@ func PatchProject(w http.ResponseWriter, r *http.Request) {
 		CreatedAt: project.CreatedAt.String(),
 	}
 	if err := jsonEncode(w, response, "public"); err != nil {
-		util.Error(patchProjectTag, err)
+		lPatchProject.Error(err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -120,7 +119,7 @@ func PatchProject(w http.ResponseWriter, r *http.Request) {
 func ListProjectAttachments(w http.ResponseWriter, r *http.Request) {
 	id, err := middleware.GetID(middleware.ProjectID, r.Context())
 	if err != nil {
-		util.Error(listProjectAttachmentsTag, err)
+		lListProjectAttachments.Error(err)
 		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
 		return
 	}
@@ -144,7 +143,7 @@ func ListProjectAttachments(w http.ResponseWriter, r *http.Request) {
 		response = append(response, toAppend)
 	}
 	if err := jsonEncode(w, response, "public"); err != nil {
-		util.Error(listProjectAttachmentsTag, err)
+		lListProjectAttachments.Error(err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

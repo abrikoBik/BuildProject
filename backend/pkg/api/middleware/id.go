@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 	"mp1/pkg/l10n"
-	"mp1/pkg/util"
 	"net/http"
 	"strconv"
 
@@ -46,9 +45,7 @@ func ParseUUID(key ContextKey, param string) func(http.Handler) http.Handler {
 				http.Error(w, l10n.MissingID, http.StatusBadRequest)
 				return
 			}
-			util.Debug("middleware.ParseUUID", "idParam", idParam)
 			id, err := uuid.Parse(idParam)
-			util.Debug("middleware.ParseUUID", "id", id, "err", err)
 			if err != nil {
 				http.Error(w, l10n.InvalidID, http.StatusBadRequest)
 				return
@@ -61,7 +58,6 @@ func ParseUUID(key ContextKey, param string) func(http.Handler) http.Handler {
 
 func GetUUID(key ContextKey, context context.Context) (uuid.UUID, error) {
 	id, ok := context.Value(key).(uuid.UUID)
-	util.Debug("middleware.GetUUID", "id", id, "ok", ok)
 	if !ok {
 		return uuid.UUID{}, l10n.InvalidIDError
 	}

@@ -12,16 +12,16 @@ import (
 	"gorm.io/gorm"
 )
 
-const (
-	getWorkerTag    = "api:GetWorker"
-	createWorkerTag = "api:CreateWorker"
-	patchWorkerTag  = "api:PatchWorker"
+var (
+	lGetWorker    = util.CreateLogger("api:GetWorker")
+	lCreateWorker = util.CreateLogger("api:CreateWorker")
+	lPatchWorker  = util.CreateLogger("api:PatchWorker")
 )
 
 func GetWorker(w http.ResponseWriter, r *http.Request) {
 	userID, err := middleware.GetID(middleware.UserID, r.Context())
 	if err != nil {
-		util.Error(getWorkerTag, err)
+		lGetWorker.Error(err)
 		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
 		return
 	}
@@ -30,31 +30,29 @@ func GetWorker(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
-	util.Debug(getWorkerTag, "user", user)
 	if user.Worker == nil {
 		http.Error(w, l10n.WorkerNotFound, http.StatusNotFound)
 		return
 	}
 	var worker models.Worker
 	if worker.Get(db.Database, user.Worker.ID) != nil {
-		util.Error(getWorkerTag, err)
+		lGetWorker.Error(err)
 		http.Error(w, l10n.GenericWorker, http.StatusInternalServerError)
 		return
 	}
-	util.Debug(getWorkerTag, "worker", worker)
 	response := models.WorkerResponse{Worker: &worker, CreatedAt: worker.CreatedAt.String()}
 	if err := jsonEncode(w, response, "public"); err != nil {
-		util.Error(getWorkerTag, err)
+		lGetWorker.Error(err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	util.Info(getWorkerTag, "id%d returned", worker.ID)
+	lGetWorker.Info("id%d returned", worker.ID)
 }
 
 func CreateWorker(w http.ResponseWriter, r *http.Request) {
 	userID, err := middleware.GetID(middleware.UserID, r.Context())
 	if err != nil {
-		util.Error(createWorkerTag, err)
+		lCreateWorker.Error(err)
 		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
 		return
 	}
@@ -72,7 +70,7 @@ func CreateWorker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := worker.Create(db.Database, request); err != nil {
-		util.Error(createWorkerTag, err)
+		lCreateWorker.Error(err)
 		switch err {
 		case l10n.WorkerExistsError:
 			http.Error(w, l10n.WorkerExists, http.StatusBadRequest)
@@ -91,14 +89,14 @@ func CreateWorker(w http.ResponseWriter, r *http.Request) {
 	}
 	user.Worker = &worker
 	if err := db.Database.Save(&user).Error; err != nil {
-		util.Error(createWorkerTag, err)
+		lCreateWorker.Error(err)
 		http.Error(w, l10n.GenericUser, http.StatusInternalServerError)
 		return
 	}
-	util.Info(createWorkerTag, "id%d registered", worker.ID)
+	lCreateWorker.Info("id%d registered", worker.ID)
 	response := models.WorkerResponse{ID: worker.ID}
 	if err := jsonEncode(w, response, "register"); err != nil {
-		util.Error(createWorkerTag, err)
+		lCreateWorker.Error(err)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
@@ -107,7 +105,7 @@ func CreateWorker(w http.ResponseWriter, r *http.Request) {
 func PatchWorker(w http.ResponseWriter, r *http.Request) {
 	userID, err := middleware.GetID(middleware.UserID, r.Context())
 	if err != nil {
-		util.Error(patchWorkerTag, err)
+		lPatchWorker.Error(err)
 		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
 		return
 	}
@@ -116,7 +114,6 @@ func PatchWorker(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
-	util.Debug(patchWorkerTag, "user", user)
 	if !verifyUser(user, w, r) {
 		return
 	}
@@ -130,14 +127,14 @@ func PatchWorker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := worker.Patch(db.Database, request); err != nil {
-		util.Error(patchWorkerTag, err)
+		lPatchWorker.Error(err)
 		http.Error(w, l10n.GenericWorker, http.StatusInternalServerError)
 		return
 	}
-	util.Info(patchWorkerTag, "%s (id%d) patched", user.Name, worker.ID)
+	lPatchWorker.Info("%s (id%d) patched", user.Name, worker.ID)
 	response := models.WorkerResponse{Worker: &worker, CreatedAt: worker.CreatedAt.String()}
 	if err := jsonEncode(w, response, "public"); err != nil {
-		util.Error(patchWorkerTag, err)
+		lPatchWorker.Error(err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
