@@ -26,7 +26,7 @@ $ docker compose exec backend ./mp1_backend -migrate
 
 ## Запуск проекта
 > [!IMPORTANT]
-> Необходимо запустить миграцию после каждого изменения моделей в `backend/models/`, либо перед первым запуском.
+> Необходимо запустить миграцию после каждого изменения моделей в `backend/pkg/models/`, либо перед первым запуском.
 
 ```shell
 $ docker compose up
