@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"encoding/json"
+	"github.com/goccy/go-json"
 	"mp1/pkg/api/middleware"
 	"mp1/pkg/db"
 	"mp1/pkg/l10n"
