@@ -29,7 +29,7 @@ func (group *EstimateGroup) Get(db *gorm.DB, id uint) error {
 
 func (group *EstimateGroup) Create(db *gorm.DB, request EstimateGroupRequest, projectID uint) error {
 	var project Project
-	if err := project.Get(db, request.ProjectID, []string{"EstimateGroup"}); err != nil {
+	if err := project.Get(db, request.ProjectID, []string{"EstimateGroups"}); err != nil {
 		return err
 	}
 	group.Name = request.Name
