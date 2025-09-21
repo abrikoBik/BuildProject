@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"log"
 	"mp1/pkg/api/middleware"
 	"mp1/pkg/db"
 	"mp1/pkg/l10n"
@@ -47,8 +48,7 @@ func GetProject(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateProject(w http.ResponseWriter, r *http.Request) {
-	var project models.Project
-	request := models.ProjectRequest{Project: &project}
+	var request models.ProjectRequest
 	if !jsonDecode(w, r, &request) {
 		return
 	}
@@ -57,6 +57,7 @@ func CreateProject(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
+	var project models.Project
 	if err := project.Create(db.Database, request); err != nil {
 		lCreateProject.Error(err)
 		switch err {
@@ -80,20 +81,24 @@ func CreateProject(w http.ResponseWriter, r *http.Request) {
 
 func PatchProject(w http.ResponseWriter, r *http.Request) {
 	id, err := middleware.GetID(middleware.ProjectID, r.Context())
+	lPatchProject.Debug("id", id, "err", err)
 	if err != nil {
 		lPatchProject.Error(err)
 		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
 		return
 	}
 	var project models.Project
+	lPatchProject.Debug("project", project)
 	if project.Get(db.Database, id) != nil {
 		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
 		return
 	}
-	request := models.ProjectRequest{Project: &models.Project{}}
+	request := *new(models.ProjectRequest)
+	lPatchProject.Debug("request", request)
 	if !jsonDecode(w, r, &request) {
 		return
 	}
+	lPatchProject.Debug("request", request)
 	if err := project.Patch(db.Database, request); err != nil {
 		lPatchProject.Error(err)
 		switch err {

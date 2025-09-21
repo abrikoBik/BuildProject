@@ -15,6 +15,7 @@ type Logger struct {
 }
 
 func CreateLogger(service string) Logger {
+	// TODO: switch to production loggers
 	config := zap.NewDevelopmentEncoderConfig()
 	config.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	l := zap.New(zapcore.NewCore(

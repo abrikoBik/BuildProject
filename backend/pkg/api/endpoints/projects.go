@@ -13,6 +13,7 @@ func AddProjects(r chi.Router, jwtKey []byte) {
 		r.Route("/{projectID}", func(r chi.Router) {
 			r.Use(middleware.ParseID(middleware.ProjectID, "projectID"))
 			r.With(middleware.JSONResponse).Get("/", handlers.GetProject)
+			r.With(middleware.JSONResponse).Patch("/", handlers.PatchProject)
 			AddStages(r, jwtKey)
 			AddAttachments(r, jwtKey)
 		})
