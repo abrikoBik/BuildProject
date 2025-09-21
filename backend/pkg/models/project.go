@@ -31,8 +31,8 @@ type ProjectRequest struct {
 
 type ProjectResponse struct {
 	*Project
-	StartTime int64  `json:"startTime" groups:"public" gorm:"not null"`
-	EndTime   int64  `json:"endTime" groups:"public" gorm:"not null"`
+	StartTime int64  `json:"startTime" groups:"public,list" gorm:"not null"`
+	EndTime   int64  `json:"endTime" groups:"public,list" gorm:"not null"`
 	CreatedAt string `json:"createdAt" groups:"public"`
 	ID        uint   `json:"id" groups:"register,list"`
 }
