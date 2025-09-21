@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"errors"
-	"log"
 	"mp1/pkg/api/middleware"
 	"mp1/pkg/db"
 	"mp1/pkg/l10n"
