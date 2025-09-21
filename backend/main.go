@@ -16,7 +16,7 @@ func main() {
 	var (
 		servicesWg  sync.WaitGroup
 		dbName      = flag.String("db-name", "mp1", "PostgreSQL database name")
-		dbHostname  = flag.String("db-hostname", "0.0.0.0", "PostgreSQL database IP")
+		dbHostname  = flag.String("db-hostname", "db", "PostgreSQL database IP")
 		dbPort      = flag.Uint("db-port", 5432, "PostgreSQL database port")
 		apiHostname = flag.String("api-hostname", "0.0.0.0", "Hostname for the API to listen to")
 		apiPort     = flag.Uint("api-port", 3000, "Port for the API to listen to")
