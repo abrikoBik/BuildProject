@@ -121,7 +121,7 @@ func ListProjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var user models.User
-	if user.Get(db.Database, id, []string{"Project"}) != nil {
+	if user.Get(db.Database, id, []string{"Projects"}) != nil {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
