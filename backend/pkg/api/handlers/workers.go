@@ -26,7 +26,7 @@ func GetWorker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var user models.User
-	if errors.Is(user.Get(db.Database, userID, []string{"Worker"}), gorm.ErrRecordNotFound) {
+	if errors.Is(user.Get(db.Database, userID, "Worker"), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
@@ -36,7 +36,7 @@ func GetWorker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var worker models.Worker
-	if worker.Get(db.Database, user.Worker.ID, []string{}) != nil {
+	if worker.Get(db.Database, user.Worker.ID) != nil {
 		util.Error(getWorkerTag, err)
 		http.Error(w, l10n.GenericWorker, http.StatusInternalServerError)
 		return
@@ -59,7 +59,7 @@ func CreateWorker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var user models.User
-	if errors.Is(user.Get(db.Database, userID, []string{"Worker"}), gorm.ErrRecordNotFound) {
+	if errors.Is(user.Get(db.Database, userID, "Worker"), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
@@ -112,7 +112,7 @@ func PatchWorker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var user models.User
-	if user.Get(db.Database, userID, []string{"Worker"}) != nil {
+	if user.Get(db.Database, userID, "Worker") != nil {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}

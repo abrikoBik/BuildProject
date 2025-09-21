@@ -36,8 +36,8 @@ type StageResponse struct {
 	ID        uint  `json:"id" groups:"register"`
 }
 
-func (stage *Stage) Get(db *gorm.DB, id uint) error {
-	return db.Preload("Workers").Where("id = ?", id).Take(&stage).Error
+func (stage *Stage) Get(db *gorm.DB, id uint, preloads ...string) error {
+	return util.Preload(db, preloads...).Where("id = ?", id).Take(&stage).Error
 }
 
 func (stage *Stage) Create(db *gorm.DB, request StageRequest) error {

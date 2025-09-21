@@ -65,7 +65,7 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var project models.Project
-	if project.Get(db.Database, projectID, []string{"Attachments"}) != nil {
+	if project.Get(db.Database, projectID, "Attachments") != nil {
 		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
 		return
 	}

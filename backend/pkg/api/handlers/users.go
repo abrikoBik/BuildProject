@@ -28,7 +28,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var user models.User
-	result := user.Get(db.Database, userID, []string{})
+	result := user.Get(db.Database, userID)
 	if errors.Is(result, gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
@@ -79,7 +79,7 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var user models.User
-	if user.Get(db.Database, id, []string{}) != nil {
+	if user.Get(db.Database, id) != nil {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
@@ -121,7 +121,7 @@ func ListProjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var user models.User
-	if user.Get(db.Database, id, []string{"Projects"}) != nil {
+	if user.Get(db.Database, id, "Projects") != nil {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
@@ -135,10 +135,11 @@ func ListProjects(w http.ResponseWriter, r *http.Request) {
 			StartTime: util.MarshalTime(p.StartTime),
 			EndTime:   util.MarshalTime(p.EndTime),
 			CreatedAt: p.CreatedAt.String(),
+			ID:        p.ID,
 		}
 		response = append(response, toAppend)
 	}
-	if err := jsonEncode(w, response, "public"); err != nil {
+	if err := jsonEncode(w, response, "public", "register"); err != nil {
 		util.Error(listProjectsTag, err)
 		return
 	}

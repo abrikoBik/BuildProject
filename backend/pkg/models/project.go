@@ -37,17 +37,13 @@ type ProjectResponse struct {
 	ID        uint   `json:"id" groups:"register"`
 }
 
-func (project *Project) Get(db *gorm.DB, id uint, preloads []string) error {
-	tx := db
-	for _, preload := range preloads {
-		tx = tx.Preload(preload)
-	}
-	return tx.Where("id = ?", id).Take(&project).Error
+func (project *Project) Get(db *gorm.DB, id uint, preloads ...string) error {
+	return util.Preload(db, preloads...).Where("id = ?", id).Take(&project).Error
 }
 
 func (project *Project) Create(db *gorm.DB, request ProjectRequest) error {
 	var user User
-	if err := user.Get(db, request.UserID, []string{"Projects"}); err != nil {
+	if err := user.Get(db, request.UserID, "Projects"); err != nil {
 		return l10n.UserNotFoundError
 	}
 	project.UserID = user.ID
