@@ -4,6 +4,10 @@ import DonutChart from "./DonutChart";
 import PushNotification from "./PushNotication";
 import { useWindowSize } from "@uidotdev/usehooks";
 import Calendar from "react-calendar";
+import axios from "axios";
+
+import { ProjectRequest } from "./types/projects";
+import { UserResponse } from "./types/user";
 
 import GanttChart from "./Gantt";
 import Header from "./Header";
@@ -19,9 +23,11 @@ const Home = () => {
         { value: 6, color: "#d2d5dd" },
     ]);
 
+    const [selectedProject, setSelectedProject] = useState<ProjectRequest>()
+
     const [date, setDate] = useState<Value>(new Date());
 
-    const [userName, setUserName] = useState("");
+    const [user, setUser] = useState<UserResponse>();
     const [showSidebar, setSidebar] = useState(true);
 
     const [showNumber, setNumber] = useState(false);
@@ -70,24 +76,41 @@ const Home = () => {
         }
     };
 
+    const getProject = async () => {
+        try {
+            const project = await axios.get<ProjectRequest>(
+                `/api/projects/${localStorage.getItem("selectedProjectID")}`
+            );
+
+            if(project.status != 200)
+            {
+                console.log(project.status);
+                return;
+            }
+
+            setSelectedProject(project.data);
+
+            const user = await axios.get<UserResponse>(
+                `/api/users/${project.data.userID}`
+            );
+
+            setUser(user.data);
+
+        } catch (e : unknown) {
+            console.error(e);
+        }
+    }
+
     const { width } = useWindowSize();
     const safeWidth = width ?? 1200;
 
     useEffect(() => {
-        let newName: string;
-        try {
-            newName = JSON.parse(localStorage.getItem("user")!).name;
-            setUserName(newName);
-        } catch {
-            setUserName("unknown");
-            console.warn("USER DONT LOGIN!");
-        }
-
-        // Adaptive 
-
         setSidebar(safeWidth > 1100);
-
     }, [safeWidth]);
+
+    useEffect(() => {
+        getProject();
+    }, [])
 
     return (
         <main className="relative">
@@ -111,13 +134,11 @@ const Home = () => {
                         <section className="justify-self-start text-left ml-5">
                             {/* Recieve data from backend */}
                             <div className="text-blue-950 font-bold text-3xl mb-5">
-                                Строительство дома
+                                {selectedProject?.name}
                             </div>
 
                             <div className="mb-5">
-                                {userName === "unknown"
-                                    ? "Пользователь не вошел!"
-                                    : `Заказчик: ${userName}`}
+                                {user?.name}
                             </div>
 
                             {/* Recieve data from backend */}
@@ -232,7 +253,7 @@ const Home = () => {
                         </section>
                         <section className="flex flex-row ml-auto self-end items-center space-x-2 mt-2 mr-15">
                             <div id="email" className={`absolute ${showEMail ? "" : "pointer-events-none"} select-none text-center justify-self-center transition-opacity duration-300 ${showEMail ? "opacity-100" : "opacity-0"}`}>
-                                aelilkidae@gmail.com
+                                {user?.email}
                             </div>
                             <input
                                 data-copy-to-clipboard-target="email"

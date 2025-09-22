@@ -206,45 +206,45 @@ const Blueprints = () => {
     };
 
     const getImages = async (blueprints: BlueprintProp[]) => {
-    const imagePromises = blueprints.map(async (item, index) => {
-        try {
-            const { data } = await axios.get(
-                `/api/projects/2/attachments/${item.uuid}`,
-                {
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
+        const imagePromises = blueprints.map(async (item, index) => {
+            try {
+                const { data } = await axios.get(
+                    `/api/projects/2/attachments/${item.uuid}`,
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                        }
                     }
+                );
+
+                let mimeType = 'image/png';
+                if (data.charAt(0) === '/') {
+                    mimeType = 'image/jpeg';
+                } else if (data.charAt(0) === 'i') {
+                    mimeType = 'image/png';
                 }
-            );
 
-            let mimeType = 'image/png';
-            if (data.charAt(0) === '/') {
-                mimeType = 'image/jpeg';
-            } else if (data.charAt(0) === 'i') {
-                mimeType = 'image/png';
+                return {
+                    index,
+                    url: `data:${mimeType};base64,${data}`
+                };
+            } catch (err) {
+                console.warn(`Ошибка загрузки изображения ${item.uuid}:`, err);
+                return {
+                    index,
+                    url: ""
+                };
             }
+        });
+        const results = await Promise.all(imagePromises);
 
-            return {
-                index,
-                url: `data:${mimeType};base64,${data}`
-            };
-        } catch (err) {
-            console.warn(`Ошибка загрузки изображения ${item.uuid}:`, err);
-            return {
-                index,
-                url: ""
-            };
-        }
-    });
-    const results = await Promise.all(imagePromises);
+        const orderedImages = Array(blueprints.length).fill("");
+        results.forEach(result => {
+            orderedImages[result.index] = result.url;
+        });
 
-    const orderedImages = Array(blueprints.length).fill("");
-    results.forEach(result => {
-        orderedImages[result.index] = result.url;
-    });
-
-    setCurrentImages(orderedImages);
-};
+        setCurrentImages(orderedImages);
+    };
 
     const loadBlueprints = async () => {
         try {
@@ -268,7 +268,31 @@ const Blueprints = () => {
             await getImages(data);
         }
         catch (err : unknown) {
-            console.warn(`${err}`);
+            console.warn(err);
+        }
+    }
+
+    const deleteAttachment = async (uuid : string) => {
+        try {
+            // TODO: fix endpoint addresation
+            const {status} = await axios.delete(
+                `/api/attachments/${uuid}`,
+                {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                }
+            );
+
+            if(status != 200)
+            {
+                console.log(status);
+                return;
+            }
+
+
+        } catch (e : unknown) {
+            console.error(e);
         }
     }
 
@@ -317,6 +341,7 @@ const Blueprints = () => {
                 }
 
                 console.log(`File name: ${selectedFiles[i].name}. File size: ${selectedFiles[i].size}. File type: ${selectedFiles[i].type}`);
+                window.location.reload();
             }
         }
     }
@@ -410,10 +435,9 @@ const Blueprints = () => {
 
                         {/* Карточки чертежей */}
                         {blueprintsArray != null ? blueprintsArray.map((item, index) => (
-                            
                             <div key={index} className="flex flex-col h-90 border-2 border-palette-color4 rounded-xl p-4 hover:shadow-md transition-shadow">
                                 <div className="w-full flex justify-end opacity-50 hover:opacity-100 hover:cursor-pointer">
-                                    <button className="w-7 h-7 bg-red-700 rounded-full -mb-10 z-50 flex items-center justify-center">
+                                    <button onClick={() => deleteAttachment(item.uuid)} className="w-7 h-7 bg-red-700 rounded-full -mb-10 z-50 flex items-center justify-center">
                                         <span className="material-symbols-outlined">
                                             close
                                         </span>
