@@ -10,4 +10,5 @@ export interface UserResponse {
     login: string;
     name: string;
     registeredAt: string;
+    id: number;
 }

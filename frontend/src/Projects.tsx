@@ -1,30 +1,36 @@
 import Sidebar from './Sidebar';
 import Header from './Header';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import { Value, UserRequest } from './types/projects'
+import { Value, ProjectRequest } from './types/projects'
 import axios from 'axios';
 
 const Projects = () => {
-    const [userRequest, setUserRequest] = useState<UserRequest>({
+    const [userRequest, setUserRequest] = useState<ProjectRequest>({
         name: "",
         description: "",
-        userID: 2,
+        userID: JSON.parse(localStorage.getItem("user") as string).userID,
         startTime: 1,
-        endTime: 1
+        endTime: 1,
+        latitude: 0,
+        longitude: 0,
+        id: 0
     });
 
     const [showPopUp, setShowPopUp] = useState(false);
+    
+    const [projectsList, setProjectsList] = useState<ProjectRequest[]>();
+    const [maximizedProjects, setProjectMaximize] = useState<boolean[]>();
 
     const [startUpDate, setStartUpDate] = useState<Value>(new Date());
     const [endDate, setEndDate] = useState<Value>(new Date());
 
-    const handleInput = (e : any) => {
+    const handleInput = (e : React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
         setUserRequest({
             ...userRequest,
             [e.target.id]: e.target.value,
-            userID: 2,
+            userID: parseInt(localStorage.getItem("userID")!),
             startTime: Math.floor((startUpDate as Date).getTime() / 1000),
             endTime:   Math.floor((endDate as Date).getTime() / 1000)
         })
@@ -53,12 +59,45 @@ const Projects = () => {
 
             console.log(data);
 
-        } catch (err : any) {
+        } catch (err : unknown) {
             console.log(err);
         }
     }
 
-    // Get list of projects
+    const listProjects = async () => {
+        try {
+            const { data, status } = await axios.get(
+                `/api/users/${localStorage.getItem("userID")}/projects`
+            );
+
+            if(status != 200) {
+                alert(status);
+                return;
+            }
+
+            console.log(data);
+
+            setProjectsList(data);
+            setProjectMaximize(Array.from({length: data.length}, (_) => false))
+
+        } catch (err : unknown) {
+            console.log(err);
+        }
+    }
+
+    const unixDateStampToDate = (unixTimeStamp : number) => {
+        const date = new Date(unixTimeStamp * 1000);
+        return date;
+    }
+
+    const selectProject = (projectID: number) => {
+        localStorage.setItem("selectedProjectID", projectID.toString());
+        window.location.href = '/';
+    }
+
+    useEffect(() => {
+        listProjects();
+    }, [])
 
     return (
         <div className="flex flex-col h-screen">
@@ -127,16 +166,48 @@ const Projects = () => {
                 <main className="w-[83%] ml-[17%] pr-5">
                     <h1 className="text-[#1D3266] text-4xl font-bold my-5">Мои проекты</h1>
                     <ul className="flex flex-row w-full gap-5 flex-wrap">
-                        <li key={0} className="flex flex-col w-[20em] h-[30em]">
+                        {projectsList?.map((item, index) => (
+                            <li key={index} 
+                                onClick={() => 
+                                {
+                                    setProjectMaximize(prev => {
+                                        const newMaximizedProjects = [...prev!];
+                                        newMaximizedProjects[index] = !newMaximizedProjects[index];
+                                        return newMaximizedProjects;
+                                    });
+                                }
+                            } 
+                            className={`flex items-center p-5 w-full rounded-xl overflow-hidden ${maximizedProjects![index] ? "max-h-[40vh] flex-col" : "h-[5vh] flex-row"} bg-red-700 mb-2`}
+                            >
+                                <div className="">{item.name}</div>
+                                {
+                                    maximizedProjects![index] ?
+                                    <>
+                                    <div className="overflow-auto">
+                                        {item.description}
+                                    </div>
+                                    <button onClick={() => selectProject(item.id)} className={`${maximizedProjects![index] ? "mt-auto" : ""} bg-white z-50 hover:cursor-pointer`}>Перейти к проекту</button>
+                                    </>
+                                     :
+                                    <>
+                                    </>
+                                }
+                                <div className={`${maximizedProjects![index] ? "" : "ml-auto"} flex flex-row`}>
+                                    <div className="">{`${unixDateStampToDate(item.startTime).getDate()}/${unixDateStampToDate(item.startTime).getMonth() + 1}/${unixDateStampToDate(item.startTime).getFullYear()} -> `}</div>
+                                    <div className="">{`${unixDateStampToDate(item.endTime).getDate()}/${unixDateStampToDate(item.endTime).getMonth() + 1}/${unixDateStampToDate(item.endTime).getFullYear()}`}</div>
+                                </div>
+                            </li>
+                            ))
+                        }
+                        <li key={0} className="flex flex-col w-full h-[5vh]">
                             <button
                                 onClick={() => setShowPopUp(true)}
-                                className="h-full w-full flex bg-palette-color4 flex-col items-center justify-center rounded-xl font-semibold text-xl text-white hover:cursor-pointer"
+                                className="h-full w-full flex bg-palette-color4 flex-row items-center justify-center rounded-xl font-semibold text-xl text-white hover:cursor-pointer"
                             >
-                                <span className="text-9xl mb-2">+</span>
                                 <div>Создать проект</div>
+                                <span className="text-2xl ml-5">+</span>
                             </button>
                         </li>
-
                     </ul>
                 </main>
             </div>

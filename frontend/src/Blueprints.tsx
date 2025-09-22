@@ -296,7 +296,8 @@ const Blueprints = () => {
 
                 try {
                     const { data, status } = await axios.post(
-                        '/api/projects/2/attachments', 
+                        // TODO
+                        `/api/projects/2/attachments`, 
                         postData, 
                         {
                             headers: {
@@ -408,9 +409,17 @@ const Blueprints = () => {
                         </div>
 
                         {/* Карточки чертежей */}
-                        {blueprintsArray.map((item, index) => (
+                        {blueprintsArray != null ? blueprintsArray.map((item, index) => (
                             
                             <div key={index} className="flex flex-col h-90 border-2 border-palette-color4 rounded-xl p-4 hover:shadow-md transition-shadow">
+                                <div className="w-full flex justify-end opacity-50 hover:opacity-100 hover:cursor-pointer">
+                                    <button className="w-7 h-7 bg-red-700 rounded-full -mb-10 z-50 flex items-center justify-center">
+                                        <span className="material-symbols-outlined">
+                                            close
+                                        </span>
+                                    </button>
+                                </div>
+
                                 <img 
                                     src={currentImages[index]} 
                                     alt={item.name} 
@@ -442,7 +451,8 @@ const Blueprints = () => {
                                     </div>
                                 </section>
                             </div>
-                        ))}
+                        )) : 
+                        <></>}
 
                     </section>
                 </main>
