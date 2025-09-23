@@ -6,7 +6,7 @@ const (
 	GenericUser      = "Ошибка пользователя"
 	WrongPassword    = "Неверный пароль"
 	InsecurePassword = "Минимальная длина пароля - 8 символов"
-	NameOrEmailTaken = "Имя пользователя или почта уже занята"
+	FieldTaken       = "Имя пользователя, электронная почта или номер телефона уже заняты"
 	InvalidEmail     = "Некорректная почта"
 	UserNotFound     = "Пользователь не найден"
 	RegisterError    = "Ошибка регистрации"
@@ -17,7 +17,7 @@ var (
 	GenericUserError      = errors.New(GenericUser)
 	WrongPasswordError    = errors.New(WrongPassword)
 	InsecurePasswordError = errors.New(InsecurePassword)
-	NameOrEmailTakenError = errors.New(NameOrEmailTaken)
+	FieldTakenError       = errors.New(FieldTaken)
 	InvalidEmailError     = errors.New(InvalidEmail)
 	UserNotFoundError     = errors.New(UserNotFound)
 	RegisterErrorError    = errors.New(RegisterError)

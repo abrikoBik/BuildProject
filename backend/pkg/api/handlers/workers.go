@@ -81,7 +81,7 @@ func CreateWorker(w http.ResponseWriter, r *http.Request) {
 		case l10n.WrongPasswordError:
 			http.Error(w, l10n.WrongPassword, http.StatusForbidden)
 		case gorm.ErrDuplicatedKey:
-			http.Error(w, l10n.NameOrEmailTaken, http.StatusBadRequest)
+			http.Error(w, l10n.FieldTaken, http.StatusBadRequest)
 		default:
 			http.Error(w, l10n.RegisterError, http.StatusInternalServerError)
 		}

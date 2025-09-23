@@ -47,8 +47,13 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	if !jsonDecode(w, r, &request) {
 		return
 	}
-	if !errors.Is(db.Database.Where("login = ? OR email = ?", request.Name, request.Email).Take(&models.User{}).Error, gorm.ErrRecordNotFound) {
-		http.Error(w, l10n.NameOrEmailTaken, http.StatusBadRequest)
+	if !errors.Is(db.Database.Where(
+		"login = ? OR email = ? OR phone_number = ?",
+		request.Name,
+		request.Email,
+		request.PhoneNumber,
+	).Take(&models.User{}).Error, gorm.ErrRecordNotFound) {
+		http.Error(w, l10n.FieldTaken, http.StatusBadRequest)
 		return
 	}
 	var user models.User
@@ -100,7 +105,7 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 		case l10n.InvalidEmailError:
 			http.Error(w, l10n.InvalidEmail, http.StatusBadRequest)
 		case gorm.ErrDuplicatedKey:
-			http.Error(w, l10n.NameOrEmailTaken, http.StatusBadRequest)
+			http.Error(w, l10n.FieldTaken, http.StatusBadRequest)
 		default:
 			http.Error(w, l10n.GenericUser, http.StatusInternalServerError)
 		}
@@ -133,8 +138,10 @@ func ListProjects(w http.ResponseWriter, r *http.Request) {
 	var response []models.ProjectResponse
 	for _, p := range user.Projects {
 		toAppend := models.ProjectResponse{
-			Project: &p,
-			ID:      p.ID,
+			Project:   &p,
+			StartTime: util.MarshalTime(p.StartTime),
+			EndTime:   util.MarshalTime(p.EndTime),
+			ID:        p.ID,
 		}
 		response = append(response, toAppend)
 	}
