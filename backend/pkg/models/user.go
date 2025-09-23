@@ -16,14 +16,15 @@ import (
 
 type User struct {
 	gorm.Model
-	Login    string    `json:"login" groups:"public" gorm:"unique;not null"`
-	Name     string    `json:"name" groups:"public" gorm:"not null"`
-	Email    string    `json:"email" groups:"public" gorm:"unique;not null"`
-	Hash     []byte    `gorm:"not null"`
-	Salt     []byte    `gorm:"not null"`
-	Sessions []Session `gorm:"foreignKey:UserID"`
-	Projects []Project `gorm:"foreignKey:UserID"`
-	Worker   *Worker
+	Login       string    `json:"login" groups:"public" gorm:"unique;not null"`
+	Email       string    `json:"email" groups:"public" gorm:"unique;not null"`
+	PhoneNumber uint      `json:"phoneNumber" groups:"public" gorm:"unique;not null"`
+	Name        string    `json:"name" groups:"public" gorm:"not null"`
+	Hash        []byte    `gorm:"not null"`
+	Salt        []byte    `gorm:"not null"`
+	Sessions    []Session `gorm:"foreignKey:UserID"`
+	Projects    []Project `gorm:"foreignKey:UserID"`
+	Worker      *Worker
 }
 
 type UserRequest struct {
@@ -54,6 +55,7 @@ func (user *User) Create(db *gorm.DB, request UserRequest) (err error) {
 	}
 	user.Name = cases.Title(language.Russian).String(request.Name)
 	user.Login = request.Login
+	user.PhoneNumber = request.PhoneNumber
 	return db.Create(&user).Error
 }
 
@@ -74,6 +76,9 @@ func (user *User) Patch(db *gorm.DB, request UserRequest) (err error) {
 	}
 	if len(request.Name) > 0 {
 		user.Name = cases.Title(language.Russian).String(request.Name)
+	}
+	if request.PhoneNumber != 0 {
+		user.PhoneNumber = request.PhoneNumber
 	}
 	return db.Save(&user).Error
 }

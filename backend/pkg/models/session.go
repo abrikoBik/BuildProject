@@ -14,8 +14,10 @@ type Session struct {
 }
 
 type SessionRequest struct {
-	Login    string `json:"login"`
-	Password string `json:"password"`
+	Login       string `json:"login,omitempty"`
+	Email       string `json:"email,omitempty"`
+	PhoneNumber uint   `json:"phoneNumber,omitempty"`
+	Password    string `json:"password"`
 }
 
 type SessionResponse struct {
@@ -24,7 +26,12 @@ type SessionResponse struct {
 
 func (session *Session) Create(db *gorm.DB, request SessionRequest, jwtKey []byte) error {
 	var user User
-	if err := db.Where("login = ?", request.Login).Take(&user).Error; err != nil {
+	if err := db.Where(
+		"login = ? OR email = ? OR phone_number = ?",
+		request.Login,
+		request.Email,
+		request.PhoneNumber,
+	).Take(&user).Error; err != nil {
 		return err
 	}
 	match, err := user.VerifyPassword(request.Password)
