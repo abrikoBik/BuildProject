@@ -35,8 +35,14 @@ const Header = () => {
                 <nav className="flex flex-col p-5">
                     <a href="">Учетная запись</a>
                     <a href="">Настройки</a>
+                    { localStorage.getItem("role") === "admin" ?
+                    <>
+                        <div className="w-[120%] h-[1px] -mx-5 my-2 bg-black"></div>
+                        <a href="/panel">Редактирование рабочих</a>
+                    </> :
+                    <></> }
                     <div className="w-[120%] h-[1px] -mx-5 my-2 bg-black"></div>
-                    <a href="">Учетная запись</a>
+                    <a href="">Выход</a>
                 </nav>
             </div>
         </header>

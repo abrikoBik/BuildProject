@@ -209,7 +209,7 @@ const Blueprints = () => {
         const imagePromises = blueprints.map(async (item, index) => {
             try {
                 const { data } = await axios.get(
-                    `/api/projects/2/attachments/${item.uuid}`,
+                    `/api/projects/${localStorage.getItem("selectedProjectID")}/attachments/${item.uuid}`,
                     {
                         headers: {
                             "Authorization": `Bearer ${token}`,
@@ -249,7 +249,7 @@ const Blueprints = () => {
     const loadBlueprints = async () => {
         try {
             const { data, status } = await axios.get(
-                '/api/projects/2/attachments',
+                `/api/projects/${localStorage.getItem("selectedProjectID")}/attachments`,
                 {
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -276,7 +276,7 @@ const Blueprints = () => {
         try {
             // TODO: fix endpoint addresation
             const {status} = await axios.delete(
-                `/api/attachments/${uuid}`,
+                `/api/projects/${localStorage.getItem("selectedProjectID")}/attachments/${uuid}`,
                 {
                     headers: {
                         "Authorization": `Bearer ${token}`
@@ -290,7 +290,7 @@ const Blueprints = () => {
                 return;
             }
 
-
+            window.location.reload();
         } catch (e : unknown) {
             console.error(e);
         }
@@ -320,8 +320,7 @@ const Blueprints = () => {
 
                 try {
                     const { data, status } = await axios.post(
-                        // TODO
-                        `/api/projects/2/attachments`, 
+                        `/api/projects/${localStorage.getItem("selectedProjectID")}/attachments`, 
                         postData, 
                         {
                             headers: {
@@ -341,8 +340,8 @@ const Blueprints = () => {
                 }
 
                 console.log(`File name: ${selectedFiles[i].name}. File size: ${selectedFiles[i].size}. File type: ${selectedFiles[i].type}`);
-                window.location.reload();
             }
+            window.location.reload();
         }
     }
 
