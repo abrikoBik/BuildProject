@@ -10,12 +10,17 @@ func Migrate(callback func()) {
 	migrationLogger := util.CreateLogger("db:Migrate")
 	migrationLogger.Info("running migrations")
 	toMigrate := map[string]any{
-		"user":       models.User{},
-		"session":    models.Session{},
-		"worker":     models.Worker{},
-		"stage":      models.Stage{},
-		"project":    models.Project{},
-		"attachment": models.Attachment{},
+		"User":    models.User{},
+		"Session": models.Session{},
+		"Worker":  models.Worker{},
+
+		"Project":       models.Project{},
+		"Attachment":    models.Attachment{},
+		"EstimateGroup": models.EstimateGroup{},
+		"StageGroup":    models.StageGroup{},
+
+		"Estimate": models.Estimate{},
+		"Stage":    models.Stage{},
 	}
 	for name, model := range toMigrate {
 		migrationLogger.Info("(%s) running migrations", name)

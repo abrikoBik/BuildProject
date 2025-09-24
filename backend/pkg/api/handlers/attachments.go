@@ -85,6 +85,7 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO: project.AddAttachment
 	project.Attachments = append(project.Attachments, attachment)
 	if err := db.Database.Save(&project).Error; err != nil {
 		lCreateAttachment.Error(err)

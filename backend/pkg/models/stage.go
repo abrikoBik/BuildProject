@@ -12,11 +12,11 @@ import (
 
 type Stage struct {
 	gorm.Model
-	Name         string `json:"name" groups:"public" gorm:"not null"`
+	Name         string `json:"name" groups:"public,list" gorm:"not null"`
 	Description  string `json:"description" groups:"public"`
-	Status       bool   `json:"status" groups:"public" gorm:"not null;default:false"`
-	StageGroupID uint   `json:"groupID" groups:"public" gorm:"not null"`
-	Index        int    `json:"index" groups:"public" gorm:"not null"`
+	Status       bool   `json:"status" groups:"public,list" gorm:"not null;default:false"`
+	Index        int    `json:"index" groups:"public,list" gorm:"not null"`
+	StageGroupID uint   `json:"groupID" gorm:"not null"`
 	StartTime    pq.NullTime
 	EndTime      pq.NullTime
 	Workers      []Worker `gorm:"many2many:stage_workers"`
@@ -33,7 +33,7 @@ type StageResponse struct {
 	StartTime int64 `json:"startTime" groups:"public"`
 	EndTime   int64 `json:"endTime" groups:"public"`
 	CreatedAt int64 `json:"createdAt" groups:"public"`
-	ID        uint  `json:"id" groups:"register"`
+	ID        uint  `json:"id" groups:"register,list"`
 }
 
 func (stage *Stage) Get(db *gorm.DB, id uint, preloads ...string) error {
@@ -55,8 +55,8 @@ func (stage *Stage) Create(db *gorm.DB, request StageRequest) error {
 	stage.StageGroupID = group.ID
 	stage.Index = request.Index
 	stage.Workers = make([]Worker, 0)
-	group.Stages = slices.Insert(group.Stages, stage.Index, *stage)
-	return errors.Join(group.CalculateTimes(db), db.Create(&stage).Error)
+	group.AddStage(db, *stage)
+	return errors.Join(db.Create(&stage).Error, group.CalculateTimes(db), db.Save(&group).Error)
 }
 
 func (stage *Stage) Delete(db *gorm.DB) error {
