@@ -86,13 +86,57 @@ func CreateEstimateGroup(w http.ResponseWriter, r *http.Request) {
 }
 
 func PatchEstimateGroup(w http.ResponseWriter, r *http.Request) {
-	lPatchEstimateGroup.Info("not implemented")
-	w.WriteHeader(http.StatusNotImplemented)
+	estimateGroupID, err := middleware.GetID(middleware.EstimateGroupID, r.Context())
+	if err != nil {
+		lPatchEstimateGroup.Error(err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
+	}
+	var estimateGroup models.EstimateGroup
+	if errors.Is(estimateGroup.Get(db.Database, estimateGroupID, "Estimates"), gorm.ErrRecordNotFound) {
+		http.Error(w, l10n.EstimateGroupNotFound, http.StatusNotFound)
+	}
+	var request models.EstimateGroupRequest
+	if !jsonDecode(w, r, &request) {
+		return
+	}
+	if err := estimateGroup.Patch(db.Database, request); err != nil {
+		lPatchEstimateGroup.Error(err)
+		switch err {
+		default:
+			http.Error(w, l10n.GenericEstimateGroup, http.StatusInternalServerError)
+		}
+		return
+	}
+	lPatchEstimateGroup.Info("id%d patched", estimateGroup.ID)
+	response := models.EstimateGroupResponse{
+		EstimateGroup: &estimateGroup,
+		TotalCost:     estimateGroup.CalculateCost(),
+	}
+	if err := jsonEncode(w, response, "public"); err != nil {
+		lPatchEstimateGroup.Error(err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func DeleteEstimateGroup(w http.ResponseWriter, r *http.Request) {
-	lDeleteEstimateGroup.Info("not implemented")
-	w.WriteHeader(http.StatusNotImplemented)
+	estimateGroupID, err := middleware.GetID(middleware.EstimateGroupID, r.Context())
+	if err != nil {
+		lDeleteEstimateGroup.Error(err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
+	}
+	var estimateGroup models.EstimateGroup
+	if errors.Is(estimateGroup.Get(db.Database, estimateGroupID, "Estimates"), gorm.ErrRecordNotFound) {
+		http.Error(w, l10n.EstimateGroupNotFound, http.StatusNotFound)
+	}
+	if err := estimateGroup.Delete(db.Database); err != nil {
+		lDeleteEstimateGroup.Error(err)
+		return
+	}
+	lDeleteEstimateGroup.Info("id%d deleted", estimateGroup.ID)
+	w.WriteHeader(http.StatusOK)
 }
 
 func ListEstimates(w http.ResponseWriter, r *http.Request) {

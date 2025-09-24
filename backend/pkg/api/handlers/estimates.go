@@ -144,9 +144,9 @@ func DeleteEstimate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := estimate.Delete(db.Database); err != nil {
-		lDeleteAttachment.Error(err)
+		lDeleteEstimate.Error(err)
 		return
 	}
-	lDeleteAttachment.Info("id%d deleted", estimate.ID)
+	lDeleteEstimate.Info("id%d deleted", estimate.ID)
 	w.WriteHeader(http.StatusOK)
 }

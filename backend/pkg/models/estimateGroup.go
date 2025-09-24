@@ -40,6 +40,13 @@ func (group *EstimateGroup) Create(db *gorm.DB, request EstimateGroupRequest) er
 	return errors.Join(db.Create(&group).Error, project.AddEstimateGroup(db, *group))
 }
 
+func (group *EstimateGroup) Patch(db *gorm.DB, request EstimateGroupRequest) error {
+	if len(request.Name) > 0 {
+		group.Name = request.Name
+	}
+	return db.Save(&group).Error
+}
+
 func (group *EstimateGroup) Delete(db *gorm.DB) error {
 	for _, estimate := range group.Estimates {
 		if err := estimate.Delete(db); err != nil {
