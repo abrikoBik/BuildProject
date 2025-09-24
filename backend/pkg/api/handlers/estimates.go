@@ -114,13 +114,6 @@ func PatchEstimate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	lPatchEstimate.Info("id%d patched", estimate.ID)
-	// TODO: fix recalculation (only recalculates after 2 PATCH requests???)
-	if err := estimateGroup.CalculateCost(db.Database); err != nil {
-		lPatchEstimate.Error(err)
-		http.Error(w, l10n.GenericEstimateGroup, http.StatusInternalServerError)
-		return
-	}
-	lDeleteAttachment.Info("id%d cost recalculated", estimateGroup.ID)
 	response := models.EstimateResponse{
 		Estimate: &estimate,
 	}
@@ -155,11 +148,5 @@ func DeleteEstimate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	lDeleteAttachment.Info("id%d deleted", estimate.ID)
-	if err := estimateGroup.CalculateCost(db.Database); err != nil {
-		lPatchEstimate.Error(err)
-		http.Error(w, l10n.GenericEstimateGroup, http.StatusInternalServerError)
-		return
-	}
-	lDeleteAttachment.Info("id%d cost recalculated", estimateGroup.ID)
 	w.WriteHeader(http.StatusOK)
 }

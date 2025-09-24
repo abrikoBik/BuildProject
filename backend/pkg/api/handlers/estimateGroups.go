@@ -43,6 +43,7 @@ func GetEstimateGroup(w http.ResponseWriter, r *http.Request) {
 	}
 	response := models.EstimateGroupResponse{
 		EstimateGroup: &estimateGroup,
+		TotalCost:     estimateGroup.CalculateCost(),
 	}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lGetEstimateGroup.Error(err)
