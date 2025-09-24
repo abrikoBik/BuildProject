@@ -8,6 +8,7 @@ import (
 	"mp1/pkg/models"
 	"mp1/pkg/util"
 	"net/http"
+	"sort"
 
 	"gorm.io/gorm"
 )
@@ -17,24 +18,38 @@ var (
 	lCreateEstimateGroup = util.CreateLogger("api:CreateEstimateGroup")
 	lPatchEstimateGroup  = util.CreateLogger("api:PatchEstimateGroup")
 	lDeleteEstimateGroup = util.CreateLogger("api:DeleteEstimateGroup")
+	lListEstimates       = util.CreateLogger("api:ListEstimates")
 )
 
 func GetEstimateGroup(w http.ResponseWriter, r *http.Request) {
-	projectID, err := middleware.GetID(middleware.ProjectID, r.Context())
-	if err != nil {
-		lGetEstimateGroup.Error(err)
-		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
-		return
+	projectID, err1 := middleware.GetID(middleware.ProjectID, r.Context())
+	estimateGroupID, err2 := middleware.GetID(middleware.EstimateGroupID, r.Context())
+	for _, e := range []error{err1, err2} {
+		if e != nil {
+			lGetEstimateGroup.Error(e)
+			http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+			return
+		}
 	}
 	var project models.Project
 	if errors.Is(project.Get(db.Database, projectID, "EstimateGroups"), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
 		return
 	}
-	if project.Get(db.Database, projectID, "EstimateGroups.Estimates") != nil {
-		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
+	var estimateGroup models.EstimateGroup
+	if errors.Is(estimateGroup.Get(db.Database, estimateGroupID, "Estimates"), gorm.ErrRecordNotFound) {
+		http.Error(w, l10n.EstimateGroupNotFound, http.StatusNotFound)
 		return
 	}
+	response := models.EstimateGroupResponse{
+		EstimateGroup: &estimateGroup,
+	}
+	if err := jsonEncode(w, response, "public"); err != nil {
+		lGetEstimateGroup.Error(err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	lGetEstimateGroup.Info("id%d returned", project.ID)
 }
 
 func CreateEstimateGroup(w http.ResponseWriter, r *http.Request) {
@@ -77,4 +92,35 @@ func PatchEstimateGroup(w http.ResponseWriter, r *http.Request) {
 func DeleteEstimateGroup(w http.ResponseWriter, r *http.Request) {
 	lDeleteEstimateGroup.Info("not implemented")
 	w.WriteHeader(http.StatusNotImplemented)
+}
+
+func ListEstimates(w http.ResponseWriter, r *http.Request) {
+	// TODO: also check if project exists? (might not be needed)
+	id, err := middleware.GetID(middleware.EstimateGroupID, r.Context())
+	if err != nil {
+		lListEstimates.Error(err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
+	}
+	var estimateGroup models.EstimateGroup
+	if estimateGroup.Get(db.Database, id, "Estimates") != nil {
+		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
+		return
+	}
+	sort.Slice(estimateGroup.Estimates, func(i, j int) bool {
+		return estimateGroup.Estimates[i].UpdatedAt.UnixMilli() > estimateGroup.Estimates[j].UpdatedAt.UnixMilli()
+	})
+	var response []models.EstimateResponse
+	for _, e := range estimateGroup.Estimates {
+		toAppend := models.EstimateResponse{
+			Estimate: &e,
+			ID:       e.ID,
+		}
+		response = append(response, toAppend)
+	}
+	if err := jsonEncode(w, response, "list"); err != nil {
+		lListEstimates.Error(err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }

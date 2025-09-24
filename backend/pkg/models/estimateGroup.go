@@ -11,9 +11,9 @@ import (
 
 type EstimateGroup struct {
 	gorm.Model
-	Name      string  `json:"name" groups:"public" gorm:"not null"`
-	ProjectID uint    `json:"projectID" groups:"public" gorm:"not null"`
-	TotalCost float64 `json:"totalCost" groups:"public" gorm:"not null"`
+	Name      string  `json:"name" groups:"public,list" gorm:"not null"`
+	TotalCost float64 `json:"totalCost" groups:"public,list" gorm:"not null"`
+	ProjectID uint    `gorm:"not null"`
 	Estimates []Estimate
 }
 
@@ -51,6 +51,9 @@ func (group *EstimateGroup) Delete(db *gorm.DB) error {
 
 func (group *EstimateGroup) AddEstimate(db *gorm.DB, estimate Estimate) error {
 	group.Estimates = append(group.Estimates, estimate)
+	if err := group.CalculateCost(db); err != nil {
+		return err
+	}
 	return db.Save(&group).Error
 }
 
@@ -59,6 +62,9 @@ func (group *EstimateGroup) RemoveEstimate(db *gorm.DB, index int) error {
 		return l10n.OutOfBoundsError
 	}
 	group.Estimates = slices.Delete(group.Estimates, index, index+1)
+	if err := group.CalculateCost(db); err != nil {
+		return err
+	}
 	return db.Save(&group).Error
 }
 

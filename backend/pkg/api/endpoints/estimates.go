@@ -10,6 +10,7 @@ import (
 func AddEstimates(r chi.Router, jwtKey []byte) {
 	r.Route("/estimates", func(r chi.Router) {
 		r.Post("/", handlers.CreateEstimate)
+		r.With(middleware.JSONResponse).Get("/", handlers.ListEstimates)
 		r.Route("/{estimateID}", func(idRouter chi.Router) {
 			idRouter.Use(middleware.ParseID(middleware.EstimateID, "estimateID"))
 			idRouter.With(middleware.JSONResponse).Get("/", handlers.GetEstimate)
@@ -27,7 +28,7 @@ func AddEstimateGroups(r chi.Router, jwtKey []byte) {
 			idRouter.With(middleware.JSONResponse).Get("/", handlers.GetEstimateGroup)
 			idRouter.With(middleware.JSONResponse).Patch("/", handlers.PatchEstimateGroup)
 			idRouter.Delete("/", handlers.DeleteEstimateGroup)
-			AddEstimates(r, jwtKey)
+			AddEstimates(idRouter, jwtKey)
 		})
 	})
 }

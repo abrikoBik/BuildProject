@@ -1,8 +1,6 @@
 package models
 
 import (
-	"errors"
-
 	"gorm.io/gorm"
 )
 
@@ -12,9 +10,7 @@ type Estimate struct {
 	Cost            float64 `json:"cost" groups:"public,list" gorm:"not null"`
 	Count           uint    `json:"count" groups:"public,list" gorm:"not null"`
 	Unit            string  `json:"unit" groups:"public,list" gorm:"not null"`
-	Index           uint    `json:"index" groups:"public,list" gorm:"not null"`
 	EstimateGroupID uint    `json:"groupID" gorm:"not null"`
-	ProjectID       uint    `json:"projectID" gorm:"not null"`
 }
 
 type EstimateRequest struct {
@@ -24,6 +20,7 @@ type EstimateRequest struct {
 type EstimateResponse struct {
 	*Estimate
 	ID uint `json:"id" groups:"register,list"`
+	// TODO: CreatedAt?
 }
 
 func (estimate *Estimate) Get(db *gorm.DB, id uint) error {
@@ -36,19 +33,11 @@ func (estimate *Estimate) Create(db *gorm.DB, request EstimateRequest) error {
 		return err
 	}
 	estimate.EstimateGroupID = request.EstimateGroupID
-	estimate.Index = uint(len(estimateGroup.Estimates) + 1)
-	var project Project
-	if err := project.Get(db, request.ProjectID, "EstimatesGroup"); err != nil {
-		return err
-	}
-	estimate.ProjectID = request.ProjectID
 	estimate.Name = request.Name
 	estimate.Cost = request.Cost
 	estimate.Count = request.Count
 	estimate.Unit = request.Unit
-	estimateGroup.AddEstimate(db, *estimate)
-	project.AddEstimateGroup(db, estimateGroup)
-	return errors.Join(db.Create(&estimate).Error, db.Save(&estimateGroup).Error, db.Save(&project).Error)
+	return estimateGroup.AddEstimate(db, *estimate)
 }
 
 func (estimate *Estimate) Patch(db *gorm.DB, request EstimateRequest) error {
@@ -67,6 +56,7 @@ func (estimate *Estimate) Patch(db *gorm.DB, request EstimateRequest) error {
 	return db.Save(&estimate).Error
 }
 
+// TODO: remove? EstimateGroup.RemoveEstimate might supersede this
 func (estimate *Estimate) Delete(db *gorm.DB) error {
 	return db.Delete(&estimate).Error
 }

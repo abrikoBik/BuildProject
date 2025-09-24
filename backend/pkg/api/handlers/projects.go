@@ -81,24 +81,20 @@ func CreateProject(w http.ResponseWriter, r *http.Request) {
 
 func PatchProject(w http.ResponseWriter, r *http.Request) {
 	id, err := middleware.GetID(middleware.ProjectID, r.Context())
-	lPatchProject.Debug("id", id, "err", err)
 	if err != nil {
 		lPatchProject.Error(err)
 		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
 		return
 	}
 	var project models.Project
-	lPatchProject.Debug("project", project)
 	if project.Get(db.Database, id) != nil {
 		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
 		return
 	}
-	request := *new(models.ProjectRequest)
-	lPatchProject.Debug("request", request)
+	var request models.ProjectRequest
 	if !jsonDecode(w, r, &request) {
 		return
 	}
-	lPatchProject.Debug("request", request)
 	if err := project.Patch(db.Database, request); err != nil {
 		lPatchProject.Error(err)
 		switch err {
