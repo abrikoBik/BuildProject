@@ -12,15 +12,17 @@ import (
 
 type StageGroup struct {
 	gorm.Model
-	Name      string `json:"name" groups:"public,list" gorm:"not null"`
-	ProjectID uint   `json:"projectID" groups:"public" gorm:"not null"`
-	StartTime pq.NullTime
-	EndTime   pq.NullTime
+	Name      string      `json:"name" groups:"public,list" gorm:"not null"`
+	ProjectID uint        `json:"projectID" groups:"public" gorm:"not null"`
+	StartTime pq.NullTime `gorm:"not null"`
+	EndTime   pq.NullTime `gorm:"not null"`
 	Stages    []Stage
 }
 
 type StageGroupRequest struct {
 	*StageGroup
+	StartTime int64 `json:"startTime" groups:"public" gorm:"not null"`
+	EndTime   int64 `json:"endTime" groups:"public" gorm:"not null"`
 }
 
 type StageGroupResponse struct {
@@ -44,6 +46,19 @@ func (group *StageGroup) Create(db *gorm.DB, request StageGroupRequest) error {
 	group.ProjectID = project.ID
 	project.StageGroups = append(project.StageGroups, *group)
 	return errors.Join(db.Save(&project).Error, db.Create(&group).Error)
+}
+
+func (group *StageGroup) Patch(db *gorm.DB, request StageGroupRequest) error {
+	if len(request.Name) > 0 {
+		group.Name = request.Name
+	}
+	if request.StartTime != 0 {
+		group.StartTime = util.UnmarshalTime(request.StartTime)
+	}
+	if request.EndTime != 0 {
+		group.EndTime = util.UnmarshalTime(request.EndTime)
+	}
+	return db.Save(&group).Error
 }
 
 func (group *StageGroup) Delete(db *gorm.DB) error {

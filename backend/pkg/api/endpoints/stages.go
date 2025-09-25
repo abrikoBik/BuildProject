@@ -28,7 +28,7 @@ func AddStageGroups(r chi.Router, jwtKey []byte) {
 			idRouter.With(middleware.JSONResponse).Get("/", handlers.GetStageGroup)
 			idRouter.With(middleware.JSONResponse).Patch("/", handlers.PatchStageGroup)
 			idRouter.Delete("/", handlers.DeleteStageGroup)
-			AddStages(r, jwtKey)
+			AddStages(idRouter, jwtKey)
 		})
 	})
 }
