@@ -17,6 +17,7 @@ var (
 	lGetProject             = util.CreateLogger("api:GetProject")
 	lCreateProject          = util.CreateLogger("api:CreateProject")
 	lPatchProject           = util.CreateLogger("api:PatchProject")
+	lDeleteProject          = util.CreateLogger("api:DeleteProject")
 	lListProjectAttachments = util.CreateLogger("api:ListProjectAttachments")
 )
 
@@ -114,6 +115,25 @@ func PatchProject(w http.ResponseWriter, r *http.Request) {
 		lPatchProject.Error(err)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func DeleteProject(w http.ResponseWriter, r *http.Request) {
+	projectID, err := middleware.GetID(middleware.ProjectID, r.Context())
+	if err != nil {
+		lDeleteProject.Error(err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
+	}
+	var project models.Project
+	if errors.Is(project.Get(db.Database, projectID), gorm.ErrRecordNotFound) {
+		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
+	}
+	if err := project.Delete(db.Database); err != nil {
+		lDeleteEstimate.Error(err)
+		return
+	}
+	lDeleteProject.Info("id%d deleted", project.ID)
 	w.WriteHeader(http.StatusOK)
 }
 
