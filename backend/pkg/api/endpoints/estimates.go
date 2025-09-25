@@ -22,6 +22,7 @@ func AddEstimates(r chi.Router, jwtKey []byte) {
 
 func AddEstimateGroups(r chi.Router, jwtKey []byte) {
 	r.Route("/estimateGroups", func(r chi.Router) {
+		r.With(middleware.JSONResponse).Get("/", handlers.ListEstimateGroups)
 		r.Post("/", handlers.CreateEstimateGroup)
 		r.Route("/{estimateGroupID}", func(idRouter chi.Router) {
 			idRouter.Use(middleware.ParseID(middleware.EstimateGroupID, "estimateGroupID"))

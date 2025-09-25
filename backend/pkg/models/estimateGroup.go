@@ -22,7 +22,7 @@ type EstimateGroupRequest struct {
 
 type EstimateGroupResponse struct {
 	*EstimateGroup
-	TotalCost float64 `json:"totalCost" groups:"public,list"`
+	TotalCost float64 `json:"totalCost" groups:"public"`
 	ID        uint    `json:"id" groups:"register,list"`
 }
 
