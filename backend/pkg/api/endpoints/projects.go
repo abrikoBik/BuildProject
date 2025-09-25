@@ -14,6 +14,7 @@ func AddProjects(r chi.Router, jwtKey []byte) {
 			r.Use(middleware.ParseID(middleware.ProjectID, "projectID"))
 			r.With(middleware.JSONResponse).Get("/", handlers.GetProject)
 			r.With(middleware.JSONResponse).Patch("/", handlers.PatchProject)
+			r.Delete("/", handlers.DeleteProject)
 			AddStageGroups(r, jwtKey)
 			AddEstimateGroups(r, jwtKey)
 			AddAttachments(r, jwtKey)
