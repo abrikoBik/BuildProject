@@ -21,6 +21,7 @@ const Projects = () => {
     const [showPopUp, setShowPopUp] = useState(false);
     
     const [projectsList, setProjectsList] = useState<ProjectRequest[]>();
+
     const [maximizedProjects, setProjectMaximize] = useState<boolean[]>();
 
     const [startUpDate, setStartUpDate] = useState<Value>(new Date());
@@ -59,8 +60,28 @@ const Projects = () => {
 
             console.log(data);
 
+            setShowPopUp(false);
+
+            listProjects();
         } catch (err : unknown) {
             console.log(err);
+        }
+    }
+
+    const deleteProject = async (id : number) => {
+        try {
+            const project = await axios.delete(
+                `/api/projects/${id}/`
+            );
+
+            if(project.status != 200) {
+                console.error(project.status);
+                return;
+            }
+            
+            listProjects();
+        } catch (err : unknown) {
+            console.error(err);
         }
     }
 
@@ -76,9 +97,9 @@ const Projects = () => {
             }
 
             console.log(data);
-
+            
             setProjectsList(data);
-            setProjectMaximize(Array.from({length: data.length}, (_) => false))
+            setProjectMaximize(Array.from({length: data.length}, () => false))
 
         } catch (err : unknown) {
             console.log(err);
@@ -167,35 +188,42 @@ const Projects = () => {
                     <h1 className="text-[#1D3266] text-4xl font-bold my-5">Мои проекты</h1>
                     <ul className="flex flex-row w-full gap-5 flex-wrap">
                         {projectsList?.map((item, index) => (
-                            <li key={index} 
-                                onClick={() => 
-                                {
-                                    setProjectMaximize(prev => {
-                                        const newMaximizedProjects = [...prev!];
-                                        newMaximizedProjects[index] = !newMaximizedProjects[index];
-                                        return newMaximizedProjects;
-                                    });
-                                }
-                            } 
-                            className={`flex items-center p-5 w-full rounded-xl overflow-hidden ${maximizedProjects![index] ? "max-h-[40vh] flex-col" : "h-[5vh] flex-row"} bg-red-700 mb-2`}
-                            >
-                                <div className="">{item.name}</div>
-                                {
-                                    maximizedProjects![index] ?
-                                    <>
-                                    <div className="overflow-auto">
-                                        {item.description}
+                            <li className="flex flex-col w-full">
+                                <section key={index} 
+                                    onClick={() => 
+                                        {
+                                            setProjectMaximize(prev => {
+                                                const newMaximizedProjects = [...prev!];
+                                                newMaximizedProjects[index] = !newMaximizedProjects[index];
+                                                return newMaximizedProjects;
+                                            });
+                                        }
+                                    } 
+                                    className={`flex items-center p-5 w-full rounded-xl overflow-hidden ${maximizedProjects![index] ? "max-h-[40vh] flex-col" : "h-[5vh] flex-row"} border-3 border-palette-color5 mb-2`}
+                                >
+                                    <div className="">{item.name}</div>
+                                    <div className={`${maximizedProjects![index] ? "" : "ml-auto mr-5"} flex flex-row`}>
+                                        <div className="">{`${unixDateStampToDate(item.startTime).getDate()}/${unixDateStampToDate(item.startTime).getMonth() + 1}/${unixDateStampToDate(item.startTime).getFullYear()}→`}</div>
+                                        <div className="">{`${unixDateStampToDate(item.endTime).getDate()}/${unixDateStampToDate(item.endTime).getMonth() + 1}/${unixDateStampToDate(item.endTime).getFullYear()}`}</div>
                                     </div>
-                                    <button onClick={() => selectProject(item.id)} className={`${maximizedProjects![index] ? "mt-auto" : ""} bg-white z-50 hover:cursor-pointer`}>Перейти к проекту</button>
-                                    </>
-                                     :
-                                    <>
-                                    </>
-                                }
-                                <div className={`${maximizedProjects![index] ? "" : "ml-auto"} flex flex-row`}>
-                                    <div className="">{`${unixDateStampToDate(item.startTime).getDate()}/${unixDateStampToDate(item.startTime).getMonth() + 1}/${unixDateStampToDate(item.startTime).getFullYear()} -> `}</div>
-                                    <div className="">{`${unixDateStampToDate(item.endTime).getDate()}/${unixDateStampToDate(item.endTime).getMonth() + 1}/${unixDateStampToDate(item.endTime).getFullYear()}`}</div>
-                                </div>
+                                    {
+                                        maximizedProjects![index] ?
+                                        <>
+                                        <div className="overflow-auto">
+                                            {item.description}
+                                        </div>
+                                        <button onClick={() => selectProject(item.id)} className={`${maximizedProjects![index] ? "mt-auto" : ""} bg-palette-color4 p-1 px-2 rounded-xl text-white z-50 hover:cursor-pointer`}>Перейти к проекту</button>
+                                        </>
+                                         :
+                                        <>
+                                        </>
+                                    }
+                                </section>
+                                <button className="absolute right-8 flex justify-flex translate-y-[42%]" onClick={() => deleteProject(item.id)}>
+                                    <span className="material-symbols-outlined select-none hover:text-red-700">
+                                        close
+                                    </span>
+                                </button>
                             </li>
                             ))
                         }

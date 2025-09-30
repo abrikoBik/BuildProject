@@ -117,7 +117,6 @@ const Home = () => {
             <Header />
             {/* TODO: fix notification laggy animation and make it more stable */}
             <PushNotification text={pushNotificationText}/>
-
             <section className="flex flex-row w-[85vw]  h-[100vh] text-2xl ml-[15%]">
                 <Sidebar show={showSidebar} choice={0}/>
                 {/* Move to Sidebar component */}
@@ -127,7 +126,8 @@ const Home = () => {
                 >
                     {showSidebar ? ">" : "<"}
                 </button>
-
+                { localStorage.getItem("selectedProjectID")  ?
+                <>
                 <div className="w-[85vw] mt-20 max-lg:w-[100vw] text-center">
                     {/* Header info */}
                     <div className="flex flex-row m-2 items-center rounded-lg border-3 p-2 border-palette-color5">
@@ -158,73 +158,98 @@ const Home = () => {
                     </div>
 
                     {/* Tasks panel */}
-                    <div className="flex flex-col m-2 items-center rounded-lg border-3 p-2 border-palette-color5 text-left">
-                        <section className="flex flex-row w-[100%]">
-                            <div className="text-blue-950 font-bold text-3xl ml-5 self-start">
-                                Задачи
-                            </div>
+                    <div className="flex flex-row m-2 rounded-lg border-3 p-2 border-palette-color5 text-left">
+                        <section className="flex flex-col w-1/2 h-full">
+                            <h2 className="text-blue-950 font-bold text-3xl ml-5 mb-3 self-start">
+                                Группы задач
+                            </h2>
 
-                            <div className="text-blue-950 font-bold text-3xl ml-auto mr-5 self-end">
-                                Дата
-                            </div>
+                            <ul className="flex flex-col h-70 overflow-scroll gap-3 mb-5">
+                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
+                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
+                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
+                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
+                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
+                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
+                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
+                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
+                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
+                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
+                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
+                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
+                            </ul>
+
+                            <button className="flex w-auto px-2 items-center rounded border-3 self-center">Добавить</button>
                         </section>
 
-                        <ul className="flex flex-col self-start gap-3 ml-5">
-                            <li>
-                                <input
-                                    onChange={checkInput}
-                                    type="checkbox"
-                                    id="1"
-                                    className="mr-2"
-                                />
-                                <label htmlFor="1">Заливка фундамента</label>
-                            </li>
-                            <li>
-                                <input
-                                    onChange={checkInput}
-                                    type="checkbox"
-                                    id="2"
-                                    className="mr-2"
-                                />
-                                <label htmlFor="2">Возведение стен</label>
-                            </li>
-                            <li>
-                                <input
-                                    onChange={checkInput}
-                                    type="checkbox"
-                                    id="3"
-                                    className="mr-2"
-                                />
-                                <label htmlFor="3">Монтаж кровли</label>
-                            </li>
-                            <li>
-                                <input
-                                    onChange={checkInput}
-                                    type="checkbox"
-                                    id="4"
-                                    className="mr-2"
-                                />
-                                <label htmlFor="4">Устройство террасы</label>
-                            </li>
-                            <li>
-                                <input
-                                    onChange={checkInput}
-                                    type="checkbox"
-                                    id="5"
-                                    className="mr-2"
-                                />
-                                <label htmlFor="5">Устройство террасы</label>
-                            </li>
-                            <li>
-                                <input
-                                    onChange={checkInput}
-                                    type="checkbox"
-                                    id="6"
-                                    className="mr-2"
-                                />
-                                <label htmlFor="6">Устройство террасы</label>
-                            </li>
-                        </ul>
+                        <section className="w-1/2 h-full">
+                            <section className="flex flex-row w-[100%]">
+                                <h2 className="text-blue-950 font-bold text-3xl ml-5 self-start">
+                                    Задачи
+                                </h2>
+
+                                <h2 className="text-blue-950 font-bold text-3xl ml-auto mr-5 self-end">
+                                    Дата
+                                </h2>
+                            </section>
+
+                            <ul className="flex flex-col self-start gap-3 ml-5">
+                                <li>
+                                    <input
+                                        onChange={checkInput}
+                                        type="checkbox"
+                                        id="1"
+                                        className="mr-2"
+                                    />
+                                    <label htmlFor="1">Заливка фундамента</label>
+                                </li>
+                                <li>
+                                    <input
+                                        onChange={checkInput}
+                                        type="checkbox"
+                                        id="2"
+                                        className="mr-2"
+                                    />
+                                    <label htmlFor="2">Возведение стен</label>
+                                </li>
+                                <li>
+                                    <input
+                                        onChange={checkInput}
+                                        type="checkbox"
+                                        id="3"
+                                        className="mr-2"
+                                    />
+                                    <label htmlFor="3">Монтаж кровли</label>
+                                </li>
+                                <li>
+                                    <input
+                                        onChange={checkInput}
+                                        type="checkbox"
+                                        id="4"
+                                        className="mr-2"
+                                    />
+                                    <label htmlFor="4">Устройство террасы</label>
+                                </li>
+                                <li>
+                                    <input
+                                        onChange={checkInput}
+                                        type="checkbox"
+                                        id="5"
+                                        className="mr-2"
+                                    />
+                                    <label htmlFor="5">Устройство террасы</label>
+                                </li>
+                                <li>
+                                    <input
+                                        onChange={checkInput}
+                                        type="checkbox"
+                                        id="6"
+                                        className="mr-2"
+                                    />
+                                    <label htmlFor="6">Устройство террасы</label>
+                                </li>
+                            </ul>
+                        </section>
                     </div>
                     
                     <div className="flex-row w-[98.5%] rounded-lg max-w-full overflow-x-auto border-3 m-2 border-palette-color5 flex items-center">
@@ -268,6 +293,10 @@ const Home = () => {
                     {/* Empty div */}
                     <div className="w-full h-5"></div>
                 </div>
+                </>
+                :
+                <div className="flex w-full h-full justify-center items-center">Проект не выбран!</div>
+                }
             </section>
         </main>
     );

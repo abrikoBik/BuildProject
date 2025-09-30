@@ -274,7 +274,6 @@ const Blueprints = () => {
 
     const deleteAttachment = async (uuid : string) => {
         try {
-            // TODO: fix endpoint addresation
             const {status} = await axios.delete(
                 `/api/projects/${localStorage.getItem("selectedProjectID")}/attachments/${uuid}`,
                 {
@@ -290,10 +289,11 @@ const Blueprints = () => {
                 return;
             }
 
-            window.location.reload();
         } catch (e : unknown) {
             console.error(e);
         }
+
+        loadBlueprints();
     }
 
     /*const handleEditEnter = (index : number) => {
@@ -332,7 +332,6 @@ const Blueprints = () => {
                         return;
                     }
 
-                    alert("Файл успешно загружен!");
                     console.log(data);
 
                 } catch (err : unknown) {
@@ -341,7 +340,7 @@ const Blueprints = () => {
 
                 console.log(`File name: ${selectedFiles[i].name}. File size: ${selectedFiles[i].size}. File type: ${selectedFiles[i].type}`);
             }
-            window.location.reload();
+            loadBlueprints();
         }
     }
 
@@ -414,23 +413,27 @@ const Blueprints = () => {
 
                     <section className="w-full h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {/* Кнопка загрузки - занимает одну ячейку */}
-                        <div>
-                            <input 
-                                type="file" 
-                                ref={fileInputRef}
-                                onChange={handleFileChange}
-                                className="hidden absolute"
-                                multiple
-                                accept="image/png, image/jpeg, image/jpg"
-                            />
-                            <button
-                                onClick={handleFileInput}
-                                className="h-90 w-full flex bg-palette-color4 flex-col items-center justify-center rounded-xl font-semibold text-xl text-white hover:cursor-pointer"
-                            >
-                                <span className="material-symbols-outlined-huge text-4xl mb-2">upload</span>
-                                <div>Загрузить файлы</div>
-                            </button>
-                        </div>
+                        { localStorage.getItem("selectedProjectID") === null ?
+                            <div>Проект не выбран!</div>
+                            :
+                            <div>
+                                <input 
+                                    type="file" 
+                                    ref={fileInputRef}
+                                    onChange={handleFileChange}
+                                    className="hidden absolute"
+                                    multiple
+                                    accept="image/png, image/jpeg, image/jpg"
+                                />
+                                <button
+                                    onClick={handleFileInput}
+                                    className="h-90 w-full flex bg-palette-color4 flex-col items-center justify-center rounded-xl font-semibold text-xl text-white hover:cursor-pointer"
+                                >
+                                    <span className="material-symbols-outlined-huge text-4xl mb-2">upload</span>
+                                    <div>Загрузить файлы</div>
+                                </button>
+                            </div>
+                        }
 
                         {/* Карточки чертежей */}
                         {blueprintsArray != null ? blueprintsArray.map((item, index) => (
