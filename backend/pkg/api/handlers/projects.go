@@ -19,8 +19,6 @@ var (
 	lPatchProject           = util.CreateLogger("api:PatchProject")
 	lDeleteProject          = util.CreateLogger("api:DeleteProject")
 	lListProjectAttachments = util.CreateLogger("api:ListProjectAttachments")
-	lListEstimateGroups     = util.CreateLogger("api:ListEstimateGroups")
-	lListStageGroups        = util.CreateLogger("api:ListStageGroups")
 )
 
 func GetProject(w http.ResponseWriter, r *http.Request) {
@@ -167,64 +165,6 @@ func ListProjectAttachments(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := jsonEncode(w, response, "list"); err != nil {
 		lListProjectAttachments.Error(err)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-}
-
-func ListEstimateGroups(w http.ResponseWriter, r *http.Request) {
-	id, err := middleware.GetID(middleware.ProjectID, r.Context())
-	if err != nil {
-		lListEstimateGroups.Error(err)
-		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
-		return
-	}
-	var project models.Project
-	if project.Get(db.Database, id, "EstimateGroups") != nil {
-		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
-		return
-	}
-	sort.Slice(project.EstimateGroups, func(i, j int) bool {
-		return project.EstimateGroups[i].UpdatedAt.UnixMilli() > project.EstimateGroups[j].UpdatedAt.UnixMilli()
-	})
-	var response []models.EstimateGroupResponse
-	for _, g := range project.EstimateGroups {
-		toAppend := models.EstimateGroupResponse{
-			EstimateGroup: &g,
-		}
-		response = append(response, toAppend)
-	}
-	if err := jsonEncode(w, response, "list"); err != nil {
-		lListEstimateGroups.Error(err)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-}
-
-func ListStageGroups(w http.ResponseWriter, r *http.Request) {
-	id, err := middleware.GetID(middleware.ProjectID, r.Context())
-	if err != nil {
-		lListStageGroups.Error(err)
-		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
-		return
-	}
-	var project models.Project
-	if project.Get(db.Database, id, "StageGroups") != nil {
-		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
-		return
-	}
-	sort.Slice(project.StageGroups, func(i, j int) bool {
-		return project.StageGroups[i].UpdatedAt.UnixMilli() > project.StageGroups[j].UpdatedAt.UnixMilli()
-	})
-	var response []models.StageGroupResponse
-	for _, g := range project.StageGroups {
-		toAppend := models.StageGroupResponse{
-			StageGroup: &g,
-		}
-		response = append(response, toAppend)
-	}
-	if err := jsonEncode(w, response, "list"); err != nil {
-		lListStageGroups.Error(err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
