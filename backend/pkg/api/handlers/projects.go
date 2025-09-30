@@ -19,6 +19,8 @@ var (
 	lPatchProject           = util.CreateLogger("api:PatchProject")
 	lDeleteProject          = util.CreateLogger("api:DeleteProject")
 	lListProjectAttachments = util.CreateLogger("api:ListProjectAttachments")
+	lListEstimateGroups     = util.CreateLogger("api:ListEstimateGroups")
+	lListStageGroups        = util.CreateLogger("api:ListStageGroups")
 )
 
 func GetProject(w http.ResponseWriter, r *http.Request) {
@@ -137,7 +139,7 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func ListProjectAttachments(w http.ResponseWriter, r *http.Request) {
+func ListAttachments(w http.ResponseWriter, r *http.Request) {
 	id, err := middleware.GetID(middleware.ProjectID, r.Context())
 	if err != nil {
 		lListProjectAttachments.Error(err)
@@ -150,21 +152,78 @@ func ListProjectAttachments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sort.Slice(project.Attachments, func(i, j int) bool {
-		return project.Attachments[i].UpdatedAt.UnixMilli() > project.Attachments[j].UpdatedAt.UnixMilli()
+		return project.Attachments[i].CreatedAt.UnixMilli() > project.Attachments[j].CreatedAt.UnixMilli()
 	})
 	var response []models.AttachmentResponse
 	for _, a := range project.Attachments {
 		toAppend := models.AttachmentResponse{
-			Attachment: &models.Attachment{
-				Name: a.Name,
-				Size: a.Size,
-			},
-			UUID: a.UUID.String(),
+			Attachment: &a,
+			UUID:       a.UUID.String(),
 		}
 		response = append(response, toAppend)
 	}
 	if err := jsonEncode(w, response, "list"); err != nil {
 		lListProjectAttachments.Error(err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func ListEstimateGroups(w http.ResponseWriter, r *http.Request) {
+	id, err := middleware.GetID(middleware.ProjectID, r.Context())
+	if err != nil {
+		lListEstimateGroups.Error(err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
+	}
+	var project models.Project
+	if project.Get(db.Database, id, "EstimateGroups") != nil {
+		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
+		return
+	}
+	sort.Slice(project.EstimateGroups, func(i, j int) bool {
+		return project.EstimateGroups[i].CreatedAt.UnixMilli() > project.EstimateGroups[j].CreatedAt.UnixMilli()
+	})
+	var response []models.EstimateGroupResponse
+	for _, g := range project.EstimateGroups {
+		toAppend := models.EstimateGroupResponse{
+			EstimateGroup: &g,
+			ID:            g.ID,
+		}
+		response = append(response, toAppend)
+	}
+	if err := jsonEncode(w, response, "list"); err != nil {
+		lListEstimateGroups.Error(err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func ListStageGroups(w http.ResponseWriter, r *http.Request) {
+	id, err := middleware.GetID(middleware.ProjectID, r.Context())
+	if err != nil {
+		lListStageGroups.Error(err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
+	}
+	var project models.Project
+	if project.Get(db.Database, id, "StageGroups") != nil {
+		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
+		return
+	}
+	sort.Slice(project.StageGroups, func(i, j int) bool {
+		return project.StageGroups[i].CreatedAt.UnixMilli() > project.StageGroups[j].CreatedAt.UnixMilli()
+	})
+	var response []models.StageGroupResponse
+	for _, g := range project.StageGroups {
+		toAppend := models.StageGroupResponse{
+			StageGroup: &g,
+			ID:         g.ID,
+		}
+		response = append(response, toAppend)
+	}
+	if err := jsonEncode(w, response, "list"); err != nil {
+		lListStageGroups.Error(err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
