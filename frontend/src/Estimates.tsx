@@ -1,21 +1,8 @@
 import Header from './Header';
 import Sidebar from './Sidebar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PushNotification from './PushNotication';
-
-interface LineItem {
-    name: string,
-    unit: string,
-    amount: number,
-    price: number,
-    cost: number
-};
-
-interface EditableCellProps {
-    value: string;
-    onSave?: (newValue: string) => void;
-    onChange?: (newValue: string) => void;
-}
+import { LineItem, EditableCellProps, /*EstimateGroup*/ } from './types/estimates';
 
 const EditableCell = ({ value, onSave, onChange }: EditableCellProps) => {
     const [isEdit, setEdit] = useState(false);
@@ -73,6 +60,14 @@ const Estimates = () => {
       cost: 0
     });
 
+    /*const [estimateGroupList, setEstimateGroupList] = useState<EstimateGroup>({
+        name: ""   
+    })*/
+
+    //const [currentEstimateGroup, setCurrentEstimateGroup] = useState();
+
+    const [estimateAddWindow, setEstimateAddWindow] = useState(false);
+
     const [lineArray, setLineArray] = useState<LineItem[]>([]);
     const [totalCost, setTotalCost] = useState(0);
 
@@ -125,15 +120,18 @@ const Estimates = () => {
         })  
     }
 
-    {/* TODO: fix buttons size when add new estimation line */}
+    useEffect(() => {
+
+    }, [])
+
     return (
         <main className="flex flex-col h-screen">
             <Header />
             <PushNotification text={pushNotificationText}/>
             <div className="flex flex-row flex-1">
                 <Sidebar show={true} choice={2}/>
-
-                <main className="w-[83%] ml-[17%] mt-20 pr-5">
+                { localStorage.getItem("selectedProjectID") ?
+                <section className="w-[83%] ml-[17%] mt-20 pr-5">
                     {/* Selected estimate group */}
                     <section className="w-full h-[60%]">
                         <section className="w-full h-20 flex flex-row">
@@ -141,7 +139,16 @@ const Estimates = () => {
                                 <h1 className="text-[#1D3266] font-bold text-4xl">Сметы</h1>
                                 <div className="text-md font-light"> Заказчик: Иванов И. С.</div>
                             </div>
-                            <input type="button" value="Создать смету" className="w-60 h-15 hover:cursor-pointer text-center bg-palette-color4 pt-1 rounded-xl font-semibold text-xl text-white self-center ml-auto justiyf-self-end" />
+                            {!estimateAddWindow ?
+                                <input onClick={() => setEstimateAddWindow(!estimateAddWindow)} type="button" value="Создать группу смет" className="w-60 h-15 hover:cursor-pointer text-center bg-palette-color4 pt-1 rounded-xl font-semibold text-xl text-white self-center ml-auto" />
+                                :
+                                <section className="mr-5 ml-auto my-auto">
+                                    <input type="text" id="estimateGroupName" className="!border-3 mr-5"/>
+                                    <label htmlFor="estimateGroupName" className="!text-black">
+                                        <button onClick={() => setEstimateAddWindow(!estimateAddWindow)} className="bg-palette-color4 text-white rounded-lg p-1 px-2">Добавить группу</button>
+                                    </label>
+                                </section>
+                            }
                         </section>
 
                         <section className="flex flex-col h-[80%] w-full p-[3px]">
@@ -270,7 +277,10 @@ const Estimates = () => {
                             </li>
                         </ul>
                     </section>
-                </main>
+                </section>
+                :
+                <div className="flex w-full h-full justify-center items-center">Проект не выбран!</div>
+                }
             </div>
         </main>
     );

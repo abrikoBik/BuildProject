@@ -1,28 +1,11 @@
-import { useState, useRef, ChangeEvent } from 'react';
+import { useState, useRef, ChangeEvent, useEffect } from 'react';
+import { BlueprintProp } from './types/blueprint.ts';
 import axios from 'axios';
 import Header from './Header';
 import Sidebar from './Sidebar';
-import Img1 from '../src/assets/image-1.png?url';
-import Img2 from '../src/assets/image-2.png?url';
-import Img3 from '../src/assets/image-3.png?url';
-import Img4 from '../src/assets/image.png?url';
+import { useCookies } from 'react-cookie';
 
-interface BlueprintProp {
-    src: string,
-    title: string,
-    description?: string;
-}
-
-interface EditableCellProps {
-    value: string;
-    onSave?: (newValue: string) => void;
-    onChange?: (newValue: string) => void;
-    inputStyle?: string;
-    textStyle?: string;
-    textArea?: boolean;
-}
-
-const EditableCell = ({ value, onSave, onChange, inputStyle, textStyle, textArea = false }: EditableCellProps) => {
+/*const EditableCell = ({ value, onSave, onChange, inputStyle, textStyle, textArea = false }: EditableCellProps) => {
     const [isEdit, setEdit] = useState(false);
     const [curValue, setValue] = useState(value);
 
@@ -79,84 +62,27 @@ const EditableCell = ({ value, onSave, onChange, inputStyle, textStyle, textArea
         )}
     </div>
 );
-};
+};*/
 
 const Blueprints = () => {
 
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const token = useCookies(["access-token"])[0]["access-token"];
 
-    const [currentBlueprint, setCurrentBlueprint] = useState({
+    const [currentBlueprint] = useState({
         src: "",
         title: "",
         description: ""
     });
 
-    const [currentBlueprintIndex, setCurrentBlueprintIndex] = useState(-1);
+    //const [currentBlueprintIndex, setCurrentBlueprintIndex] = useState(-1);
+    const [currentImages, setCurrentImages] = useState<string[]>([""]);
 
     const [editVisible, setEditVisible] = useState(false);
     
     // Test description in future this should load from the server
     const [blueprintsArray, setBlueprintsArray] = useState<BlueprintProp[]>([
-        {
-            src: Img1,
-            title: "План этажа",
-            description: " Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vestibulum urna blandit facilisis finibus. Curabitur faucibus suscipit tortor, et ultrices dui accumsan sed. Aenean risus sapien, suscipit at nisi ac, sagittis varius lacus. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed gravida odio ac interdum eleifend. Sed condimentum neque id nunc scelerisque convallis. Ut sodales ultrices libero non cursus. Nulla in nibh euismod, congue lacus eu, consequat justo.Fusce sed ipsum vestibulum, posuere elit id, aliquam nulla. Duis eleifend elit sit amet enim condimentum feugiat non quis nibh. Nam purus arcu, pretium quis tincidunt id, fermentum in nunc. Donec porta elit eu odio lobortis, quis posuere nisl dapibus. Pellentesque viverra commodo tellus hendrerit pretium. Praesent et feugiat mauris, id fermentum massa. Proin ac lectus sit amet augue pulvinar cursus. Nullam hendrerit a lorem vel vestibulum. Morbi pharetra leo et erat maximus, a vulputate nulla ullamcorper. Vivamus quis nunc maximus, efficitur arcu rutrum, tincidunt ante. "
-        },
-        {
-            src: Img2,
-            title: "Каркас дома",
-            description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc accumsan purus id sodales rutrum. Aenean tempor leo a tortor malesuada, at lobortis nulla elementum. Ut in eleifend nulla. Sed hendrerit interdum purus, et maximus enim luctus at. Aenean in tincidunt libero, ut rhoncus arcu. Cras sed nibh nisi. Etiam et risus est. Nulla placerat erat ut tincidunt pharetra. Praesent nisl turpis, interdum vel orci non, blandit pulvinar nisl.Fusce imperdiet accumsan neque, sit amet consectetur nisl. Aliquam vehicula lobortis dolor vitae finibus. Fusce sed posuere purus, sagittis imperdiet eros. Pellentesque orci ligula, porta ut ex non, vehicula sodales massa. Donec. ",
-        },
-        {
-            src: Img3,
-            title: "План фундамента",
-            description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis porttitor metus dolor, ut fringilla turpis fringilla sit amet. Ut dictum, lectus a semper laoreet, urna purus viverra quam, eu tempor odio massa et dui. Phasellus laoreet lectus sit amet pretium fermentum. Integer sed sodales ligula. Quisque finibus euismod tortor id."
-        },
-        {
-            src: Img4,
-            title: "Чертеж фасада",
-            description: "Фасад, общая высота 8м"
-        },
-        {
-            src: Img1,
-            title: "План этажа",
-            description: "Первый этаж двери и мебель"
-        },
-        {
-            src: Img2,
-            title: "Каркас дома",
-            description: "Схема строительной системы",
-        },
-        {
-            src: Img3,
-            title: "План фундамента",
-            description: "Фундамент, вид сверху"
-        },
-        {
-            src: Img4,
-            title: "Чертеж фасада",
-            description: "Фасад, общая высота 8м"
-        },
-        {
-            src: Img1,
-            title: "План этажа",
-            description: "Первый этаж двери и мебель"
-        },
-        {
-            src: Img2,
-            title: "Каркас дома",
-            description: "Схема строительной системы",
-        },
-        {
-            src: Img3,
-            title: "План фундамента",
-            description: "Фундамент, вид сверху"
-        },
-        {
-            src: Img4,
-            title: "Чертеж фасада",
-            description: "Фасад, общая высота 8м"
-        }
+        
     ]);
 
     const handleZoom = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -217,8 +143,8 @@ const Blueprints = () => {
             const zoomedImg = new Image();
             zoomedImg.src = imgElement.src;
             zoomedImg.style.objectFit = 'contain';
-            zoomedImg.style.width = '100px';
-            zoomedImg.style.height = '100px';
+            zoomedImg.style.width = '40vw';
+            zoomedImg.style.height = '40vh';
             zoomedImg.style.userSelect = 'none';
             zoomedImg.style.pointerEvents = 'none';
 
@@ -237,8 +163,8 @@ const Blueprints = () => {
                 scale += event.deltaY > 0 ? -scrollSpeed : scrollSpeed;
                 scale = Math.min(Math.max(scale, minScale), maxScale);
 
-                zoomedImg.style.width = `${100 * scale}px`;
-                zoomedImg.style.height = `${100 * scale}px`;
+                zoomedImg.style.width = `${40 * scale}vw`;
+                zoomedImg.style.height = `${40 * scale}vh`;
             });
 
             overlay.addEventListener("mousedown", function(event) {
@@ -279,7 +205,98 @@ const Blueprints = () => {
         }
     };
 
-    const handleEditEnter = (index : number) => {
+    const getImages = async (blueprints: BlueprintProp[]) => {
+        const imagePromises = blueprints.map(async (item, index) => {
+            try {
+                const { data } = await axios.get(
+                    `/api/projects/${localStorage.getItem("selectedProjectID")}/attachments/${item.uuid}`,
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                        }
+                    }
+                );
+
+                let mimeType = 'image/png';
+                if (data.charAt(0) === '/') {
+                    mimeType = 'image/jpeg';
+                } else if (data.charAt(0) === 'i') {
+                    mimeType = 'image/png';
+                }
+
+                return {
+                    index,
+                    url: `data:${mimeType};base64,${data}`
+                };
+            } catch (err) {
+                console.warn(`Ошибка загрузки изображения ${item.uuid}:`, err);
+                return {
+                    index,
+                    url: ""
+                };
+            }
+        });
+        const results = await Promise.all(imagePromises);
+
+        const orderedImages = Array(blueprints.length).fill("");
+        results.forEach(result => {
+            orderedImages[result.index] = result.url;
+        });
+
+        setCurrentImages(orderedImages);
+    };
+
+    const loadBlueprints = async () => {
+        try {
+            const { data, status } = await axios.get(
+                `/api/projects/${localStorage.getItem("selectedProjectID")}/attachments`,
+                {
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                    }
+                }
+            );
+            console.info(data);
+
+            setBlueprintsArray(data);
+
+            if(status != 200)
+            {
+                alert(`${status}`);
+            }
+
+            await getImages(data);
+        }
+        catch (err : unknown) {
+            console.warn(err);
+        }
+    }
+
+    const deleteAttachment = async (uuid : string) => {
+        try {
+            const {status} = await axios.delete(
+                `/api/projects/${localStorage.getItem("selectedProjectID")}/attachments/${uuid}`,
+                {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                }
+            );
+
+            if(status != 200)
+            {
+                console.log(status);
+                return;
+            }
+
+        } catch (e : unknown) {
+            console.error(e);
+        }
+
+        loadBlueprints();
+    }
+
+    /*const handleEditEnter = (index : number) => {
         setCurrentBlueprint({
             src: blueprintsArray[index].src,
             title: blueprintsArray[index].title,
@@ -287,7 +304,7 @@ const Blueprints = () => {
         })
         setCurrentBlueprintIndex(index);
         setEditVisible(true);
-    }
+    }*/
 
     const handleFileInput = () => {
         fileInputRef.current?.click();
@@ -303,7 +320,7 @@ const Blueprints = () => {
 
                 try {
                     const { data, status } = await axios.post(
-                        '/api/attachments', 
+                        `/api/projects/${localStorage.getItem("selectedProjectID")}/attachments`, 
                         postData, 
                         {
                             headers: {
@@ -315,7 +332,6 @@ const Blueprints = () => {
                         return;
                     }
 
-                    alert("Файл успешно загружен!");
                     console.log(data);
 
                 } catch (err : unknown) {
@@ -324,13 +340,17 @@ const Blueprints = () => {
 
                 console.log(`File name: ${selectedFiles[i].name}. File size: ${selectedFiles[i].size}. File type: ${selectedFiles[i].type}`);
             }
+            loadBlueprints();
         }
     }
+
+    useEffect(() => {
+        loadBlueprints();
+    }, [])
 
     return (
         <div className="flex flex-col h-screen">
             <Header />
-
             { editVisible ? 
                 <section className="fixed left-0 top-0 w-screen h-screen bg-[rgba(0,0,0,0.4)] z-150">
                     <div className="flex flex-col relative left-1/2 top-1/2 -translate-1/2 w-[60%] h-[80%] rounded-xl border-2 border-palette-color4 bg-palette-color1">
@@ -348,7 +368,7 @@ const Blueprints = () => {
                         <div className="grid grid-rows-4 h-full min-h-0 overflow-auto p-5">
                             <div className="flex flex-col">
                                 <label className="text-sm font-medium mb-1">Название</label>
-                                <EditableCell 
+                                {/*<EditableCell 
                                     value={currentBlueprint.title} 
                                     inputStyle="w-full p-2 border rounded"
                                     textStyle="p-2 cursor-text hover:bg-gray-100 rounded"
@@ -357,13 +377,13 @@ const Blueprints = () => {
                                         updated[currentBlueprintIndex].title = newValue || '-';
                                         setBlueprintsArray(updated);
                                     }}
-                                />
+                                />*/}
                             </div>
                             
                             <div className="flex flex-col min-h-0 h-full">
                                 <label className="text-sm font-medium mb-1">Описание</label>
                                 <div className="flex-1 min-h-0">
-                                  <EditableCell 
+                                  {/*<EditableCell 
                                     value={currentBlueprint.description} 
                                     inputStyle="w-full h-50 p-2 border rounded"
                                     textStyle="h-full p-2 cursor-text hover:bg-gray-100 rounded"
@@ -373,7 +393,7 @@ const Blueprints = () => {
                                         updated[currentBlueprintIndex].description = newValue || '-';
                                         setBlueprintsArray(updated);
                                     }}
-                                  />
+                                  />*/}
                                 </div>
                             </div>
                         </div>
@@ -382,7 +402,7 @@ const Blueprints = () => {
                 <></>
             }
 
-            <div className={`flex flex-row flex-1 min-h-0 ${editVisible ? "overflow-hidden" : "overflow-auto"}`}>
+            <div className={`flex flex-row flex-1 min-h-0 ${editVisible ? "overflow-hidden" : "overflow-auto"} mt-20 `}>
                 <Sidebar show={true} choice={3}/>
                 <main className="w-[83%] ml-[17%] pr-5">
                     <h1 className="text-[#1D3266] text-4xl font-bold mt-5 ">Чертежи и планы</h1>
@@ -393,45 +413,57 @@ const Blueprints = () => {
 
                     <section className="w-full h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {/* Кнопка загрузки - занимает одну ячейку */}
-                        <div>
-                            <input 
-                                type="file" 
-                                ref={fileInputRef}
-                                onChange={handleFileChange}
-                                className="hidden absolute"
-                                multiple
-                                accept="image/png, image/jpeg, image/jpg"
-                            />
-                            <button
-                                onClick={handleFileInput}
-                                className="h-90 w-full flex bg-palette-color4 flex-col items-center justify-center rounded-xl font-semibold text-xl text-white hover:cursor-pointer"
-                            >
-                                <span className="material-symbols-outlined-huge text-4xl mb-2">upload</span>
-                                <div>Загрузить файлы</div>
-                            </button>
-                        </div>
+                        { localStorage.getItem("selectedProjectID") === null ?
+                            <div>Проект не выбран!</div>
+                            :
+                            <div>
+                                <input 
+                                    type="file" 
+                                    ref={fileInputRef}
+                                    onChange={handleFileChange}
+                                    className="hidden absolute"
+                                    multiple
+                                    accept="image/png, image/jpeg, image/jpg"
+                                />
+                                <button
+                                    onClick={handleFileInput}
+                                    className="h-90 w-full flex bg-palette-color4 flex-col items-center justify-center rounded-xl font-semibold text-xl text-white hover:cursor-pointer"
+                                >
+                                    <span className="material-symbols-outlined-huge text-4xl mb-2">upload</span>
+                                    <div>Загрузить файлы</div>
+                                </button>
+                            </div>
+                        }
 
                         {/* Карточки чертежей */}
-                        {blueprintsArray.map((item, index) => (
+                        {blueprintsArray != null ? blueprintsArray.map((item, index) => (
                             <div key={index} className="flex flex-col h-90 border-2 border-palette-color4 rounded-xl p-4 hover:shadow-md transition-shadow">
+                                <div className="w-full flex justify-end opacity-50 hover:opacity-100 hover:cursor-pointer">
+                                    <button onClick={() => deleteAttachment(item.uuid)} className="w-7 h-7 bg-red-700 rounded-full -mb-10 z-50 flex items-center justify-center">
+                                        <span className="material-symbols-outlined">
+                                            close
+                                        </span>
+                                    </button>
+                                </div>
+
                                 <img 
-                                    src={item.src} 
-                                    alt={item.title} 
+                                    src={currentImages[index]} 
+                                    alt={item.name} 
                                     className="rounded-lg w-full h-40 object-contain bg-gray-100 image"
                                 />
                                 <section className="flex flex-col mt-4 gap-3 flex-grow">
                                     <div>
-                                        <div className="text-lg font-bold mb-1">{item.title}</div>
-                                        <div className="text-gray-600 text-sm">{item.description?.length as number < 100 ? item.description : item.description?.slice(0, 97) + "..."}</div>
+                                        <div className="text-lg font-bold mb-1">{item.name}</div>
+                                        {/*<div className="text-gray-600 text-sm">{item.description?.length as number < 100 ? item.description : item.description?.slice(0, 97) + "..."}</div>*/}
                                     </div>
 
                                     <div className="flex flex-row gap-3 ml-auto mt-auto">
-                                        <button onClick={() => handleEditEnter(index)} 
+                                        <button 
                                                 className="w-8 h-8 hover:cursor-pointer rounded-lg bg-gray-300 transition-colors hover:bg-gray-400 flex items-center justify-center"
                                         >
                                             <span className="material-symbols-outlined text-base">edit</span>
                                         </button>
-                                        <button onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleDownload(e, item.title)} 
+                                        <button onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleDownload(e, item.name)} 
                                                 className="w-8 h-8 hover:cursor-pointer select-none rounded-lg bg-gray-300 transition-colors hover:bg-gray-400 hover:bg-palette-color2 flex items-center justify-center"
                                         >
                                             <span className="material-symbols-outlined text-base">download</span>
@@ -445,7 +477,9 @@ const Blueprints = () => {
                                     </div>
                                 </section>
                             </div>
-                        ))}
+                        )) : 
+                        <></>}
+
                     </section>
                 </main>
             </div>

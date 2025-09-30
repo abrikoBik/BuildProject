@@ -3,7 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import HalfImage from "./assets/auth_image.png";
 import errors from "./util/errors.ts";
-import { UserRequest } from "./types/user.ts";
+import { UserRequest, UserResponse } from "./types/user.ts";
 import Logo from "./assets/logo.svg";
 
 const Register = () => {
@@ -43,7 +43,7 @@ const Register = () => {
 		        alert("Пароли не совпадают!");
 		        return;
             }
-            const { data, status } = await axios.post<UserRequest>(
+            const { data, status } = await axios.post<UserResponse>(
                 "/api/users",
                 userRequest,
             );

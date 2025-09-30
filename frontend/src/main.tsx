@@ -9,9 +9,7 @@ import Register from "./Register.tsx";
 import Estimates from "./Estimates.tsx";
 import Projects from "./Projects.tsx";
 import Blueprints from "./Blueprints.tsx";
-
-{/* DEV */}
-import GanttChart from "./Gantt.tsx";
+import ManagerPanel from "./ManagerPanel.tsx"
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
@@ -24,7 +22,13 @@ createRoot(document.getElementById("root")!).render(
                     <Route path="/estimates" element={<Estimates />} />
                     <Route path="/blueprints" element={<Blueprints />} />
                     <Route path="/projects" element={<Projects />}/>
-                    <Route path="/ganttDEV" element={<GanttChart />}/>
+                    {
+                        localStorage.getItem("role") === "admin" 
+                        ?
+                        <Route path="/panel" element={<ManagerPanel />}/>
+                        :
+                        <></> 
+                    }
                 </Routes>
             </Router>
         </CookiesProvider>

@@ -7,6 +7,7 @@ import errors from "./util/errors.ts";
 import { SessionRequest, SessionResponse } from "./types/session.ts";
 import { UserResponse } from "./types/user.ts";
 import Logo from "./assets/logo.svg";
+import { WorkerResponse } from "./types/worker.ts";
 
 const Login = () => {
     const [visibility, setVisibility] = useState(true);
@@ -27,6 +28,7 @@ const Login = () => {
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        localStorage.clear();
         try {
             const session: AxiosResponse<SessionResponse> = await axios.post(
                 "/api/sessions",
@@ -37,21 +39,40 @@ const Login = () => {
                 path: "/",
                 sameSite: "none",
                 secure: true,
+                maxAge: 3600 * 24 * 7 * 5
             });
 
+            console.log(session);
+
             const user: AxiosResponse<UserResponse> = await axios.get(
-                `/api/users/${session.data.userID}`,
+                `/api/users/${session.data.userID}`
             );
+
             if (user.status != 200) {
-                alert(user.data);
+                alert(user.status);
                 return;
             }
-            localStorage.setItem("user", JSON.stringify(user.data));
+            
+            try {
+                const role : AxiosResponse<WorkerResponse> = await axios.get(
+                    `/api/users/${session.data.userID}/worker`,
+                );
 
-            const storedUser: UserResponse = JSON.parse(
-                localStorage.getItem("user")!,
-            );
-            alert(`Добро пожаловать, ${storedUser.name}!`);
+                if (role.status != 200) {
+                    console.log(role.status);
+                    return;
+                }
+
+                localStorage.setItem("role", role.data.role);
+            } catch (err : unknown) {
+                console.log(err);
+                localStorage.setItem("role", "client");
+            }
+
+            localStorage.setItem("user", JSON.stringify(user.data));
+            localStorage.setItem("userID", session.data.userID.toString());
+
+            alert(`Добро пожаловать, ${user.data.name}!`);
             window.location.href = '/';
         } catch (err: unknown) {
             errors.axiosError(err);

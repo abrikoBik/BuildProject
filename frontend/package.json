@@ -11,12 +11,15 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "@mjackson/multipart-parser": "^0.10.1",
         "@rsagiev/gantt-task-react-19": "^0.3.9",
         "@tailwindcss/vite": "^4.1.11",
         "@types/wicg-file-system-access": "^2023.10.6",
         "@uidotdev/usehooks": "^2.4.1",
         "axios": "^1.8.1",
+        "base64-js": "^1.5.1",
         "react": "^19.1.1",
+        "react-calendar": "^6.0.0",
         "react-cookie": "^8.0.1",
         "react-dom": "^19.1.1",
         "react-router": "^7.2.0",
