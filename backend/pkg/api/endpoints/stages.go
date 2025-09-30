@@ -23,6 +23,7 @@ func AddStages(r chi.Router, jwtKey []byte) {
 func AddStageGroups(r chi.Router, jwtKey []byte) {
 	r.Route("/stageGroups", func(r chi.Router) {
 		r.Post("/", handlers.CreateStageGroup)
+		r.With(middleware.JSONResponse).Get("/", handlers.ListStageGroups)
 		r.Route("/{stageGroupID}", func(idRouter chi.Router) {
 			idRouter.Use(middleware.ParseID(middleware.StageGroupID, "stageGroupID"))
 			idRouter.With(middleware.JSONResponse).Get("/", handlers.GetStageGroup)
