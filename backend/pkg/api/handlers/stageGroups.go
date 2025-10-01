@@ -43,8 +43,11 @@ func GetStageGroup(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.StageGroupNotFound, http.StatusNotFound)
 		return
 	}
+	lGetStageGroup.Debug("stageGroup", stageGroup)
 	response := models.StageGroupResponse{
 		StageGroup: &stageGroup,
+		StartTime:  util.MarshalTime(stageGroup.StartTime),
+		EndTime:    util.MarshalTime(stageGroup.EndTime),
 	}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lGetStageGroup.Error(err)

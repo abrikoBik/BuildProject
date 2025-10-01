@@ -211,6 +211,7 @@ func ListStageGroups(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
 		return
 	}
+	lListStageGroups.Debug("project.StageGroups", project.StageGroups)
 	sort.Slice(project.StageGroups, func(i, j int) bool {
 		return project.StageGroups[i].CreatedAt.UnixMilli() > project.StageGroups[j].CreatedAt.UnixMilli()
 	})

@@ -29,8 +29,10 @@ type StageGroupResponse struct {
 	*StageGroup
 	StartTime int64 `json:"startTime" groups:"public"`
 	EndTime   int64 `json:"endTime" groups:"public"`
+	// TODO: is this really needed?
 	CreatedAt int64 `json:"createdAt" groups:"public"`
-	ID        uint  `json:"id" groups:"register,list"`
+
+	ID uint `json:"id" groups:"register,list"`
 }
 
 func (group *StageGroup) Get(db *gorm.DB, id uint, preloads ...string) error {
@@ -43,6 +45,8 @@ func (group *StageGroup) Create(db *gorm.DB, request StageGroupRequest) error {
 		return err
 	}
 	group.Name = request.Name
+	group.StartTime = util.UnmarshalTime(request.StartTime)
+	group.EndTime = util.UnmarshalTime(request.EndTime)
 	group.ProjectID = project.ID
 	project.StageGroups = append(project.StageGroups, *group)
 	return errors.Join(db.Save(&project).Error, db.Create(&group).Error)
