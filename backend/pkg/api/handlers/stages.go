@@ -22,12 +22,10 @@ var (
 func GetStage(w http.ResponseWriter, r *http.Request) {
 	stageGroupID, err1 := middleware.GetID(middleware.StageGroupID, r.Context())
 	stageID, err2 := middleware.GetID(middleware.StageID, r.Context())
-	for _, e := range []error{err1, err2} {
-		if e != nil {
-			lGetStage.Error(e)
-			http.Error(w, l10n.ContextID, http.StatusInternalServerError)
-			return
-		}
+	if err := errors.Join(err1, err2); err != nil {
+		lGetStage.Error(err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
 	}
 	var stageGroup models.StageGroup
 	if errors.Is(stageGroup.Get(db.Database, stageGroupID), gorm.ErrRecordNotFound) {
@@ -37,9 +35,7 @@ func GetStage(w http.ResponseWriter, r *http.Request) {
 	if errors.Is(stage.Get(db.Database, stageID), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.StageNotFound, http.StatusNotFound)
 	}
-	response := models.StageResponse{
-		Stage: &stage,
-	}
+	response := models.StageResponse{Stage: &stage}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lGetStageGroup.Error(err)
 		return
@@ -85,15 +81,13 @@ func CreateStage(w http.ResponseWriter, r *http.Request) {
 func PatchStage(w http.ResponseWriter, r *http.Request) {
 	stageGroupID, err1 := middleware.GetID(middleware.StageGroupID, r.Context())
 	stageID, err2 := middleware.GetID(middleware.StageID, r.Context())
-	for _, e := range []error{err1, err2} {
-		if e != nil {
-			lGetStage.Error(e)
-			http.Error(w, l10n.ContextID, http.StatusInternalServerError)
-			return
-		}
+	if err := errors.Join(err1, err2); err != nil {
+		lPatchStage.Error(err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
 	}
 	var stageGroup models.StageGroup
-	if errors.Is(stageGroup.Get(db.Database, stageGroupID, "Stages"), gorm.ErrRecordNotFound) {
+	if errors.Is(stageGroup.Get(db.Database, stageGroupID), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.StageGroupNotFound, http.StatusNotFound)
 	}
 	var stage models.Stage
@@ -114,9 +108,7 @@ func PatchStage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	lPatchStage.Info("id%d patched", stage.ID)
-	response := models.StageResponse{
-		Stage: &stage,
-	}
+	response := models.StageResponse{Stage: &stage}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lPatchStage.Error(err)
 		return
@@ -127,15 +119,13 @@ func PatchStage(w http.ResponseWriter, r *http.Request) {
 func DeleteStage(w http.ResponseWriter, r *http.Request) {
 	stageGroupID, err1 := middleware.GetID(middleware.StageGroupID, r.Context())
 	stageID, err2 := middleware.GetID(middleware.StageID, r.Context())
-	for _, e := range []error{err1, err2} {
-		if e != nil {
-			lDeleteStage.Error(e)
-			http.Error(w, l10n.ContextID, http.StatusInternalServerError)
-			return
-		}
+	if err := errors.Join(err1, err2); err != nil {
+		lDeleteStage.Error(err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
 	}
 	var stageGroup models.StageGroup
-	if errors.Is(stageGroup.Get(db.Database, stageGroupID, "Stages"), gorm.ErrRecordNotFound) {
+	if errors.Is(stageGroup.Get(db.Database, stageGroupID), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.StageGroupNotFound, http.StatusNotFound)
 	}
 	var stage models.Stage

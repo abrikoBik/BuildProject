@@ -24,22 +24,18 @@ var (
 func GetStageGroup(w http.ResponseWriter, r *http.Request) {
 	projectID, err1 := middleware.GetID(middleware.ProjectID, r.Context())
 	stageGroupID, err2 := middleware.GetID(middleware.StageGroupID, r.Context())
-	// TODO: errors.Join?
-	for _, e := range []error{err1, err2} {
-		if e != nil {
-			lGetStageGroup.Error(e)
-			http.Error(w, l10n.ContextID, http.StatusInternalServerError)
-			return
-		}
+	if err := errors.Join(err1, err2); err != nil {
+		lGetStageGroup.Error(err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
 	}
 	var project models.Project
-	// TODO: is this preload really needed?
-	if errors.Is(project.Get(db.Database, projectID, "StageGroups"), gorm.ErrRecordNotFound) {
+	if errors.Is(project.Get(db.Database, projectID), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
 		return
 	}
 	var stageGroup models.StageGroup
-	if errors.Is(stageGroup.Get(db.Database, stageGroupID, "Stages"), gorm.ErrRecordNotFound) {
+	if errors.Is(stageGroup.Get(db.Database, stageGroupID), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.StageGroupNotFound, http.StatusNotFound)
 		return
 	}
@@ -69,6 +65,7 @@ func CreateStageGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var project models.Project
+	// TODO: is this preload really needed?
 	if project.Get(db.Database, projectID, "StageGroups.Stages") != nil {
 		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
 		return
@@ -97,7 +94,7 @@ func PatchStageGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var stageGroup models.StageGroup
-	if errors.Is(stageGroup.Get(db.Database, stageGroupID, "Stages"), gorm.ErrRecordNotFound) {
+	if errors.Is(stageGroup.Get(db.Database, stageGroupID), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.StageGroupNotFound, http.StatusNotFound)
 	}
 	var request models.StageGroupRequest
