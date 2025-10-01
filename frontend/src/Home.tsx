@@ -264,29 +264,31 @@ const Home = () => {
                         <div className="text-blue-950 font-bold">
                             Связь с клиентом:
                         </div>
-                        <section className="flex flex-row ml-auto self-end items-center space-x-2">
-                            <div id="number" className={`absolute ${showNumber ? "" : "pointer-events-none"} select-none text-center justify-self-center transition-opacity duration-300 ${showNumber ? "opacity-100" : "opacity-0"}`}>
-                                +78005353535
-                            </div>
-                            <input
-                                data-copy-to-clipboard-target="number"
-                                onClick={() => numberCopy()}
-                                type="button"
-                                value="Показать номер"
-                                className={`border-2 border-blue-950 p-2 rounded-xl transition-opacity duration-300 ${showNumber ? "opacity-0" : "opacity-100"}`}
-                            />
-                        </section>
-                        <section className="flex flex-row ml-auto self-end items-center space-x-2 mt-2 mr-15">
-                            <div id="email" className={`absolute ${showEMail ? "" : "pointer-events-none"} select-none text-center justify-self-center transition-opacity duration-300 ${showEMail ? "opacity-100" : "opacity-0"}`}>
-                                {user?.email}
-                            </div>
-                            <input
-                                data-copy-to-clipboard-target="email"
-                                onClick={() => emailCopy()}
-                                type="button"
-                                value="Показать почту"
-                                className={`border-2 border-blue-950 p-2 rounded-xl transition-opacity duration-300 ${showEMail ? "opacity-0" : "opacity-100"}`}
-                            />
+                        <section className="ml-[30%] flex flex-row gap-20">
+                            <section className="flex flex-row ml-auto items-center">
+                                <div id="number" className={`absolute ${showNumber ? "" : "pointer-events-none"} select-none text-center justify-self-center transition-opacity duration-300 ${showNumber ? "opacity-100" : "opacity-0"}`}>
+                                    +78005353535
+                                </div>
+                                <input
+                                    data-copy-to-clipboard-target="number"
+                                    onClick={() => numberCopy()}
+                                    type="button"
+                                    value="Показать номер"
+                                    className={`border-2 border-blue-950 p-2 rounded-xl transition-opacity duration-300 ${showNumber ? "opacity-0" : "opacity-100"}`}
+                                />
+                            </section>
+                            <section className="flex flex-row items-center overflow-x-scroll">
+                                <div id="email" className={`absolute ${showEMail ? "" : "pointer-events-none"} select-none text-center justify-self-center transition-opacity duration-300 ${showEMail ? "opacity-100" : "opacity-0"}`}>
+                                    {user?.email}
+                                </div>
+                                <input
+                                    data-copy-to-clipboard-target="email"
+                                    onClick={() => emailCopy()}
+                                    type="button"
+                                    value="Показать почту"
+                                    className={`border-2 border-blue-950 p-2 rounded-xl transition-opacity duration-300 ${showEMail ? "opacity-0" : "opacity-100"}`}
+                                />
+                            </section>
                         </section>
                     </div>
 

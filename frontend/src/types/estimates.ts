@@ -1,9 +1,9 @@
 export interface LineItem {
+    id: number,
     name: string,
     unit: string,
-    amount: number,
-    price: number,
-    cost: number
+    count: number,
+    cost: number,
 };
 
 export interface EditableCellProps {
@@ -13,5 +13,6 @@ export interface EditableCellProps {
 }
 
 export interface EstimateGroup {
+    id: number
     name: string;
 }

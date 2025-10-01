@@ -2,9 +2,10 @@ import Header from './Header';
 import Sidebar from './Sidebar';
 import { useEffect, useState } from 'react';
 import PushNotification from './PushNotication';
-import { LineItem, EditableCellProps, /*EstimateGroup*/ } from './types/estimates';
+import { LineItem, /*EditableCellProps,*/ EstimateGroup } from './types/estimates';
+import axios from 'axios';
 
-const EditableCell = ({ value, onSave, onChange }: EditableCellProps) => {
+/*const EditableCell = ({ value, onSave, onChange }: EditableCellProps) => {
     const [isEdit, setEdit] = useState(false);
     const [curValue, setValue] = useState(value);
 
@@ -49,79 +50,138 @@ const EditableCell = ({ value, onSave, onChange }: EditableCellProps) => {
             )}
         </div>
     );
-};
+};*/
 
 const Estimates = () => {
     const [formData, setFormData] = useState<LineItem>({
-      name: '',
-      unit: '',
-      amount: 0,
-      price: 0,
-      cost: 0
+        id: 0,
+        name: '',
+        unit: '',
+        count: 0,
+        cost: 0,
     });
-
-    /*const [estimateGroupList, setEstimateGroupList] = useState<EstimateGroup>({
-        name: ""   
-    })*/
-
-    //const [currentEstimateGroup, setCurrentEstimateGroup] = useState();
 
     const [estimateAddWindow, setEstimateAddWindow] = useState(false);
 
     const [lineArray, setLineArray] = useState<LineItem[]>([]);
-    const [totalCost, setTotalCost] = useState(0);
+    
 
     const [pushNotificationText, setPushNotificationText] = useState("");
+
+    const [estimateGroupsList, setEstimateGroupsList] = useState<EstimateGroup[]>();
+
+    const [totalCost, setTotalCost] = useState(0);
 
     const pushNotification = (text : string) => {
         setPushNotificationText(text);
     }
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { id, value } = e.target;
-      const numericValue = id === 'name' || id === 'unit' ? value : parseFloat(value) || 0;
-    
-      setFormData(prev => {
-        const newData = { ...prev, [id]: numericValue };
-        if (id === 'price' || id === 'amount') {
-            newData.cost = newData.price * newData.amount;
+    const handleAppending = async () => {
+        try {
+            const estimate = await axios.post(
+                `/api/projects/${localStorage.getItem("selectedProjectID")}/estimateGroups/${localStorage.getItem("selectedEstimateGroup")}/estimates`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+            )
+
+            console.log(estimate);
+            listEstimates();
+            getTotalCost();
+            pushNotification("Добавлена смета")
+        } catch (e : unknown) {
+            console.log(e);
         }
-        return newData;
-      });
     };
 
-    const handleAppending = () => {
-        setLineArray(prev => [...prev, formData]);
-        setTotalCost(totalCost + formData.cost);
+    const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
-          name: '',
-          unit: '',
-          amount: 0,
-          price: 0,
-          cost: 0
+            ...formData,
+            [event.target.id]: event.target.id === "cost" || event.target.id === "count" ? parseInt(event.target.value) : event.target.value
         });
-    };
+    }
 
-    const handleDelete = (index : number) => {
-        if(index != null)
-        {
-            const array = [...lineArray];
-            setTotalCost(totalCost - array[index].cost);
-            array.splice(index, 1);
-            setLineArray(array);
-            pushNotification(`Удалена строка номер ${index+1}`);
+    const listEstimates = async () => {
+        try {
+            const estimatesList = await axios.get(
+                `api/projects/${localStorage.getItem("selectedProjectID")}/estimateGroups/${localStorage.getItem("selectedEstimateGroup")}/estimates`
+            )
+
+            console.log(estimatesList.data)
+            setLineArray(estimatesList.data);
+        } catch (e : unknown) {
+            console.log(e)
         }
     }
 
-    const recalculateTotalCost = () => {
-        setTotalCost(0);
-        lineArray.map((item) => {
-            setTotalCost(totalCost + item.cost);
-        })  
+    const listGroups = async () => {
+        try {
+            const estimateGroups = await axios.get(
+                `api/projects/${localStorage.getItem("selectedProjectID")}/estimateGroups`
+            )
+
+            console.log(estimateGroups.data)
+            setEstimateGroupsList(estimateGroups.data);
+        } catch (e : unknown) {
+            console.error(e);
+        }
+    }
+
+    const addGroup = async (name : string) => {
+        try {
+            const estimateGroup = await axios.post(
+                `api/projects/${localStorage.getItem("selectedProjectID")}/estimateGroups`,
+                {"name": name},
+                {
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }          
+            )
+
+            console.log(estimateGroup.data);
+            listGroups();
+            getTotalCost();
+            pushNotification("Добавлена группа смет")
+        } catch (e : unknown) {
+            console.error(e);
+        }
+    }
+
+    const getTotalCost = async () => {
+        try {
+            const estimateGroup = await axios.get(
+                `api/projects/${localStorage.getItem("selectedProjectID")}/estimateGroups/${localStorage.getItem("selectedEstimateGroup")}`
+            )
+
+            setTotalCost(estimateGroup.data.totalCost)
+        } catch (e : unknown) {
+            console.error(e);
+        }
+    }
+
+    const handleEstimateDelete = async (id: number) => {
+        try {
+            const estimate = await axios.delete(
+                `api/projects/${localStorage.getItem("selectedProjectID")}/estimateGroups/${localStorage.getItem("selectedEstimateGroup")}/estimates/${id}`
+            )
+
+            console.log(estimate.data);
+            listEstimates();
+            getTotalCost();
+            pushNotification("Удалена смета");
+        } catch (e : unknown) {
+            console.error(e);
+        }
     }
 
     useEffect(() => {
-
+        listEstimates();
+        listGroups();
+        getTotalCost();
     }, [])
 
     return (
@@ -145,7 +205,14 @@ const Estimates = () => {
                                 <section className="mr-5 ml-auto my-auto">
                                     <input type="text" id="estimateGroupName" className="!border-3 mr-5"/>
                                     <label htmlFor="estimateGroupName" className="!text-black">
-                                        <button onClick={() => setEstimateAddWindow(!estimateAddWindow)} className="bg-palette-color4 text-white rounded-lg p-1 px-2">Добавить группу</button>
+                                        <button 
+                                            onClick={() => {
+                                                setEstimateAddWindow(!estimateAddWindow);
+                                                addGroup((document.getElementById("estimateGroupName") as HTMLInputElement).value);
+                                            }} 
+                                            className="bg-palette-color4 text-white rounded-lg p-1 px-2">
+                                                Добавить группу
+                                        </button>
                                     </label>
                                 </section>
                             }
@@ -160,82 +227,37 @@ const Estimates = () => {
                               <li className="text-center">Стоимость</li>
                             </ul>
                             <section className="flex flex-row w-full h-full rounded-xl border-3 py-[50px] z-50 border-palette-color4">
-                                <form className="flex flex-col items-center w-full overflow-scroll">
-                                    {lineArray.map((item, index) => {
-                                        return (
-                                        <div 
-                                            key={index}
-                                            className="grid grid-cols-5 gap-4 w-full px-[2%] py-3 items-center border-b border-gray-200"
-                                        >
-                                            {/* TODO: fix bug when input stays blank */}
-                                            <EditableCell 
-                                              value={item.name || '-'} 
-                                              onSave={(newValue) => {
-                                                const updated = [...lineArray];
-                                                updated[index].name = newValue ?? '-';
-                                                setLineArray(updated);
-                                              }}
-                                            />
-                                            <EditableCell 
-                                              value={item.unit || '-'} 
-                                              onSave={(newValue) => {
-                                                const updated = [...lineArray];
-                                                updated[index].unit = newValue ?? '-';
-                                                setLineArray(updated);
-                                              }}
-                                            />
-                                            <EditableCell 
-                                              value={String(item.amount ?? '0')} 
-                                              onSave={(newValue) => {
-                                                const updated = [...lineArray];
-                                                updated[index].amount = parseFloat(newValue) ?? 0;
-                                                recalculateTotalCost();
-                                                setLineArray(updated);
-                                              }}
-                                              onChange={(newValue) => {
-                                                const updated = [...lineArray];
-                                                updated[index].cost = (parseFloat(newValue) ?? 0) * updated[index].price;
-                                                setLineArray(updated);
-                                              }}
-                                            />
-                                            <EditableCell 
-                                              value={String(item.price ?? '0')} 
-                                              onSave={(newValue) => {
-                                                const updated = [...lineArray];
-                                                updated[index].price = parseFloat(newValue) ?? 0;
-                                                recalculateTotalCost();
-                                                setLineArray(updated);
-                                              }}
-                                              onChange={(newValue) => {
-                                                const updated = [...lineArray];
-                                                updated[index].cost = (parseFloat(newValue) ?? 0) * updated[index].amount;
-                                                setLineArray(updated);
-                                              }}
-                                            />
-                                            <div className="flex flex-row gap-10 justify-center pl-15">
-                                                <div className="text-center font-medium">{item.cost ?? '0'} р</div>
-                                                <div onMouseDown={() => handleDelete(index)} 
-                                                    className="flex w-7 h-7 items-center justify-center hover:text-red-700 select-none hover:cursor-pointer"
-                                                    aria-label="Удалить строку"
-                                                >
-                                                    <span className="material-symbols-outlined">
-                                                        close
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        )
-                                    })}
-
-                                    <section className="flex flex-row justify-between w-full px-[2%]">
-                                        <input type="text" onChange={handleChange} className="border-2 border-palette-color4 mb-2 text-black" id="name"/>
-                                        {/* should be dropbox */}<input type="text" onChange={handleChange} className="border-2 border-palette-color4 mb-2" id="unit"/>
-                                        <input onChange={handleChange} type="text" className="border-2 border-palette-color4 mb-2" id="amount"/>
-                                        <input onChange={handleChange} type="text" className="border-2 border-palette-color4 mb-2" id="price"/>
-                                        <div className="self-center" id="cost">{formData.cost} р</div>
-                                    </section>
-                                    <input onClick={handleAppending} type="reset" value="Добавить строку" className="w-40 h-10 min-h-10 hover:cursor-pointer bg-palette-color4 text-white rounded-lg"/>
-                                </form>
+                                <ul className="flex flex-col w-full h-full">
+                                    {
+                                        lineArray != null ? lineArray.map((item, index) => (
+                                            <li key={index} className="flex flex-row px-[2%] mb-5">
+                                                <section className="flex flex-row w-full justify-between">
+                                                    <div className="text-center w-[15%]">{item.name}</div>
+                                                    <div className="text-center w-[15%]">{item.unit}</div>
+                                                    <div className="text-center w-[15%]">{item.count}</div>
+                                                    <div className="text-center w-[15%]">{item.cost}</div>
+                                                    <div className="text-center w-[15%]">{item.count * item.cost} р</div>
+                                                </section>
+                                                <span onClick={() => handleEstimateDelete(item.id)} className="asbolute right-4 material-symbols-outlined select-none hover:text-red-700">
+                                                    close
+                                                </span>
+                                            </li>
+                                        ))
+                                        :
+                                        <>
+                                        </>
+                                    }
+                                    <form className="flex flex-col items-center w-full overflow-scroll">
+                                        <section className="flex flex-row justify-between w-full px-[2%] mb-5">
+                                            <input id="name" type="text" onChange={handleInput} className="!w-[15%] border-2 border-palette-color4 mb-2 text-black"/>
+                                            <input id="unit" type="text" onChange={handleInput} className="!w-[15%] border-2 border-palette-color4 mb-2"/>
+                                            <input id="count" onChange={handleInput} type="text" className="!w-[15%] border-2 border-palette-color4 mb-2"/>
+                                            <input id="cost" onChange={handleInput} type="text" className="!w-[15%] border-2 border-palette-color4 mb-2"/>
+                                            <div className="self-center w-[15%] text-center" id="cost">{formData.count * formData.cost} р</div>
+                                        </section>
+                                        <input onClick={handleAppending} type="button" value="Добавить строку" className="w-40 h-10 min-h-10 hover:cursor-pointer bg-palette-color4 text-white rounded-lg"/>
+                                    </form>
+                                </ul>
                             </section>
                             <ul className="flex flex-row bold-child relative items-center z-0 rounded-b-xl mt-[-40px] w-full h-10 border-2 border-x-0 border-b-0 border-palette-color4 px-[2%]">
                                 <li className="text-[#1D3266]">Итого</li>
@@ -246,35 +268,19 @@ const Estimates = () => {
 
                     {/* Estimate groups */}
                     <section className="w-full h-1/2 mb-5">
-                        <h2 className="text-[#1D3266] font-bold text-2xl mb-6">Предварительное ведение смет</h2>
+                        <h2 className="text-[#1D3266] font-bold text-2xl mb-6">Группы смет</h2>
                         <ul className="flex flex-col gap-5 select-none">
-                            <li>
-                                <div className="flex flex-row h-18 border-3 rounded-xl p-3 hover:shadow-[0px_0px_5px_#37515fff] border-palette-color4 ">
-                                    <h5 className="self-center">Фундамент</h5>                                    
-                                    <div className="ml-auto self-center">25 апр - 2025</div>
-                                </div>
-                            </li>
-                            <li>
-                                <div className="flex flex-row h-18 border-3 rounded-xl p-3 hover:shadow-[0px_0px_5px_#37515fff] border-palette-color4 ">
-                                    <h5 className="self-center">Пол</h5>                                    
-                                    <div className="ml-auto self-center">19 апр - 2025</div>
-                                </div>
-                            </li>
-                            <li>
-                                <div className="flex flex-row h-18 border-3 rounded-xl p-3 hover:shadow-[0px_0px_5px_#37515fff] border-palette-color4 ">
-                                    <h5 className="self-center">Стены</h5>                                    
-                                    <div className="ml-auto self-center">15 апр - 2025</div>
-                                </div>
-                            </li>
-                            <li>
-                                <div className="flex flex-row h-18 border-3 rounded-xl p-3 hover:shadow-[0px_0px_5px_#37515fff] border-palette-color4 ">
-                                    <h5 className="self-center">Терраса</h5>                                    
-                                    <div className="ml-auto self-center">10 апр - 2025</div>
-                                </div>
-                            </li>
-                            <li className="w-full h-5">
-
-                            </li>
+                            { estimateGroupsList?.map((item, index) => (
+                                <li key={index}>
+                                    <div onClick={() => {
+                                        localStorage.setItem("selectedEstimateGroup", item.id.toString());
+                                        listEstimates();
+                                    }} className="flex flex-row h-18 border-3 justify-center rounded-xl p-3 hover:shadow-[0px_0px_5px_#37515fff] border-palette-color4 ">
+                                        <h5 className="self-center">{item.name}</h5>                                    
+                                    </div>
+                                </li>
+                            ))
+                            }
                         </ul>
                     </section>
                 </section>
