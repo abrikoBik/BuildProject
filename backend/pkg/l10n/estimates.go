@@ -4,7 +4,7 @@ import "errors"
 
 const (
 	GenericEstimate  = "Ошибка сметы"
-	EstimateNotFound = "Смета не найден"
+	EstimateNotFound = "Смета не найдена"
 
 	GenericEstimateGroup  = "Ошибка группы смет"
 	EstimateGroupNotFound = "Группа смет не найдена"

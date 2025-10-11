@@ -24,20 +24,18 @@ var (
 func GetEstimateGroup(w http.ResponseWriter, r *http.Request) {
 	projectID, err1 := middleware.GetID(middleware.ProjectID, r.Context())
 	estimateGroupID, err2 := middleware.GetID(middleware.EstimateGroupID, r.Context())
-	for _, e := range []error{err1, err2} {
-		if e != nil {
-			lGetEstimateGroup.Error(e)
-			http.Error(w, l10n.ContextID, http.StatusInternalServerError)
-			return
-		}
+	if err := errors.Join(err1, err2); err != nil {
+		lGetEstimateGroup.Error(err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
 	}
 	var project models.Project
-	if errors.Is(project.Get(db.Database, projectID, "EstimateGroups"), gorm.ErrRecordNotFound) {
+	if errors.Is(project.Get(db.Database, projectID), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
 		return
 	}
 	var estimateGroup models.EstimateGroup
-	if errors.Is(estimateGroup.Get(db.Database, estimateGroupID, "Estimates"), gorm.ErrRecordNotFound) {
+	if errors.Is(estimateGroup.Get(db.Database, estimateGroupID), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.EstimateGroupNotFound, http.StatusNotFound)
 		return
 	}
@@ -65,6 +63,7 @@ func CreateEstimateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var project models.Project
+	// TODO: is this preload really needed?
 	if project.Get(db.Database, projectID, "EstimateGroups.Estimates") != nil {
 		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
 		return
@@ -93,7 +92,7 @@ func PatchEstimateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var estimateGroup models.EstimateGroup
-	if errors.Is(estimateGroup.Get(db.Database, estimateGroupID, "Estimates"), gorm.ErrRecordNotFound) {
+	if errors.Is(estimateGroup.Get(db.Database, estimateGroupID), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.EstimateGroupNotFound, http.StatusNotFound)
 	}
 	var request models.EstimateGroupRequest

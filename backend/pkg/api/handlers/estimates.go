@@ -22,12 +22,10 @@ var (
 func GetEstimate(w http.ResponseWriter, r *http.Request) {
 	estimateGroupID, err1 := middleware.GetID(middleware.EstimateGroupID, r.Context())
 	estimateID, err2 := middleware.GetID(middleware.EstimateID, r.Context())
-	for _, e := range []error{err1, err2} {
-		if e != nil {
-			lGetEstimate.Error(e)
-			http.Error(w, l10n.ContextID, http.StatusInternalServerError)
-			return
-		}
+	if err := errors.Join(err1, err2); err != nil {
+		lGetEstimate.Error(err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
 	}
 	var estimateGroup models.EstimateGroup
 	if errors.Is(estimateGroup.Get(db.Database, estimateGroupID), gorm.ErrRecordNotFound) {
@@ -37,9 +35,7 @@ func GetEstimate(w http.ResponseWriter, r *http.Request) {
 	if errors.Is(estimate.Get(db.Database, estimateID), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.EstimateNotFound, http.StatusNotFound)
 	}
-	response := models.EstimateResponse{
-		Estimate: &estimate,
-	}
+	response := models.EstimateResponse{Estimate: &estimate}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lGetEstimateGroup.Error(err)
 		return
@@ -73,7 +69,9 @@ func CreateEstimate(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, l10n.GenericEstimate, http.StatusInternalServerError)
 		}
 	}
+	lCreateEstimate.Debug("estimate", estimate)
 	lCreateEstimate.Info("%s (id%d) created", estimate.Name, estimate.ID)
+	// TODO: fix id = 0
 	response := models.EstimateResponse{ID: estimate.ID}
 	if err := jsonEncode(w, response, "register"); err != nil {
 		lCreateEstimate.Error(err)
@@ -85,15 +83,13 @@ func CreateEstimate(w http.ResponseWriter, r *http.Request) {
 func PatchEstimate(w http.ResponseWriter, r *http.Request) {
 	estimateGroupID, err1 := middleware.GetID(middleware.EstimateGroupID, r.Context())
 	estimateID, err2 := middleware.GetID(middleware.EstimateID, r.Context())
-	for _, e := range []error{err1, err2} {
-		if e != nil {
-			lGetEstimate.Error(e)
-			http.Error(w, l10n.ContextID, http.StatusInternalServerError)
-			return
-		}
+	if err := errors.Join(err1, err2); err != nil {
+		lPatchEstimate.Error(err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
 	}
 	var estimateGroup models.EstimateGroup
-	if errors.Is(estimateGroup.Get(db.Database, estimateGroupID, "Estimates"), gorm.ErrRecordNotFound) {
+	if errors.Is(estimateGroup.Get(db.Database, estimateGroupID), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.EstimateGroupNotFound, http.StatusNotFound)
 	}
 	var estimate models.Estimate
@@ -114,9 +110,7 @@ func PatchEstimate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	lPatchEstimate.Info("id%d patched", estimate.ID)
-	response := models.EstimateResponse{
-		Estimate: &estimate,
-	}
+	response := models.EstimateResponse{Estimate: &estimate}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lPatchEstimate.Error(err)
 		return
@@ -127,15 +121,13 @@ func PatchEstimate(w http.ResponseWriter, r *http.Request) {
 func DeleteEstimate(w http.ResponseWriter, r *http.Request) {
 	estimateGroupID, err1 := middleware.GetID(middleware.EstimateGroupID, r.Context())
 	estimateID, err2 := middleware.GetID(middleware.EstimateID, r.Context())
-	for _, e := range []error{err1, err2} {
-		if e != nil {
-			lDeleteEstimate.Error(e)
-			http.Error(w, l10n.ContextID, http.StatusInternalServerError)
-			return
-		}
+	if err := errors.Join(err1, err2); err != nil {
+		lDeleteEstimate.Error(err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
 	}
 	var estimateGroup models.EstimateGroup
-	if errors.Is(estimateGroup.Get(db.Database, estimateGroupID, "Estimates"), gorm.ErrRecordNotFound) {
+	if errors.Is(estimateGroup.Get(db.Database, estimateGroupID), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.EstimateGroupNotFound, http.StatusNotFound)
 	}
 	var estimate models.Estimate
