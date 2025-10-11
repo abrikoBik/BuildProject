@@ -1,7 +1,7 @@
 package models
 
 import (
-	"errors"
+	"log"
 	"mp1/pkg/util"
 
 	"github.com/lib/pq"
@@ -28,7 +28,6 @@ type StageResponse struct {
 	*Stage
 	StartTime int64 `json:"startTime" groups:"public"`
 	EndTime   int64 `json:"endTime" groups:"public"`
-	CreatedAt int64 `json:"createdAt" groups:"public"`
 	ID        uint  `json:"id" groups:"register,list"`
 }
 
@@ -37,17 +36,18 @@ func (stage *Stage) Get(db *gorm.DB, id uint, preloads ...string) error {
 }
 
 func (stage *Stage) Create(db *gorm.DB, request StageRequest) error {
-	group, err := stage.GetGroup(db)
-	if err != nil {
-		return err
-	}
+	stage.StageGroupID = request.StageGroupID
+	// group, err := stage.GetGroup(db)
+	// if err != nil {
+	// 	return err
+	// }
 	stage.Name = request.Name
 	stage.Description = request.Description
 	stage.StartTime = util.UnmarshalTime(request.StartTime)
 	stage.EndTime = util.UnmarshalTime(request.EndTime)
-	stage.StageGroupID = group.ID
-	group.AddStage(db, *stage)
-	return errors.Join(db.Create(&stage).Error, group.CalculateTimes(db), db.Save(&group).Error)
+	log.Println(stage, request)
+	// return errors.Join(db.Create(&stage).Error, group.CalculateTimes(db), db.Save(&group).Error)
+	return db.Create(&stage).Error
 }
 
 func (stage *Stage) Delete(db *gorm.DB) error {

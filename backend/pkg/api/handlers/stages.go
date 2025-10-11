@@ -35,7 +35,11 @@ func GetStage(w http.ResponseWriter, r *http.Request) {
 	if errors.Is(stage.Get(db.Database, stageID), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.StageNotFound, http.StatusNotFound)
 	}
-	response := models.StageResponse{Stage: &stage}
+	response := models.StageResponse{
+		Stage:     &stage,
+		StartTime: util.MarshalTime(stage.StartTime),
+		EndTime:   util.MarshalTime(stage.EndTime),
+	}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lGetStageGroup.Error(err)
 		return
@@ -60,7 +64,6 @@ func CreateStage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	request.StageGroupID = stageGroupID
-	lCreateStage.Debug("stageGroupID", stageGroupID, "stageGroup", stageGroup, "request", request)
 	var stage models.Stage
 	if err := stage.Create(db.Database, request); err != nil {
 		lCreateStage.Error(err)
@@ -69,6 +72,7 @@ func CreateStage(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, l10n.GenericStage, http.StatusInternalServerError)
 		}
 	}
+	lCreateStage.Debug("stage", stage, "request", request)
 	lCreateStage.Info("%s (id%d) created", stage.Name, stage.ID)
 	response := models.StageResponse{ID: stage.ID}
 	if err := jsonEncode(w, response, "register"); err != nil {

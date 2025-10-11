@@ -87,11 +87,15 @@ func (group *StageGroup) RemoveStage(db *gorm.DB, index int) error {
 	return db.Save(&group).Error
 }
 
-func (group *StageGroup) CalculateTimes(db *gorm.DB) error {
-	if len(group.Stages) == 0 {
-		return nil
-	}
-	group.StartTime = group.Stages[0].StartTime
-	group.EndTime = group.Stages[len(group.Stages)-1].EndTime
-	return db.Save(&group).Error
-}
+// TODO: rework
+// func (group *StageGroup) CalculateTimes(db *gorm.DB) error {
+// 	if len(group.Stages) == 0 {
+// 		return nil
+// 	}
+// 	sort.Slice(group.Stages, func(i, j int) bool {
+// 		return group.Stages[i].StartTime > group.Stages[j].StartTime
+// 	})
+// 	group.StartTime = group.Stages[0].StartTime
+// 	group.EndTime = group.Stages[len(group.Stages)-1].EndTime
+// 	return db.Save(&group).Error
+// }
