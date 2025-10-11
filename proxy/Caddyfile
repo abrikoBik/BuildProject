@@ -1,0 +1,9 @@
+# TODO: remove http://
+http://localhost
+
+encode
+templates
+reverse_proxy frontend:5173
+handle_path /api/* {
+	reverse_proxy backend:3000
+}
