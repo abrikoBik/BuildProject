@@ -81,6 +81,8 @@ const Projects = () => {
                 `/api/projects/${id}/`
             );
 
+            localStorage.removeItem("selectedProjectID");
+
             if(project.status != 200) {
                 console.error(project.status);
                 return;
@@ -171,7 +173,7 @@ const Projects = () => {
                             </span>
                         </button>
 
-                        <form action={createProject} className="flex flex-col w-full h-full p-5 gap-5">
+                        <form onSubmit={createProject} className="flex flex-col w-full h-full p-5 gap-5">
                             <div className="flex flex-row gap-2">
                                 <label htmlFor="name" className="!text-black">Название проекта</label>
                                 <input 
@@ -195,12 +197,14 @@ const Projects = () => {
                                 <div>Карта</div>
                                 <section>
                                     <input type="text" onChange={(e : ChangeEvent<HTMLInputElement>) => setAddress(e.target.value)}/>
-                                    <button onClick={handleCoordinates} type="button" className="bg-blue-700 rounded-xl p-2">Добавить метку</button>
+                                    <button 
+                                    onClick={handleCoordinates} type="button" className="bg-blue-700 rounded-xl p-2">Добавить метку</button>
                                 </section>
                                 <Map
                                     provider={osm}
                                     height={200}
                                     defaultCenter={[Latitude, Longitude]}
+                                    center={[Latitude, Longitude]}
                                     defaultZoom={11}
                                 >
                                     <Marker
@@ -228,6 +232,7 @@ const Projects = () => {
                             </section>
 
                             <button
+                                type="submit"
                                 className="min-h-10 w-50 flex bg-palette-color4 flex-col items-center justify-center self-center rounded-xl font-semibold text-xl text-white hover:cursor-pointer"
                             >
                                 Создать проект

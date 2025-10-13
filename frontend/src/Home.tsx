@@ -115,7 +115,6 @@ const Home = () => {
     return (
         <main className="relative">
             <Header />
-            {/* TODO: fix notification laggy animation and make it more stable */}
             <PushNotification text={pushNotificationText}/>
             <section className="flex flex-row w-[85vw]  h-[100vh] text-2xl ml-[15%]">
                 <Sidebar show={showSidebar} choice={0}/>
