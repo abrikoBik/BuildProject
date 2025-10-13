@@ -1,16 +1,13 @@
 package models
 
 import (
-	"bytes"
 	"crypto/sha256"
 	"io"
 	"mime/multipart"
 	"mp1/pkg/consts"
 	"mp1/pkg/l10n"
-	"mp1/pkg/util"
 	"os"
 	"path/filepath"
-	"sync"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -35,48 +32,31 @@ func (attachment *Attachment) Get(db *gorm.DB, id uuid.UUID) error {
 	return db.Where("uuid = ?", id).Take(&attachment).Error
 }
 
-func (attachment *Attachment) Create(db *gorm.DB, projectID uint, file multipart.File, header *multipart.FileHeader) error {
+func (attachment *Attachment) Create(db *gorm.DB, projectID uint, multipartFile multipart.File, header *multipart.FileHeader) error {
 	attachment.Size = header.Size
 	if (attachment.Size) > consts.MaxAttachmentSize {
 		return l10n.AttachmentSizeError
-	}
-	// TODO: explore memory usage
-	buf := new(bytes.Buffer)
-	if _, err := io.Copy(buf, file); err != nil {
-		return err
 	}
 	attachment.Name = header.Filename
 	attachment.UUID = uuid.New()
 	// TODO: check if a project exists
 	attachment.ProjectID = projectID
-	attachmentPath := filepath.Join(consts.AttachmentPath, attachment.UUID.String())
-	attachmentFile, err := os.OpenFile(attachmentPath, os.O_CREATE|os.O_RDWR, 0644)
+	path := filepath.Join(consts.AttachmentPath, attachment.UUID.String())
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
 		return err
 	}
-	// TODO: decide if a waitgroup is needed
-	var wg sync.WaitGroup
-	wg.Add(2)
-	go func() {
-		reader := bytes.NewReader(buf.Bytes())
-		_, err := io.Copy(attachmentFile, reader)
-		util.Check(err, attachmentFile.Close())
-		wg.Done()
-	}()
-	go func() {
-		reader := bytes.NewReader(buf.Bytes())
-		hash := sha256.New()
-		_, err := io.Copy(hash, reader)
-		util.Check(err)
-		attachment.Checksum = hash.Sum(nil)
-		wg.Done()
-	}()
-	wg.Wait()
+	defer file.Close()
+	hash := sha256.New()
+	w := io.MultiWriter(file, hash)
+	if _, err = io.Copy(w, multipartFile); err != nil {
+		return err
+	}
+	attachment.Checksum = hash.Sum(nil)
 	return db.Create(&attachment).Error
 }
 
 func (attachment *Attachment) Delete(db *gorm.DB) error {
-	// might get very messy
 	attachmentPath := filepath.Join(consts.AttachmentPath, attachment.UUID.String())
 	if err := os.Remove(attachmentPath); err != nil {
 		return err

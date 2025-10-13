@@ -70,14 +70,18 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	util.Check(r.ParseMultipartForm(consts.MaxAttachmentSize))
+	if r.ParseMultipartForm(consts.MaxAttachmentSize) != nil {
+		lCreateAttachment.Error(err)
+		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
+		return
+	}
 	file, header, err := r.FormFile(consts.AttachmentMultipartKey)
 	if err != nil {
 		lCreateAttachment.Error(err)
 		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
 		return
 	}
-	defer util.Check(file.Close())
+	defer file.Close()
 	var attachment models.Attachment
 	if err := attachment.Create(db.Database, projectID, file, header); err != nil {
 		lCreateAttachment.Error(err)
