@@ -29,8 +29,7 @@ func init() {
 // Opens a PostgreSQL database with the name dbname at hostname:port.
 func Open(hostname string, port uint, dbname string) error {
 	connStr := fmt.Sprintf(
-		// TODO: remove sslmode=disable
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		"host=%s port=%d user=%s password=%s dbname=%s sslmode=prefer",
 		hostname,
 		port,
 		username,

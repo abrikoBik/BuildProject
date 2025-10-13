@@ -40,7 +40,7 @@ func GetWorker(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.GenericWorker, http.StatusInternalServerError)
 		return
 	}
-	response := models.WorkerResponse{Worker: &worker, CreatedAt: worker.CreatedAt.String()}
+	response := models.WorkerResponse{Worker: &worker}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lGetWorker.Error(err)
 		return
@@ -62,10 +62,8 @@ func CreateWorker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var worker models.Worker
-	request := models.WorkerRequest{
-		Worker: &worker,
-		UserID: userID,
-	}
+	request := models.WorkerRequest{Worker: &worker}
+	request.UserID = userID
 	if !jsonDecode(w, r, &request) {
 		return
 	}
@@ -132,7 +130,7 @@ func PatchWorker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	lPatchWorker.Info("%s (id%d) patched", user.Name, worker.ID)
-	response := models.WorkerResponse{Worker: &worker, CreatedAt: worker.CreatedAt.String()}
+	response := models.WorkerResponse{Worker: &worker}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lPatchWorker.Error(err)
 		return

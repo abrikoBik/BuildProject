@@ -39,7 +39,6 @@ func GetProject(w http.ResponseWriter, r *http.Request) {
 		Project:   &project,
 		StartTime: util.MarshalTime(project.StartTime),
 		EndTime:   util.MarshalTime(project.EndTime),
-		CreatedAt: project.CreatedAt.String(),
 	}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lGetProject.Error(err)
@@ -111,7 +110,6 @@ func PatchProject(w http.ResponseWriter, r *http.Request) {
 		Project:   &project,
 		StartTime: util.MarshalTime(project.StartTime),
 		EndTime:   util.MarshalTime(project.EndTime),
-		CreatedAt: project.CreatedAt.String(),
 	}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lPatchProject.Error(err)
