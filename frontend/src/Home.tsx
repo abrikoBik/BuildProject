@@ -267,7 +267,7 @@ const Home = () => {
                         <section className="ml-[30%] flex flex-row gap-20">
                             <section className="flex flex-row ml-auto items-center">
                                 <div id="number" className={`absolute ${showNumber ? "" : "pointer-events-none"} select-none text-center justify-self-center transition-opacity duration-300 ${showNumber ? "opacity-100" : "opacity-0"}`}>
-                                    +78005353535
+                                    {user?.phoneNumber}
                                 </div>
                                 <input
                                     data-copy-to-clipboard-target="number"

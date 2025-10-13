@@ -2,10 +2,10 @@ import Header from './Header';
 import Sidebar from './Sidebar';
 import { useEffect, useState } from 'react';
 import PushNotification from './PushNotication';
-import { LineItem, /*EditableCellProps,*/ EstimateGroup } from './types/estimates';
+import { LineItem, EditableCellProps, EstimateGroup } from './types/estimates';
 import axios from 'axios';
 
-/*const EditableCell = ({ value, onSave, onChange }: EditableCellProps) => {
+const EditableCell = ({ value, onSave, onChange, textStyle, inputStyle }: EditableCellProps) => {
     const [isEdit, setEdit] = useState(false);
     const [curValue, setValue] = useState(value);
 
@@ -29,7 +29,7 @@ import axios from 'axios';
     };
 
     return (
-        <div className="text-center">
+        <>
             {isEdit ? (
                 <input
                     type="text"
@@ -38,19 +38,19 @@ import axios from 'axios';
                     onBlur={handleEditEnd}
                     onKeyDown={handleEditEnd}
                     autoFocus
-                    className="w-full px-2 border-2"
+                    className={inputStyle}
                 />
             ) : (
                 <div 
                     onDoubleClick={() => setEdit(true)}
-                    className="cursor-text hover:bg-gray-100 p-1"
+                    className={textStyle}
                 >
                     {curValue}
                 </div>
             )}
-        </div>
+        </>
     );
-};*/
+};
 
 const Estimates = () => {
     const [formData, setFormData] = useState<LineItem>({
@@ -227,16 +227,16 @@ const Estimates = () => {
                               <li className="text-center">Стоимость</li>
                             </ul>
                             <section className="flex flex-row w-full h-full rounded-xl border-3 py-[50px] z-50 border-palette-color4">
-                                <ul className="flex flex-col w-full h-full">
+                                <ul className="flex flex-col w-full h-full overflow-scroll">
                                     {
                                         lineArray != null ? lineArray.map((item, index) => (
-                                            <li key={index} className="flex flex-row px-[2%] mb-5">
-                                                <section className="flex flex-row w-full justify-between">
-                                                    <div className="text-center w-[15%]">{item.name}</div>
-                                                    <div className="text-center w-[15%]">{item.unit}</div>
-                                                    <div className="text-center w-[15%]">{item.count}</div>
-                                                    <div className="text-center w-[15%]">{item.cost}</div>
-                                                    <div className="text-center w-[15%]">{item.count * item.cost} р</div>
+                                            <li key={index} className="flex flex-row">
+                                                <section className="flex flex-row w-full px-[2%] mb-5 justify-between">
+                                                    <EditableCell value={item.name ? item.name : "-"} textStyle="text-center w-[16%] h-[40px]" inputStyle="!w-[15%] border-2 border-palette-color4 mb-2 text-black text-center" />
+                                                    <EditableCell value={item.unit ? item.unit : "-"} textStyle="text-center w-[16%] h-[40px]"  inputStyle="!w-[15%] border-2 border-palette-color4 mb-2 text-black text-center"/>
+                                                    <EditableCell value={(item.count).toString()} textStyle="text-center w-[16%] h-[40px]"  inputStyle="!w-[15%] border-2 border-palette-color4 mb-2 text-black text-center"/>
+                                                    <EditableCell value={(item.cost).toString()} textStyle="text-center w-[16%] h-[40px]"  inputStyle="!w-[15%] border-2 border-palette-color4 mb-2 text-black text-center"/>
+                                                    <div className="text-center w-[16%]">{item.count * item.cost} р</div>
                                                 </section>
                                                 <span onClick={() => handleEstimateDelete(item.id)} className="asbolute right-4 material-symbols-outlined select-none hover:text-red-700">
                                                     close
@@ -247,7 +247,7 @@ const Estimates = () => {
                                         <>
                                         </>
                                     }
-                                    <form className="flex flex-col items-center w-full overflow-scroll">
+                                    <form className="flex flex-col items-center w-full">
                                         <section className="flex flex-row justify-between w-full px-[2%] mb-5">
                                             <input id="name" type="text" onChange={handleInput} className="!w-[15%] border-2 border-palette-color4 mb-2 text-black"/>
                                             <input id="unit" type="text" onChange={handleInput} className="!w-[15%] border-2 border-palette-color4 mb-2"/>

@@ -1,10 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const Header = () => {
 
     const [userBlock, setUserBlock] = useState(false);
     const [userBlockVisible, setUseBlockVisible] = useState(false);
+
+    const [name, setName] = useState("");
+
+    useEffect(() => {
+        try {
+            setName(JSON.parse(localStorage.getItem("user")!).name[0]);
+        } catch {
+            window.location.href = "/login";
+        }
+    }
+    , [])
 
     return (
         <header className="flex flex-row fixed w-[90%] h-20 ml-[15%] pl-5 mr-[10%] bg-linear-to-t from-white/80 to-white/100 z-100">
@@ -27,7 +38,9 @@ const Header = () => {
                     {(userBlock ? "<" : ">")}
                 </div>
                 <button className="select-none rounded-4xl text-2xl font-bold bg-[#1D3266] text-white w-10 h-10 flex items-center justify-center self-center hover:cursor-pointer">
-                    {JSON.parse(localStorage.getItem("user")!).name[0]}
+                    {
+                        name
+                    }
                 </button>
             </div>
             {/* User block drop box */}

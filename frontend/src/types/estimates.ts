@@ -10,9 +10,11 @@ export interface EditableCellProps {
     value: string;
     onSave?: (newValue: string) => void;
     onChange?: (newValue: string) => void;
+    textStyle: string;
+    inputStyle: string;
 }
 
 export interface EstimateGroup {
-    id: number
+    id: number;
     name: string;
 }
