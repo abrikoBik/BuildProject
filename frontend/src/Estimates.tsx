@@ -157,7 +157,7 @@ const Estimates = () => {
                 `api/projects/${localStorage.getItem("selectedProjectID")}/estimateGroups/${localStorage.getItem("selectedEstimateGroup")}`
             )
 
-            setTotalCost(estimateGroup.data.totalCost)
+            setTotalCost(estimateGroup.data.totalCost);
         } catch (e : unknown) {
             console.error(e);
         }
@@ -193,7 +193,7 @@ const Estimates = () => {
                 { localStorage.getItem("selectedProjectID") ?
                 <section className="w-[83%] ml-[17%] mt-20 pr-5">
                     {/* Selected estimate group */}
-                    <section className="w-full h-[60%]">
+                    <section className="w-full flex-col justify-between h-1/2">
                         <section className="w-full h-20 flex flex-row">
                             <div>
                                 <h1 className="text-[#1D3266] font-bold text-4xl">Сметы</h1>
@@ -203,7 +203,19 @@ const Estimates = () => {
                                 <input onClick={() => setEstimateAddWindow(!estimateAddWindow)} type="button" value="Создать группу смет" className="w-60 h-15 hover:cursor-pointer text-center bg-palette-color4 pt-1 rounded-xl font-semibold text-xl text-white self-center ml-auto" />
                                 :
                                 <section className="mr-5 ml-auto my-auto">
-                                    <input type="text" id="estimateGroupName" className="!border-3 mr-5"/>
+                                    <input 
+                                        type="text"
+                                        id="estimateGroupName"
+                                        autoFocus
+                                        className="!border-3 mr-5"
+                                        onKeyDown={(e) => {
+                                            if(e.key == "Enter") {
+                                                setEstimateAddWindow(!estimateAddWindow);
+                                                addGroup(e.currentTarget.value);
+                                            }
+                                        }}
+                                    />
+
                                     <label htmlFor="estimateGroupName" className="!text-black">
                                         <button 
                                             onClick={() => {
@@ -218,7 +230,7 @@ const Estimates = () => {
                             }
                         </section>
 
-                        <section className="flex flex-col h-[80%] w-full p-[3px]">
+                        <section className="flex flex-col h-[100%] w-full p-[3px] min-h-100">
                              <ul className="grid grid-cols-5 bold-child relative z-0 rounded-t-xl w-full h-10 bg-palette-color2 px-[2%] items-center mb-[-40px]">
                               <li className="text-center">Наименование</li>
                               <li className="text-center">Единица</li>
@@ -267,7 +279,7 @@ const Estimates = () => {
                     </section>
 
                     {/* Estimate groups */}
-                    <section className="w-full h-1/2 mb-5">
+                    <section className="w-full h-1/2 mb-5 mt-40">
                         <h2 className="text-[#1D3266] font-bold text-2xl mb-6">Группы смет</h2>
                         <ul className="flex flex-col gap-5 select-none">
                             { estimateGroupsList?.map((item, index) => (

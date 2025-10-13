@@ -173,7 +173,7 @@ const Projects = () => {
                             </span>
                         </button>
 
-                        <form onSubmit={createProject} className="flex flex-col w-full h-full p-5 gap-5">
+                        <section className="flex flex-col w-full h-full p-5 gap-5">
                             <div className="flex flex-row gap-2">
                                 <label htmlFor="name" className="!text-black">Название проекта</label>
                                 <input 
@@ -195,15 +195,10 @@ const Projects = () => {
 
                             <div>
                                 <div>Карта</div>
-                                <section>
-                                    <input type="text" onChange={(e : ChangeEvent<HTMLInputElement>) => setAddress(e.target.value)}/>
-                                    <button 
-                                    onClick={handleCoordinates} type="button" className="bg-blue-700 rounded-xl p-2">Добавить метку</button>
-                                </section>
                                 <Map
                                     provider={osm}
                                     height={200}
-                                    defaultCenter={[Latitude, Longitude]}
+                                    defaultCenter={[47.2153657, 38.9285216]}
                                     center={[Latitude, Longitude]}
                                     defaultZoom={11}
                                 >
@@ -212,6 +207,26 @@ const Projects = () => {
                                         anchor={[Latitude, Longitude]} 
                                     />
                                 </Map>
+                                <section>
+                                    <input 
+                                        type="text"
+                                        onChange={(e : ChangeEvent<HTMLInputElement>) => setAddress(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if(e.key === "Enter")
+                                            {
+                                                setAddress(e.currentTarget.value);
+                                                handleCoordinates();
+                                            }
+                                        }}
+                                    />
+                                    <button 
+                                        onClick={handleCoordinates}
+                                        type="button"
+                                        className="bg-blue-700 rounded-xl p-2"
+                                    >
+                                    Добавить метку
+                                    </button>
+                                </section>
                             </div>
 
                             <section className="flex flex-row w-full">
@@ -232,12 +247,12 @@ const Projects = () => {
                             </section>
 
                             <button
-                                type="submit"
+                                onClick={createProject}
                                 className="min-h-10 w-50 flex bg-palette-color4 flex-col items-center justify-center self-center rounded-xl font-semibold text-xl text-white hover:cursor-pointer"
                             >
                                 Создать проект
                             </button>
-                        </form>
+                        </section>
                     </div>
                 </section>
                 :

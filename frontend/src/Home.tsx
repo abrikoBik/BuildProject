@@ -33,6 +33,8 @@ const Home = () => {
     const [showNumber, setNumber] = useState(false);
     const [showEMail, setEmail] = useState(false);
 
+    const [addTaskGroupInput, setAddTaskGroupInput] = useState(false);
+
     const [pushNotificationText, setPushNotificationText] = useState("");
 
     const toggleSidebar = () => {
@@ -145,14 +147,7 @@ const Home = () => {
                         </section>
                         
                         <section className="ml-auto self-end transition-all">
-                            <DonutChart
-                                data={chartData}
-                                width={200}
-                                height={200}
-                                innerRadius={90}
-                                outerRadius={100}
-                                
-                            />
+                            google charts
                         </section>
                     </div>
 
@@ -164,21 +159,29 @@ const Home = () => {
                             </h2>
 
                             <ul className="flex flex-col h-70 overflow-scroll gap-3 mb-5">
-                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
-                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
-                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
-                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
-                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
-                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
-                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
-                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
-                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
-                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
-                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
+                                {
+                                    addTaskGroupInput ?
+                                    <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">
+                                        <input autoFocus type="text" id="groupInput" className="w-full !text-black" onKeyDown={(e) => {
+                                            if(e.key === "Enter")
+                                            {
+                                                setAddTaskGroupInput(false);
+                                            }
+                                        }} />
+                                    </li>
+                                    :
+                                    <></>
+                                }
                                 <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
                             </ul>
 
-                            <button className="flex w-auto px-2 items-center rounded border-3 self-center">Добавить</button>
+                            <button onClick={() => {
+                                    setAddTaskGroupInput(!addTaskGroupInput);
+                                }} 
+                                className="flex w-auto px-2 items-center rounded border-3 self-center"
+                            >
+                            Добавить
+                            </button>
                         </section>
 
                         <section className="w-1/2 h-full">
