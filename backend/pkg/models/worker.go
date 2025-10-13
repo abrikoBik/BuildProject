@@ -10,21 +10,19 @@ import (
 
 type Worker struct {
 	gorm.Model
-	Role   string  `json:"role" groups:"public" gorm:"not null"`
+	Role   string  `json:"role" groups:"public,list" gorm:"not null"`
+	User   User    `gorm:"foreignKey:UserID,not null"`
+	UserID uint    `json:"userID" groups:"list" gorm:"not null"`
 	Stages []Stage `gorm:"many2many:stage_workers"`
-	User   User    `gorm:"foreignKey:UserID"`
-	UserID uint    `json:"userID" groups:"list"`
 }
 
 type WorkerRequest struct {
 	*Worker
-	UserID uint
 }
 
 type WorkerResponse struct {
 	*Worker
-	CreatedAt string `json:"registeredAt" groups:"public"`
-	ID        uint   `json:"id" groups:"register"`
+	ID uint `json:"id" groups:"register,list"`
 }
 
 func (worker *Worker) Get(db *gorm.DB, id uint, preloads ...string) error {

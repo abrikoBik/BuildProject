@@ -13,7 +13,7 @@ type Stage struct {
 	Name         string `json:"name" groups:"public,list" gorm:"not null"`
 	Description  string `json:"description" groups:"public"`
 	Status       bool   `json:"status" groups:"public,list" gorm:"not null;default:false"`
-	StageGroupID uint   `json:"groupID" gorm:"not null"`
+	StageGroupID uint   `gorm:"not null"`
 	StartTime    pq.NullTime
 	EndTime      pq.NullTime
 }

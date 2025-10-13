@@ -13,7 +13,7 @@ import (
 type StageGroup struct {
 	gorm.Model
 	Name      string      `json:"name" groups:"public,list" gorm:"not null"`
-	ProjectID uint        `json:"projectID" groups:"public" gorm:"not null"`
+	ProjectID uint        `gorm:"not null"`
 	StartTime pq.NullTime `gorm:"not null"`
 	EndTime   pq.NullTime `gorm:"not null"`
 	Stages    []Stage
@@ -21,18 +21,13 @@ type StageGroup struct {
 
 type StageGroupRequest struct {
 	*StageGroup
-	StartTime int64 `json:"startTime" groups:"public" gorm:"not null"`
-	EndTime   int64 `json:"endTime" groups:"public" gorm:"not null"`
 }
 
 type StageGroupResponse struct {
 	*StageGroup
 	StartTime int64 `json:"startTime" groups:"public"`
 	EndTime   int64 `json:"endTime" groups:"public"`
-	// TODO: is this really needed?
-	CreatedAt int64 `json:"createdAt" groups:"public"`
-
-	ID uint `json:"id" groups:"register,list"`
+	ID        uint  `json:"id" groups:"register,list"`
 }
 
 func (group *StageGroup) Get(db *gorm.DB, id uint, preloads ...string) error {
@@ -45,8 +40,8 @@ func (group *StageGroup) Create(db *gorm.DB, request StageGroupRequest) error {
 		return err
 	}
 	group.Name = request.Name
-	group.StartTime = util.UnmarshalTime(request.StartTime)
-	group.EndTime = util.UnmarshalTime(request.EndTime)
+	// group.StartTime = util.UnmarshalTime(request.StartTime)
+	// group.EndTime = util.UnmarshalTime(request.EndTime)
 	group.ProjectID = project.ID
 	project.StageGroups = append(project.StageGroups, *group)
 	return errors.Join(db.Save(&project).Error, db.Create(&group).Error)
@@ -56,12 +51,12 @@ func (group *StageGroup) Patch(db *gorm.DB, request StageGroupRequest) error {
 	if len(request.Name) > 0 {
 		group.Name = request.Name
 	}
-	if request.StartTime != 0 {
-		group.StartTime = util.UnmarshalTime(request.StartTime)
-	}
-	if request.EndTime != 0 {
-		group.EndTime = util.UnmarshalTime(request.EndTime)
-	}
+	// if request.StartTime != 0 {
+	// 	group.StartTime = util.UnmarshalTime(request.StartTime)
+	// }
+	// if request.EndTime != 0 {
+	// 	group.EndTime = util.UnmarshalTime(request.EndTime)
+	// }
 	return db.Save(&group).Error
 }
 
