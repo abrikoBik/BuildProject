@@ -70,9 +70,6 @@ func (group *EstimateGroup) RemoveEstimate(db *gorm.DB, index int) error {
 }
 
 func (group *EstimateGroup) CalculateCost() (totalCost float64) {
-	if len(group.Estimates) == 0 {
-		return
-	}
 	for _, estimate := range group.Estimates {
 		totalCost += estimate.Cost * float64(estimate.Count)
 	}

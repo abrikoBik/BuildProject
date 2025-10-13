@@ -35,7 +35,7 @@ func GetEstimateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var estimateGroup models.EstimateGroup
-	if errors.Is(estimateGroup.Get(db.Database, estimateGroupID), gorm.ErrRecordNotFound) {
+	if errors.Is(estimateGroup.Get(db.Database, estimateGroupID, "Estimates"), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.EstimateGroupNotFound, http.StatusNotFound)
 		return
 	}
