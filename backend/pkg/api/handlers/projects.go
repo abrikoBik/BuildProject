@@ -66,11 +66,10 @@ func CreateProject(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, l10n.GenericProject, http.StatusInternalServerError)
 		}
 	}
-	// TODO: user.AddProject
-	user.Projects = append(user.Projects, project)
-	if err := db.Database.Save(user).Error; err != nil {
+	if err := user.AddProject(db.Database, project); err != nil {
 		lCreateProject.Error(err)
 		http.Error(w, l10n.GenericUser, http.StatusInternalServerError)
+		return
 	}
 	lCreateProject.Info("%s (id%d) created", project.Name, project.ID)
 	response := models.ProjectResponse{ID: project.ID}

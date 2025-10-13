@@ -69,7 +69,6 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
 		return
 	}
-
 	if r.ParseMultipartForm(consts.MaxAttachmentSize) != nil {
 		lCreateAttachment.Error(err)
 		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
@@ -88,16 +87,12 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
 		return
 	}
-
-	// TODO: project.AddAttachment
-	project.Attachments = append(project.Attachments, attachment)
-	if err := db.Database.Save(&project).Error; err != nil {
+	if err := project.AddAttachment(db.Database, attachment); err != nil {
 		lCreateAttachment.Error(err)
 		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
 		return
 	}
 	lCreateAttachment.Info("id%d saved", project.ID)
-
 	attachmentUUID := attachment.UUID.String()
 	lCreateAttachment.Info("%s created", attachmentUUID)
 	response := models.AttachmentResponse{UUID: attachmentUUID}
