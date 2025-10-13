@@ -286,6 +286,7 @@ const Estimates = () => {
                                 <li key={index}>
                                     <div onClick={() => {
                                         localStorage.setItem("selectedEstimateGroup", item.id.toString());
+                                        getTotalCost();
                                         listEstimates();
                                     }} className="flex flex-row h-18 border-3 justify-center rounded-xl p-3 hover:shadow-[0px_0px_5px_#37515fff] border-palette-color4 ">
                                         <h5 className="self-center">{item.name}</h5>                                    

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
-import DonutChart from "./DonutChart";
 import PushNotification from "./PushNotication";
 import { useWindowSize } from "@uidotdev/usehooks";
 import Calendar from "react-calendar";
