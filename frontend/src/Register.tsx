@@ -21,6 +21,7 @@ const Register = () => {
         login: "",
         name: "",
         email: "",
+        phoneNumber: 0,
         password: "",
     });
 
@@ -28,11 +29,11 @@ const Register = () => {
         if (event.target.name != "checkPass") {
             setUserRequest({
                 ...userRequest,
-                [event.target.name]: event.target.value,
+                [event.target.name]: event.target.name === "phoneNumber" ? parseInt(event.target.value) : event.target.value,
             });
-        } else {
-	    setCheckPass(event.target.value);
-	}
+        } else if(event.target.name === "checkPass"){
+	        setCheckPass(event.target.value);
+	    }
     };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -79,7 +80,7 @@ const Register = () => {
 
                 <form
                     onSubmit={handleSubmit}
-                    className="w-full max-w-[400px] flex flex-col gap-6"
+                    className="w-full max-w-[400px] flex flex-col gap-6 overflow-scroll mt-[10%]"
                 >
                     <div className="flex flex-col gap-0">
                         <label className="flex items-center gap-2">
@@ -122,6 +123,21 @@ const Register = () => {
                             onChange={handleInput}
                             type="text"
                             name="email"
+                            className="w-full"
+                        />
+                    </div>
+
+                    <div className="flex flex-col gap-0">
+                        <label className="flex items-center gap-2">
+                            <span className="material-symbols-outlined">
+                                call
+                            </span>
+                            Номер телефона
+                        </label>
+                        <input
+                            onChange={handleInput}
+                            type="text"
+                            name="phoneNumber"
                             className="w-full"
                         />
                     </div>

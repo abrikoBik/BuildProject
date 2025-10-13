@@ -1,10 +1,13 @@
 import Sidebar from './Sidebar';
 import Header from './Header';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
+import { Value, ProjectRequest } from './types/projects'
+
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import { Value, ProjectRequest } from './types/projects'
 import axios from 'axios';
+import { Map, Marker } from 'pigeon-maps'
+import { osm } from 'pigeon-maps/providers'
 
 const Projects = () => {
     const [userRequest, setUserRequest] = useState<ProjectRequest>({
@@ -19,6 +22,10 @@ const Projects = () => {
     });
 
     const [showPopUp, setShowPopUp] = useState(false);
+
+    const [Longitude, setLongitude] = useState<number>(0);
+    const [Latitude, setLatitude] = useState<number>(0);
+    const [AddressString, setAddress] = useState<string>();
     
     const [projectsList, setProjectsList] = useState<ProjectRequest[]>();
 
@@ -33,13 +40,13 @@ const Projects = () => {
             [e.target.id]: e.target.value,
             userID: parseInt(localStorage.getItem("userID")!),
             startTime: Math.floor((startUpDate as Date).getTime() / 1000),
-            endTime:   Math.floor((endDate as Date).getTime() / 1000)
+            endTime: Math.floor((endDate as Date).getTime() / 1000)
         })
     }
 
     const createProject = async () => {
         try {
-
+            
             console.log(userRequest);
 
             const { data, status } = await axios.post(
@@ -73,6 +80,8 @@ const Projects = () => {
             const project = await axios.delete(
                 `/api/projects/${id}/`
             );
+
+            localStorage.removeItem("selectedProjectID");
 
             if(project.status != 200) {
                 console.error(project.status);
@@ -116,6 +125,37 @@ const Projects = () => {
         window.location.href = '/';
     }
 
+    const handleCoordinates = async () => {
+        try {
+            console.log("Fetching coordinates...");
+            const response = await axios.get(
+                `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(AddressString!)}&format=json`
+            );
+
+            const results = response.data;
+            if (!Array.isArray(results) || results.length === 0) {
+                console.warn("No coordinates found for address:", AddressString);
+                return;
+            }
+
+            const firstResult = results[0];
+            const lat = parseFloat(firstResult.lat);
+            const lon = parseFloat(firstResult.lon);
+
+            setLatitude(lat);
+            setLongitude(lon);
+
+            console.log(`Address is ${AddressString}, lat: ${lat}, lon: ${lon}`);
+
+        } catch (e) {
+            if (e instanceof Error) {
+                console.error("Error fetching coordinates:", e.message);
+            } else {
+                console.error("Unknown error:", e);
+            }
+        }
+    };
+
     useEffect(() => {
         listProjects();
     }, [])
@@ -133,7 +173,7 @@ const Projects = () => {
                             </span>
                         </button>
 
-                        <form action={createProject} className="flex flex-col w-full h-full p-5 gap-5">
+                        <form onSubmit={createProject} className="flex flex-col w-full h-full p-5 gap-5">
                             <div className="flex flex-row gap-2">
                                 <label htmlFor="name" className="!text-black">Название проекта</label>
                                 <input 
@@ -151,6 +191,27 @@ const Projects = () => {
                                 >
 
                                 </textarea>
+                            </div>
+
+                            <div>
+                                <div>Карта</div>
+                                <section>
+                                    <input type="text" onChange={(e : ChangeEvent<HTMLInputElement>) => setAddress(e.target.value)}/>
+                                    <button 
+                                    onClick={handleCoordinates} type="button" className="bg-blue-700 rounded-xl p-2">Добавить метку</button>
+                                </section>
+                                <Map
+                                    provider={osm}
+                                    height={200}
+                                    defaultCenter={[Latitude, Longitude]}
+                                    center={[Latitude, Longitude]}
+                                    defaultZoom={11}
+                                >
+                                    <Marker
+                                        width={50}
+                                        anchor={[Latitude, Longitude]} 
+                                    />
+                                </Map>
                             </div>
 
                             <section className="flex flex-row w-full">
@@ -171,6 +232,7 @@ const Projects = () => {
                             </section>
 
                             <button
+                                type="submit"
                                 className="min-h-10 w-50 flex bg-palette-color4 flex-col items-center justify-center self-center rounded-xl font-semibold text-xl text-white hover:cursor-pointer"
                             >
                                 Создать проект
@@ -188,8 +250,8 @@ const Projects = () => {
                     <h1 className="text-[#1D3266] text-4xl font-bold my-5">Мои проекты</h1>
                     <ul className="flex flex-row w-full gap-5 flex-wrap">
                         {projectsList?.map((item, index) => (
-                            <li className="flex flex-col w-full">
-                                <section key={index} 
+                            <li key={index} className="flex flex-col w-full">
+                                <section
                                     onClick={() => 
                                         {
                                             setProjectMaximize(prev => {
