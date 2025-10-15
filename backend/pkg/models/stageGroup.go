@@ -1,6 +1,7 @@
 package models
 
 import (
+	"log"
 	"mp1/pkg/util"
 	"sort"
 	"time"
@@ -61,9 +62,14 @@ func (group *StageGroup) CalculateTimes(db *gorm.DB) (start time.Time, end time.
 		return
 	}
 	sort.Slice(group.Stages, func(i, j int) bool {
-		return group.Stages[i].StartTime.Time.UnixMilli() > group.Stages[j].StartTime.Time.UnixMilli()
+		return group.Stages[i].StartTime.Time.UnixMilli() < group.Stages[j].StartTime.Time.UnixMilli()
 	})
+	log.Println(group.Stages[0])
 	start = group.Stages[0].StartTime.Time
-	end = group.Stages[len(group.Stages)-1].EndTime.Time
+	sort.Slice(group.Stages, func(i, j int) bool {
+		return group.Stages[i].EndTime.Time.UnixMilli() > group.Stages[j].EndTime.Time.UnixMilli()
+	})
+	log.Println(group.Stages[0])
+	end = group.Stages[0].EndTime.Time
 	return
 }

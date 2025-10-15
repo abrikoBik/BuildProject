@@ -35,12 +35,12 @@ func GetStageGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var stageGroup models.StageGroup
-	if errors.Is(stageGroup.Get(db.Database, stageGroupID), gorm.ErrRecordNotFound) {
+	if errors.Is(stageGroup.Get(db.Database, stageGroupID, "Stages"), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.StageGroupNotFound, http.StatusNotFound)
 		return
 	}
-	lGetStageGroup.Debug("stageGroup", stageGroup)
 	start, end := stageGroup.CalculateTimes(db.Database)
+	lGetStageGroup.Debug("stageGroup", stageGroup, "start", start, "end", end)
 	response := models.StageGroupResponse{
 		StageGroup: &stageGroup,
 		StartTime:  start.Unix(),
@@ -156,10 +156,12 @@ func ListStages(w http.ResponseWriter, r *http.Request) {
 		return stageGroup.Stages[i].UpdatedAt.UnixMilli() > stageGroup.Stages[j].UpdatedAt.UnixMilli()
 	})
 	var response []models.StageResponse
-	for _, e := range stageGroup.Stages {
+	for _, s := range stageGroup.Stages {
 		toAppend := models.StageResponse{
-			Stage: &e,
-			ID:    e.ID,
+			Stage:     &s,
+			ID:        s.ID,
+			StartTime: s.StartTime.Time.Unix(),
+			EndTime:   s.EndTime.Time.Unix(),
 		}
 		response = append(response, toAppend)
 	}

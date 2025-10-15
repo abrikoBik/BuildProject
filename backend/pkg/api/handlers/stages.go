@@ -35,13 +35,14 @@ func GetStage(w http.ResponseWriter, r *http.Request) {
 	if errors.Is(stage.Get(db.Database, stageID), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.StageNotFound, http.StatusNotFound)
 	}
+	lGetStage.Debug("stage", stage)
 	response := models.StageResponse{
 		Stage:     &stage,
 		StartTime: stage.StartTime.Time.Unix(),
 		EndTime:   stage.EndTime.Time.Unix(),
 	}
 	if err := jsonEncode(w, response, "public"); err != nil {
-		lGetStageGroup.Error(err)
+		lGetStage.Error(err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
