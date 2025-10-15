@@ -64,7 +64,6 @@ const Estimates = () => {
     const [estimateAddWindow, setEstimateAddWindow] = useState(false);
 
     const [lineArray, setLineArray] = useState<LineItem[]>([]);
-    
 
     const [pushNotificationText, setPushNotificationText] = useState("");
 
@@ -197,7 +196,7 @@ const Estimates = () => {
                         <section className="w-full h-20 flex flex-row">
                             <div>
                                 <h1 className="text-[#1D3266] font-bold text-4xl">Сметы</h1>
-                                <div className="text-md font-light"> Заказчик: Иванов И. С.</div>
+                                <div className="text-md font-light">{ `Текущая группа смет: ${localStorage.getItem("estimateGroup") ? localStorage.getItem("estimateGroup") : "не выбрана"}` }</div>
                             </div>
                             {!estimateAddWindow ?
                                 <input onClick={() => setEstimateAddWindow(!estimateAddWindow)} type="button" value="Создать группу смет" className="w-60 h-15 hover:cursor-pointer text-center bg-palette-color4 pt-1 rounded-xl font-semibold text-xl text-white self-center ml-auto" />
@@ -244,10 +243,11 @@ const Estimates = () => {
                                         lineArray != null ? lineArray.map((item, index) => (
                                             <li key={index} className="flex flex-row">
                                                 <section className="flex flex-row w-full px-[2%] mb-5 justify-between">
-                                                    <EditableCell value={item.name ? item.name : "-"} textStyle="text-center w-[16%] h-[40px]" inputStyle="!w-[15%] border-2 border-palette-color4 mb-2 text-black text-center" />
-                                                    <EditableCell value={item.unit ? item.unit : "-"} textStyle="text-center w-[16%] h-[40px]"  inputStyle="!w-[15%] border-2 border-palette-color4 mb-2 text-black text-center"/>
-                                                    <EditableCell value={(item.count).toString()} textStyle="text-center w-[16%] h-[40px]"  inputStyle="!w-[15%] border-2 border-palette-color4 mb-2 text-black text-center"/>
-                                                    <EditableCell value={(item.cost).toString()} textStyle="text-center w-[16%] h-[40px]"  inputStyle="!w-[15%] border-2 border-palette-color4 mb-2 text-black text-center"/>
+                                                    {/* TODO: fix sizes */}
+                                                    <EditableCell value={item.name ? item.name : "-"} textStyle="text-center w-[16%] h-[40px] border-2 border-white hover:border-black" inputStyle="!w-[15%] border-2 border-palette-color4 mb-2 text-black text-center" />
+                                                    <EditableCell value={item.unit ? item.unit : "-"} textStyle="text-center w-[16%] h-[40px] border-2 border-white hover:border-black"  inputStyle="!w-[15%] border-2 border-palette-color4 mb-2 text-black text-center"/>
+                                                    <EditableCell value={(item.count).toString()} textStyle="text-center w-[16%] h-[40px] border-2 border-white hover:border-black"  inputStyle="!w-[15%] border-2 border-palette-color4 mb-2 text-black text-center"/>
+                                                    <EditableCell value={(item.cost).toString()} textStyle="text-center w-[16%] h-[40px] border-2 border-white hover:border-black"  inputStyle="!w-[15%] border-2 border-palette-color4 mb-2 text-black text-center"/>
                                                     <div className="text-center w-[16%]">{item.count * item.cost} р</div>
                                                 </section>
                                                 <span onClick={() => handleEstimateDelete(item.id)} className="asbolute right-4 material-symbols-outlined select-none hover:text-red-700">
@@ -286,6 +286,7 @@ const Estimates = () => {
                                 <li key={index}>
                                     <div onClick={() => {
                                         localStorage.setItem("selectedEstimateGroup", item.id.toString());
+                                        localStorage.setItem("estimateGroup", item.name as string);
                                         getTotalCost();
                                         listEstimates();
                                     }} className="flex flex-row h-18 border-3 justify-center rounded-xl p-3 hover:shadow-[0px_0px_5px_#37515fff] border-palette-color4 ">

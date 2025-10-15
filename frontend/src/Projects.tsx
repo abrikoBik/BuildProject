@@ -1,19 +1,27 @@
 import Sidebar from './Sidebar';
 import Header from './Header';
 import { useState, useEffect, ChangeEvent } from 'react';
-import { Value, ProjectRequest } from './types/projects'
+import { ProjectRequest } from './types/projects'
 
-import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import axios from 'axios';
 import { Map, Marker } from 'pigeon-maps'
 import { osm } from 'pigeon-maps/providers'
 
 const Projects = () => {
+    let userID = 0;
+
+    try {
+        userID = JSON.parse(localStorage.getItem("user") as string).userID;
+    } catch (e : unknown) {
+        console.log(e);
+        window.location.href = "/login";
+    }
+
     const [userRequest, setUserRequest] = useState<ProjectRequest>({
         name: "",
         description: "",
-        userID: JSON.parse(localStorage.getItem("user") as string).userID,
+        userID: userID,
         startTime: 1,
         endTime: 1,
         latitude: 0,
@@ -31,17 +39,23 @@ const Projects = () => {
 
     const [maximizedProjects, setProjectMaximize] = useState<boolean[]>();
 
-    const [startUpDate, setStartUpDate] = useState<Value>(new Date());
-    const [endDate, setEndDate] = useState<Value>(new Date());
-
-    const handleInput = (e : React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
-        setUserRequest({
-            ...userRequest,
-            [e.target.id]: e.target.value,
-            userID: parseInt(localStorage.getItem("userID")!),
-            startTime: Math.floor((startUpDate as Date).getTime() / 1000),
-            endTime: Math.floor((endDate as Date).getTime() / 1000)
-        })
+    const handleInput = (e : React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLDataElement>) => {
+        if(e.target.id != "startDate" && e.target.id != "endDate")
+            setUserRequest({
+                ...userRequest,
+                [e.target.id]: e.target.value,
+                userID: parseInt(localStorage.getItem("userID")!),
+            })
+        else if (e.target.id === "startDate")
+            setUserRequest({
+                ...userRequest,
+                startTime: Math.floor((new Date(e.target.value)).getTime() / 1000),
+            })
+        else if (e.target.id === "endDate")
+            setUserRequest({
+                ...userRequest,
+                endTime: Math.floor((new Date(e.target.value)).getTime() / 1000),
+            })
     }
 
     const createProject = async () => {
@@ -108,7 +122,7 @@ const Projects = () => {
             console.log(data);
             
             setProjectsList(data);
-            setProjectMaximize(Array.from({length: data.length}, () => false))
+            setProjectMaximize(Array.from({length: data?.length}, () => false))
 
         } catch (err : unknown) {
             console.log(err);
@@ -122,6 +136,9 @@ const Projects = () => {
 
     const selectProject = (projectID: number) => {
         localStorage.setItem("selectedProjectID", projectID.toString());
+        localStorage.removeItem("estimateGroup");
+        localStorage.removeItem("selectedEstimateGroup");
+
         window.location.href = '/';
     }
 
@@ -166,11 +183,18 @@ const Projects = () => {
 
             { showPopUp ? 
                 <section className="fixed left-0 top-0 w-screen h-screen bg-[rgba(0,0,0,0.4)] z-150">
-                    <div className="flex flex-col relative left-1/2 top-1/2 -translate-1/2 w-[60%] h-[80%] rounded-xl border-2 border-palette-color4 bg-palette-color1 overflow-y-scroll">
+                    <div className="flex flex-col relative left-1/2 top-1/2 -translate-1/2 w-[60%] h-[80%] rounded-xl border-2 border-palette-color4 bg-white overflow-y-scroll">
                         <button onClick={() => setShowPopUp(false)} type="button" className="hover:cursor-pointer hover:text-red-700 w-7 h-7 flex items-center justify-center self-end">
                             <span className="material-symbols-outlined">
                                 close
                             </span>
+                        </button>
+
+                        <button
+                            onClick={createProject}
+                            className="min-h-10 w-50 flex bg-palette-color4 flex-col items-center justify-center self-center rounded-xl font-semibold text-xl text-white hover:cursor-pointer"
+                        >
+                                Создать проект
                         </button>
 
                         <section className="flex flex-col w-full h-full p-5 gap-5">
@@ -193,6 +217,17 @@ const Projects = () => {
                                 </textarea>
                             </div>
 
+                            <section className="flex flex-row w-full">
+                                <div>
+                                    <p>Дата начала проекта</p>
+                                    <input id="startDate" type="date" onChange={handleInput}/>
+                                </div>
+                                <div className="ml-auto">
+                                    <p>Дата конца проекта</p>
+                                    <input id="endDate" type="date" onChange={handleInput}/>
+                                </div>
+                            </section>
+
                             <div>
                                 <div>Карта</div>
                                 <Map
@@ -207,7 +242,7 @@ const Projects = () => {
                                         anchor={[Latitude, Longitude]} 
                                     />
                                 </Map>
-                                <section>
+                                <section className="w-full">
                                     <input 
                                         type="text"
                                         onChange={(e : ChangeEvent<HTMLInputElement>) => setAddress(e.target.value)}
@@ -218,40 +253,17 @@ const Projects = () => {
                                                 handleCoordinates();
                                             }
                                         }}
+                                        className="w-[80%]"
                                     />
                                     <button 
                                         onClick={handleCoordinates}
                                         type="button"
-                                        className="bg-blue-700 rounded-xl p-2"
+                                        className="bg-palette-color4 text-white rounded-xl p-2 w-[20%]"
                                     >
                                     Добавить метку
                                     </button>
                                 </section>
                             </div>
-
-                            <section className="flex flex-row w-full">
-                                <div>
-                                    <p>Дата начала проекта</p>
-                                    <Calendar 
-                                    onChange={setStartUpDate} 
-                                    value={startUpDate}
-                                    />
-                                </div>
-                                <div className="ml-auto">
-                                    <p>Дата конца проекта</p>
-                                    <Calendar 
-                                    onChange={setEndDate}
-                                    value={endDate}
-                                    />
-                                </div>
-                            </section>
-
-                            <button
-                                onClick={createProject}
-                                className="min-h-10 w-50 flex bg-palette-color4 flex-col items-center justify-center self-center rounded-xl font-semibold text-xl text-white hover:cursor-pointer"
-                            >
-                                Создать проект
-                            </button>
                         </section>
                     </div>
                 </section>
@@ -307,7 +319,7 @@ const Projects = () => {
                         <li key={0} className="flex flex-col w-full h-[5vh]">
                             <button
                                 onClick={() => setShowPopUp(true)}
-                                className="h-full w-full flex bg-palette-color4 flex-row items-center justify-center rounded-xl font-semibold text-xl text-white hover:cursor-pointer"
+                                className="h-full w-full flex bg-palette-color4 flex-row items-center justify-center rounded-xl font-semibold text-xl text-white hover:cursor-pointer min-h-10"
                             >
                                 <div>Создать проект</div>
                                 <span className="text-2xl ml-5">+</span>

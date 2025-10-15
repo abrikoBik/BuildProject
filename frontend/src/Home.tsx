@@ -7,8 +7,10 @@ import axios from "axios";
 
 import { ProjectRequest } from "./types/projects";
 import { UserResponse } from "./types/user";
+import { TaskGroup, TaskRequest} from "./types/home";
 
 import GanttChart from "./Gantt";
+import { Chart } from "react-google-charts";
 import Header from "./Header";
 
 type ValuePiece = Date | null;
@@ -17,11 +19,21 @@ type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 const Home = () => {
 
-    const [chartData, setChartData] = useState([
-        { value: 0, color: "#37515f" },
-        { value: 6, color: "#d2d5dd" },
-    ]);
+    const data = [
+        ["xyi", "xyi"],
+        ["Work", 9],
+        ["Eat", 2],
+        ["Commute", 2],
+        ["Watch TV", 2],
+        ["Sleep", 7],
+    ];
 
+    const options = {
+        pieHole: 0.6,
+        legend: 'none',
+        pieSliceText: 'none'
+    };
+    
     const [selectedProject, setSelectedProject] = useState<ProjectRequest>()
 
     const [date, setDate] = useState<Value>(new Date());
@@ -33,6 +45,13 @@ const Home = () => {
     const [showEMail, setEmail] = useState(false);
 
     const [addTaskGroupInput, setAddTaskGroupInput] = useState(false);
+    const [taskGroupsList, setTaskGroupsList] = useState<TaskGroup[]>();
+
+    const [taskData, setTaskData] = useState<TaskRequest>({
+        startTime: 0,
+        endTime: 0,
+        name: "",
+    });
 
     const [pushNotificationText, setPushNotificationText] = useState("");
 
@@ -43,15 +62,6 @@ const Home = () => {
     const pushNotification = (text : string) => {
         setPushNotificationText(text);
     }
-
-    const checkInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const chartMaxValue = chartData[0].value + chartData[1].value;
-        const checked = event.currentTarget.checked;
-        const newData = [...chartData];
-        newData[0].value += checked ? 1 : -1;
-        newData[1].value = chartMaxValue - newData[0].value;
-        setChartData(newData);
-    };
 
     const emailCopy = () => {
         const emailTextElement = document.getElementById("email");
@@ -102,6 +112,103 @@ const Home = () => {
         }
     }
 
+    const taskGroupAdd = async (name : string) => {
+        try {
+            const taskGroup = await axios.post(
+                `api/projects/${localStorage.getItem("selectedProjectID")}/stageGroups`,
+                {"name": name},
+                {
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+            );
+
+            console.log(taskGroup.status, taskGroup.data);
+            listTaskGroups();
+
+        } catch (e : unknown) {
+            console.log(e);
+        }
+    }
+
+    const listTaskGroups = async () => {
+        try {
+            const taskGroup = await axios.get(
+                `api/projects/${localStorage.getItem("selectedProjectID")}/stageGroups`
+            );
+
+            setTaskGroupsList(taskGroup.data);
+        } catch (e : unknown) {
+            console.log(e);
+        }
+    }
+
+    const listTasks = async () => {
+        try {
+            const tasks = await axios.get(
+                `api/projects/${localStorage.getItem("selectedProjectID")}/stageGroups/${localStorage.getItem("selectedStageGroupID")}/stages`
+            )
+
+            console.log(tasks.data);
+        } catch (e : unknown) {
+            console.log(e);
+        }
+    }
+
+    const addTask = async () => {
+        try {
+            const tasks = await axios.post(
+                `api/projects/${localStorage.getItem("selectedProjectID")}/stageGroups/${localStorage.getItem("selectedStageGroupID")}`,
+                taskData,
+                {
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+            )
+
+            console.log(tasks.status);
+            listTasks();
+        } catch (e : unknown) {
+            console.log(e);
+        }
+    }
+
+    const handleTaskInput = (e : React.ChangeEvent<HTMLInputElement | HTMLDataElement>) => {
+        if(e.target.id === "name")
+        {
+            setTaskData({
+                ...taskData, 
+                name: e.target.value,
+            })
+        } else {
+            setTaskData({
+                ...taskData, 
+                startTime: Math.floor((new Date()).getTime() / 1000),
+                endTime: Math.floor((new Date(e.target.value)).getTime() / 1000)
+            })
+        }
+    }
+
+    const deleteTaskGroup = async (id : number) => {
+        try {
+            const taskGroup = await axios.delete(
+                `api/projects/${localStorage.getItem("selectedProjectID")}/stageGroups/${id}/`
+            )
+
+            console.log(taskGroup.status);
+            listTaskGroups();
+        } catch (e : unknown) {
+            console.log(e);
+        }
+    }
+
+    /*const unixDateStampToDate = (unixTimeStamp : number) => {
+        const date = new Date(unixTimeStamp * 1000);
+        return date;
+    }*/
+
     const { width } = useWindowSize();
     const safeWidth = width ?? 1200;
 
@@ -111,6 +218,8 @@ const Home = () => {
 
     useEffect(() => {
         getProject();
+        listTaskGroups();
+        listTasks();
     }, [])
 
     return (
@@ -119,7 +228,6 @@ const Home = () => {
             <PushNotification text={pushNotificationText}/>
             <section className="flex flex-row w-[85vw]  h-[100vh] text-2xl ml-[15%]">
                 <Sidebar show={showSidebar} choice={0}/>
-                {/* Move to Sidebar component */}
                 <button
                     onClick={toggleSidebar}
                     className={`${!showSidebar ? "ml-[-10%]" : "ml-[-50px]"} ${safeWidth <= 1100 ? "" : "hidden"} relative h-10 w-10 bg-palette-color4 rounded-2xl text-white`}
@@ -130,9 +238,8 @@ const Home = () => {
                 <>
                 <div className="w-[85vw] mt-20 max-lg:w-[100vw] text-center">
                     {/* Header info */}
-                    <div className="flex flex-row m-2 items-center rounded-lg border-3 p-2 border-palette-color5">
+                    <div className="flex flex-row m-2 rounded-lg border-3 p-2 border-palette-color5">
                         <section className="justify-self-start text-left ml-5">
-                            {/* Recieve data from backend */}
                             <div className="text-blue-950 font-bold text-3xl mb-5">
                                 {selectedProject?.name}
                             </div>
@@ -141,12 +248,17 @@ const Home = () => {
                                 {user?.name}
                             </div>
 
-                            {/* Recieve data from backend */}
                             <div>Выполняется</div>
                         </section>
                         
                         <section className="ml-auto self-end transition-all">
-                            google charts
+                            <Chart
+                              chartType="PieChart"
+                              data={data}
+                              options={options}
+                              width={"300px"}
+                              height={"300px"}
+                            />
                         </section>
                     </div>
 
@@ -161,9 +273,13 @@ const Home = () => {
                                 {
                                     addTaskGroupInput ?
                                     <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">
-                                        <input autoFocus type="text" id="groupInput" className="w-full !text-black" onKeyDown={(e) => {
+                                        <input autoFocus type="text" id="groupInput" className="w-full !text-black !border-0" onKeyDown={(e) => {
                                             if(e.key === "Enter")
                                             {
+                                                setAddTaskGroupInput(false);
+                                                if(e.currentTarget.value != "")
+                                                    taskGroupAdd(e.currentTarget.value);
+                                            } else if (e.key === "Escape") {
                                                 setAddTaskGroupInput(false);
                                             }
                                         }} />
@@ -171,13 +287,28 @@ const Home = () => {
                                     :
                                     <></>
                                 }
-                                <li className="w-full h-10 items-center flex px-3 border-3 border-palette-color5 rounded-lg">Заливка фундамента 1</li>
+
+                                { taskGroupsList?.map((item, index) => (
+                                    <li 
+                                        key={index}
+                                        onClick={() => {localStorage.setItem("selectedStageGroupID", item.id.toString()); listTaskGroups()}}
+                                        className={`w-full min-h-10 ${item.id === parseInt(localStorage.getItem("selectedStageGroupID")!) ? "bg-yellow-100" : ""} items-center flex px-3 border-3 border-palette-color5 rounded-lg justify-between hover:shadow-[0px_0px_5px_#37515fff]`}
+                                    >
+                                        <div>{item.name}</div>
+                                        <span onClick={() => deleteTaskGroup(item.id)} className="material-symbols-outlined hover:text-red-700 select-none hover:cursor-pointer">
+                                            close
+                                        </span>
+                                    </li>
+                                ))
+                                }
                             </ul>
 
                             <button onClick={() => {
                                     setAddTaskGroupInput(!addTaskGroupInput);
+                                    if((document.getElementById("groupInput") as HTMLInputElement).value)
+                                        taskGroupAdd((document.getElementById("groupInput") as HTMLInputElement).value);
                                 }} 
-                                className="flex w-auto px-2 items-center rounded border-3 self-center"
+                                className="flex w-auto px-2 items-center  active:text-white rounded border-3 self-center bg-palette-color4 active:!bg-[#232c33] text-white border-palette-color4 hover:!bg-white hover:text-black hover:cursor-pointer"
                             >
                             Добавить
                             </button>
@@ -195,61 +326,48 @@ const Home = () => {
                             </section>
 
                             <ul className="flex flex-col self-start gap-3 ml-5">
-                                <li>
-                                    <input
-                                        onChange={checkInput}
-                                        type="checkbox"
-                                        id="1"
-                                        className="mr-2"
-                                    />
-                                    <label htmlFor="1">Заливка фундамента</label>
-                                </li>
-                                <li>
-                                    <input
-                                        onChange={checkInput}
-                                        type="checkbox"
-                                        id="2"
-                                        className="mr-2"
-                                    />
-                                    <label htmlFor="2">Возведение стен</label>
-                                </li>
-                                <li>
-                                    <input
-                                        onChange={checkInput}
-                                        type="checkbox"
-                                        id="3"
-                                        className="mr-2"
-                                    />
-                                    <label htmlFor="3">Монтаж кровли</label>
-                                </li>
-                                <li>
-                                    <input
-                                        onChange={checkInput}
-                                        type="checkbox"
-                                        id="4"
-                                        className="mr-2"
-                                    />
-                                    <label htmlFor="4">Устройство террасы</label>
-                                </li>
-                                <li>
-                                    <input
-                                        onChange={checkInput}
-                                        type="checkbox"
-                                        id="5"
-                                        className="mr-2"
-                                    />
-                                    <label htmlFor="5">Устройство террасы</label>
-                                </li>
-                                <li>
-                                    <input
-                                        onChange={checkInput}
-                                        type="checkbox"
-                                        id="6"
-                                        className="mr-2"
-                                    />
-                                    <label htmlFor="6">Устройство террасы</label>
+                                <li className="flex flex-row justify-between pr-5">
+                                    <section>
+                                        <input
+                                            type="checkbox"
+                                            id="check"
+                                            className="mr-2"
+                                        />
+                                        <label htmlFor="check">Заливка фундамента</label>
+                                    </section>
+                                    <div className="text-gray-500">19/20/2025</div>
                                 </li>
                             </ul>
+                            <section className="flex flex-col gap-3 ml-5">
+                                <div className="w-full">
+                                    <input 
+                                        onKeyDown={(e : React.KeyboardEvent) => {
+                                            if(e.key === "Enter") {
+                                                addTask();
+                                            }
+                                        }}
+                                        type="text"
+                                        id="name"
+                                        onChange={handleTaskInput}
+                                        className="w-[70%]"
+                                    />
+                                    <input
+                                        type="date"
+                                        id="date"
+                                        onChange={handleTaskInput}
+                                    />
+                                </div>
+                                <div>
+                                    <button 
+                                        onClick={() => {
+                                            addTask();
+                                        }}
+                                        className="w-full min-h-10 bg-palette-color4 text-white rounded-xl  hover:!bg-white hover:text-black border-3 border-palette-color4 hover:cursor-pointer active:!bg-[#232c33] active:text-white"
+                                    >
+                                    Добавить задачу
+                                    </button>
+                                </div>
+                            </section>
                         </section>
                     </div>
                     

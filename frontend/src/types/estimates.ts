@@ -16,5 +16,5 @@ export interface EditableCellProps {
 
 export interface EstimateGroup {
     id: number;
-    name: string;
+    name: string | null;
 }

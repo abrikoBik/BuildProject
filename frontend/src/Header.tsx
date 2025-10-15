@@ -55,7 +55,7 @@ const Header = () => {
                     </> :
                     <></> }
                     <div className="w-[120%] h-[1px] -mx-5 my-2 bg-black"></div>
-                    <a href="">Выход</a>
+                    <button onClick={() => {localStorage.clear(); window.location.href = "/login"}} className="w-20 h-10 bg-red-700">Выход</button>
                 </nav>
             </div>
         </header>

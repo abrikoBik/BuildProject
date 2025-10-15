@@ -2,7 +2,7 @@ import { Gantt, Task, ViewMode } from '@rsagiev/gantt-task-react-19';
 import "@rsagiev/gantt-task-react-19/dist/index.css";
 
 const GanttChart = () => {
-    const tasks: Task[] = [
+    const tasks1: Task[] = [
         {
             start: new Date(2020, 1, 1),
             end: new Date(2020, 1, 2),
@@ -58,7 +58,7 @@ const GanttChart = () => {
     return (
         <div className="w-full h-full">
             <Gantt
-                tasks={tasks}
+                tasks={tasks1}
                 viewMode={ViewMode.Week}
                 locale='rus'
                 listCellWidth=''

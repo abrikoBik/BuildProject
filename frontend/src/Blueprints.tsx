@@ -438,8 +438,8 @@ const Blueprints = () => {
                         {/* Карточки чертежей */}
                         {blueprintsArray != null ? blueprintsArray.map((item, index) => (
                             <div key={index} className="flex flex-col h-90 border-2 border-palette-color4 rounded-xl p-4 hover:shadow-md transition-shadow">
-                                <div className="w-full flex justify-end opacity-50 hover:opacity-100 hover:cursor-pointer">
-                                    <button onClick={() => deleteAttachment(item.uuid)} className="w-7 h-7 bg-red-700 rounded-full -mb-10 z-50 flex items-center justify-center">
+                                <div className="w-full flex justify-end hover:cursor-pointer">
+                                    <button onClick={() => deleteAttachment(item.uuid)} className="w-7 h-7 hover:bg-red-700 rounded-full bg-gray-300 opacity-75 -mb-10 z-50 flex items-center justify-center">
                                         <span className="material-symbols-outlined">
                                             close
                                         </span>
