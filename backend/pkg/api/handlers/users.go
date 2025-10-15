@@ -139,8 +139,8 @@ func ListProjects(w http.ResponseWriter, r *http.Request) {
 	for _, p := range user.Projects {
 		toAppend := models.ProjectResponse{
 			Project:   &p,
-			StartTime: util.MarshalTime(p.StartTime),
-			EndTime:   util.MarshalTime(p.EndTime),
+			StartTime: p.StartTime.Time.Unix(),
+			EndTime:   p.EndTime.Time.Unix(),
 			ID:        p.ID,
 		}
 		response = append(response, toAppend)

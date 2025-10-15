@@ -37,8 +37,8 @@ func GetProject(w http.ResponseWriter, r *http.Request) {
 	}
 	response := models.ProjectResponse{
 		Project:   &project,
-		StartTime: util.MarshalTime(project.StartTime),
-		EndTime:   util.MarshalTime(project.EndTime),
+		StartTime: project.StartTime.Time.Unix(),
+		EndTime:   project.EndTime.Time.Unix(),
 	}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lGetProject.Error(err)
@@ -97,8 +97,8 @@ func PatchProject(w http.ResponseWriter, r *http.Request) {
 	lPatchProject.Info("%s (id%d) patched", project.Name, project.ID)
 	response := models.ProjectResponse{
 		Project:   &project,
-		StartTime: util.MarshalTime(project.StartTime),
-		EndTime:   util.MarshalTime(project.EndTime),
+		StartTime: project.StartTime.Time.Unix(),
+		EndTime:   project.EndTime.Time.Unix(),
 	}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lPatchProject.Error(err)
