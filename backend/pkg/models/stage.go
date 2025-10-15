@@ -10,7 +10,6 @@ import (
 type Stage struct {
 	gorm.Model
 	Name         string `json:"name" groups:"public,list" gorm:"not null"`
-	Description  string `json:"description" groups:"public"`
 	Status       bool   `json:"status" groups:"public,list" gorm:"not null;default:false"`
 	StageGroupID uint   `gorm:"not null"`
 	StartTime    pq.NullTime
@@ -19,14 +18,14 @@ type Stage struct {
 
 type StageRequest struct {
 	*Stage
-	StartTime int64 `json:"startTime" groups:"public"`
-	EndTime   int64 `json:"endTime" groups:"public"`
+	StartTime int64 `json:"startTime"`
+	EndTime   int64 `json:"endTime"`
 }
 
 type StageResponse struct {
 	*Stage
-	StartTime int64 `json:"startTime" groups:"public"`
-	EndTime   int64 `json:"endTime" groups:"public"`
+	StartTime int64 `json:"startTime" groups:"public,list"`
+	EndTime   int64 `json:"endTime" groups:"public,list"`
 	ID        uint  `json:"id" groups:"register,list"`
 }
 
@@ -37,7 +36,6 @@ func (stage *Stage) Get(db *gorm.DB, id uint, preloads ...string) error {
 func (stage *Stage) Create(db *gorm.DB, request StageRequest) error {
 	stage.StageGroupID = request.StageGroupID
 	stage.Name = request.Name
-	stage.Description = request.Description
 	stage.StartTime = util.UnmarshalTime(request.StartTime)
 	stage.EndTime = util.UnmarshalTime(request.EndTime)
 	return db.Create(&stage).Error
@@ -51,8 +49,8 @@ func (stage *Stage) Patch(db *gorm.DB, request StageRequest) error {
 	if len(request.Name) > 0 {
 		stage.Name = request.Name
 	}
-	if len(request.Description) > 0 {
-		stage.Description = request.Description
+	if request.Status {
+		stage.Status = request.Status
 	}
 	if request.StartTime != 0 {
 		stage.StartTime = util.UnmarshalTime(request.StartTime)

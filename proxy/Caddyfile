@@ -1,29 +1,33 @@
 (cors) {
-	@cors_preflight method OPTIONS
-
-	header {
-		Access-Control-Allow-Origin "{header.origin}"
-		Vary Origin
-		Access-Control-Expose-Headers "Authorization"
-		Access-Control-Allow-Credentials "true"
-	}
-
-	handle @cors_preflight {
-		header {
-			Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE"
-			Access-Control-Max-Age "3600"
-		}
-		respond "" 204
-	}
+    header {
+        Access-Control-Allow-Origin "{http.request.header.Origin}"
+        Access-Control-Allow-Credentials true
+        Access-Control-Allow-Methods *
+        Access-Control-Allow-Headers DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization
+    }
+    @options {
+        method OPTIONS
+    }
+    @not-options {
+        not method OPTIONS
+    }
 }
 
 # TODO: remove http://
 http://localhost {
-	encode
-	templates
-	import cors http://localhost
-	reverse_proxy frontend:5173
+	log {
+		level ERROR
+	}
 	handle_path /api/* {
 		reverse_proxy backend:3000
+	}	
+	respond @options 204
+	reverse_proxy @not-options frontend:5173 {
+		# header_up Host {upstream_hostport}
+  #       header_up -X-Forwarded-Host
+  #       header_up -X-forwarded-For
+  #       header_up -X-forwarded-Proto
+  #       header_down -Access-Control-Allow-Origin
 	}
+	import cors
 }
