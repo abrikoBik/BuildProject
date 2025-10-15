@@ -64,13 +64,7 @@ func CreateStageGroup(w http.ResponseWriter, r *http.Request) {
 	if !jsonDecode(w, r, &request) {
 		return
 	}
-	var project models.Project
-	// TODO: is this preload really needed?
-	if project.Get(db.Database, projectID, "StageGroups.Stages") != nil {
-		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
-		return
-	}
-	request.ProjectID = project.ID
+	request.ProjectID = projectID
 	var group models.StageGroup
 	if group.Create(db.Database, request) != nil {
 		lCreateStageGroup.Error(err)
@@ -140,14 +134,20 @@ func DeleteStageGroup(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListStages(w http.ResponseWriter, r *http.Request) {
-	id, err := middleware.GetID(middleware.StageGroupID, r.Context())
-	if err != nil {
+	projectID, err1 := middleware.GetID(middleware.ProjectID, r.Context())
+	stageGroupID, err2 := middleware.GetID(middleware.StageGroupID, r.Context())
+	if err := errors.Join(err1, err2); err != nil {
 		lListStages.Error(err)
 		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
 		return
 	}
+	var project models.Project
+	if errors.Is(project.Get(db.Database, projectID), gorm.ErrRecordNotFound) {
+		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
+		return
+	}
 	var stageGroup models.StageGroup
-	if stageGroup.Get(db.Database, id, "Stages") != nil {
+	if stageGroup.Get(db.Database, stageGroupID, "Stages") != nil {
 		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
 		return
 	}
@@ -167,4 +167,5 @@ func ListStages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+	lListStages.Info("%d stage(s) returned", len(stageGroup.Stages))
 }
