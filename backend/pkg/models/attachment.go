@@ -34,7 +34,7 @@ func (attachment *Attachment) Get(db *gorm.DB, id uuid.UUID) error {
 
 func (attachment *Attachment) Create(db *gorm.DB, projectID uint, multipartFile multipart.File, header *multipart.FileHeader) error {
 	var project Project
-	if err := project.Get(db, projectID, "Projects"); err != nil {
+	if err := project.Get(db, projectID); err != nil {
 		return l10n.ProjectNotFoundError
 	}
 	attachment.ProjectID = projectID
