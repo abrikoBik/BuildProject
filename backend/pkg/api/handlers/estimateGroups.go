@@ -151,7 +151,7 @@ func ListEstimates(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sort.Slice(estimateGroup.Estimates, func(i, j int) bool {
-		return estimateGroup.Estimates[i].UpdatedAt.Unix() > estimateGroup.Estimates[j].UpdatedAt.Unix()
+		return estimateGroup.Estimates[i].UpdatedAt.UnixMilli() > estimateGroup.Estimates[j].UpdatedAt.UnixMilli()
 	})
 	var response []models.EstimateResponse
 	for _, e := range estimateGroup.Estimates {

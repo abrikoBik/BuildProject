@@ -133,7 +133,7 @@ func ListProjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sort.Slice(user.Projects, func(i, j int) bool {
-		return user.Projects[i].UpdatedAt.Unix() > user.Projects[j].UpdatedAt.Unix()
+		return user.Projects[i].UpdatedAt.UnixMilli() > user.Projects[j].UpdatedAt.UnixMilli()
 	})
 	var response []models.ProjectResponse
 	for _, p := range user.Projects {

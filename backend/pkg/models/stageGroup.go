@@ -61,7 +61,7 @@ func (group *StageGroup) CalculateTimes(db *gorm.DB) (start time.Time, end time.
 		return
 	}
 	sort.Slice(group.Stages, func(i, j int) bool {
-		return group.Stages[i].StartTime.Time.Unix() > group.Stages[j].StartTime.Time.Unix()
+		return group.Stages[i].StartTime.Time.UnixMilli() > group.Stages[j].StartTime.Time.UnixMilli()
 	})
 	start = group.Stages[0].StartTime.Time
 	end = group.Stages[len(group.Stages)-1].EndTime.Time
