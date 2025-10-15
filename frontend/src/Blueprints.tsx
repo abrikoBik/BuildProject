@@ -66,6 +66,9 @@ import { useCookies } from 'react-cookie';
 
 const Blueprints = () => {
 
+    {/* TODO: remove role from localstorage */}
+    const role = localStorage.getItem("role");
+
     const fileInputRef = useRef<HTMLInputElement>(null);
     const token = useCookies(["access-token"])[0]["access-token"];
 
@@ -413,37 +416,47 @@ const Blueprints = () => {
 
                     <section className="w-full h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {/* Кнопка загрузки - занимает одну ячейку */}
-                        { localStorage.getItem("selectedProjectID") === null ?
-                            <div>Проект не выбран!</div>
+                        {role === "client" ?
+                            <></>
                             :
-                            <div>
-                                <input 
-                                    type="file" 
-                                    ref={fileInputRef}
-                                    onChange={handleFileChange}
-                                    className="hidden absolute"
-                                    multiple
-                                    accept="image/png, image/jpeg, image/jpg"
-                                />
-                                <button
-                                    onClick={handleFileInput}
-                                    className="h-90 w-full flex bg-palette-color4 flex-col items-center justify-center rounded-xl font-semibold text-xl text-white hover:cursor-pointer"
-                                >
-                                    <span className="material-symbols-outlined-huge text-4xl mb-2">upload</span>
-                                    <div>Загрузить файлы</div>
-                                </button>
-                            </div>
+                            <>
+                                { localStorage.getItem("selectedProjectID") === null ?
+                                    <div>Проект не выбран!</div>
+                                    :
+                                    <div>
+                                        <input 
+                                            type="file" 
+                                            ref={fileInputRef}
+                                            onChange={handleFileChange}
+                                            className="hidden absolute"
+                                            multiple
+                                            accept="image/png, image/jpeg, image/jpg"
+                                        />
+                                        <button
+                                            onClick={handleFileInput}
+                                            className="h-90 w-full flex bg-palette-color4 flex-col items-center justify-center rounded-xl font-semibold text-xl text-white hover:cursor-pointer"
+                                        >
+                                            <span className="material-symbols-outlined-huge text-4xl mb-2">upload</span>
+                                            <div>Загрузить файлы</div>
+                                        </button>
+                                    </div>
+                                }
+                            </>
                         }
 
                         {/* Карточки чертежей */}
                         {blueprintsArray != null ? blueprintsArray.map((item, index) => (
                             <div key={index} className="flex flex-col h-90 border-2 border-palette-color4 rounded-xl p-4 hover:shadow-md transition-shadow">
                                 <div className="w-full flex justify-end hover:cursor-pointer">
-                                    <button onClick={() => deleteAttachment(item.uuid)} className="w-7 h-7 hover:bg-red-700 rounded-full bg-gray-300 opacity-75 -mb-10 z-50 flex items-center justify-center">
-                                        <span className="material-symbols-outlined">
-                                            close
-                                        </span>
-                                    </button>
+                                    {role === "client" ?
+                                        <></>
+                                        :
+                                        <button onClick={() => deleteAttachment(item.uuid)} className="w-7 h-7 hover:bg-red-700 rounded-full bg-gray-300 opacity-75 -mb-10 z-50 flex items-center justify-center">
+                                            <span className="material-symbols-outlined">
+                                                close
+                                            </span>
+                                        </button>
+                                    }
                                 </div>
 
                                 <img 
@@ -458,11 +471,6 @@ const Blueprints = () => {
                                     </div>
 
                                     <div className="flex flex-row gap-3 ml-auto mt-auto">
-                                        <button 
-                                                className="w-8 h-8 hover:cursor-pointer rounded-lg bg-gray-300 transition-colors hover:bg-gray-400 flex items-center justify-center"
-                                        >
-                                            <span className="material-symbols-outlined text-base">edit</span>
-                                        </button>
                                         <button onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleDownload(e, item.name)} 
                                                 className="w-8 h-8 hover:cursor-pointer select-none rounded-lg bg-gray-300 transition-colors hover:bg-gray-400 hover:bg-palette-color2 flex items-center justify-center"
                                         >

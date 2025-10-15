@@ -11,6 +11,9 @@ import { osm } from 'pigeon-maps/providers'
 const Projects = () => {
     let userID = 0;
 
+    {/* TODO: remove role from localstorage */}
+    const role = localStorage.getItem("role");
+
     try {
         userID = JSON.parse(localStorage.getItem("user") as string).userID;
     } catch (e : unknown) {
@@ -308,23 +311,31 @@ const Projects = () => {
                                         </>
                                     }
                                 </section>
-                                <button className="absolute right-8 flex justify-flex translate-y-[42%]" onClick={() => deleteProject(item.id)}>
-                                    <span className="material-symbols-outlined select-none hover:text-red-700">
-                                        close
-                                    </span>
-                                </button>
+                                { role === "client" ?
+                                    <></>
+                                    :
+                                    <button className="absolute right-8 flex justify-flex translate-y-[42%]" onClick={() => deleteProject(item.id)}>
+                                        <span className="material-symbols-outlined select-none hover:text-red-700">
+                                            close
+                                        </span>
+                                    </button>
+                                }
                             </li>
                             ))
                         }
-                        <li key={0} className="flex flex-col w-full h-[5vh]">
-                            <button
-                                onClick={() => setShowPopUp(true)}
-                                className="h-full w-full flex bg-palette-color4 flex-row items-center justify-center rounded-xl font-semibold text-xl text-white hover:cursor-pointer min-h-10"
-                            >
-                                <div>Создать проект</div>
-                                <span className="text-2xl ml-5">+</span>
-                            </button>
-                        </li>
+                        { role === "client" ?
+                            <></>
+                            :
+                            <li key={0} className="flex flex-col w-full h-[5vh]">
+                                <button
+                                    onClick={() => setShowPopUp(true)}
+                                    className="h-full w-full flex bg-palette-color4 flex-row items-center justify-center rounded-xl font-semibold text-xl text-white hover:cursor-pointer min-h-10"
+                                >
+                                    <div>Создать проект</div>
+                                    <span className="text-2xl ml-5">+</span>
+                                </button>
+                            </li>
+                        }
                     </ul>
                 </main>
             </div>

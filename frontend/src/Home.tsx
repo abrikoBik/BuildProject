@@ -7,7 +7,7 @@ import axios from "axios";
 
 import { ProjectRequest } from "./types/projects";
 import { UserResponse } from "./types/user";
-import { TaskGroup, TaskRequest} from "./types/home";
+import { TaskGroup, TaskRequest, Task } from "./types/home";
 
 import GanttChart from "./Gantt";
 import { Chart } from "react-google-charts";
@@ -18,6 +18,9 @@ type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 const Home = () => {
+
+    {/* TODO: remove role from localstorage */}
+    const role = localStorage.getItem("role");
 
     const data = [
         ["xyi", "xyi"],
@@ -52,6 +55,8 @@ const Home = () => {
         endTime: 0,
         name: "",
     });
+
+    const [tasksList, setTasksList] = useState<Task[]>()
 
     const [pushNotificationText, setPushNotificationText] = useState("");
 
@@ -146,11 +151,11 @@ const Home = () => {
 
     const listTasks = async () => {
         try {
-            const tasks = await axios.get(
+            const tasks = await axios.get<Task[]>(
                 `api/projects/${localStorage.getItem("selectedProjectID")}/stageGroups/${localStorage.getItem("selectedStageGroupID")}/stages`
             )
 
-            console.log(tasks.data);
+            setTasksList(tasks.data);
         } catch (e : unknown) {
             console.log(e);
         }
@@ -159,7 +164,7 @@ const Home = () => {
     const addTask = async () => {
         try {
             const tasks = await axios.post(
-                `api/projects/${localStorage.getItem("selectedProjectID")}/stageGroups/${localStorage.getItem("selectedStageGroupID")}`,
+                `api/projects/${localStorage.getItem("selectedProjectID")}/stageGroups/${localStorage.getItem("selectedStageGroupID")}/stages`,
                 taskData,
                 {
                     headers: {
@@ -168,14 +173,15 @@ const Home = () => {
                 }
             )
 
-            console.log(tasks.status);
+            console.log(tasks.data);
+            console.log(taskData);
             listTasks();
         } catch (e : unknown) {
             console.log(e);
         }
     }
 
-    const handleTaskInput = (e : React.ChangeEvent<HTMLInputElement | HTMLDataElement>) => {
+    const handleTaskInput = (e : React.ChangeEvent<HTMLInputElement>) => {
         if(e.target.id === "name")
         {
             setTaskData({
@@ -199,15 +205,16 @@ const Home = () => {
 
             console.log(taskGroup.status);
             listTaskGroups();
+            listTasks();
         } catch (e : unknown) {
             console.log(e);
         }
     }
 
-    /*const unixDateStampToDate = (unixTimeStamp : number) => {
+    const unixDateStampToDate = (unixTimeStamp : number) => {
         const date = new Date(unixTimeStamp * 1000);
-        return date;
-    }*/
+        return `${date.getDay()}/${date.getMonth()}/${date.getFullYear()}`;
+    }
 
     const { width } = useWindowSize();
     const safeWidth = width ?? 1200;
@@ -220,6 +227,7 @@ const Home = () => {
         getProject();
         listTaskGroups();
         listTasks();
+        console.log(role);
     }, [])
 
     return (
@@ -291,7 +299,7 @@ const Home = () => {
                                 { taskGroupsList?.map((item, index) => (
                                     <li 
                                         key={index}
-                                        onClick={() => {localStorage.setItem("selectedStageGroupID", item.id.toString()); listTaskGroups()}}
+                                        onClick={() => {localStorage.setItem("selectedStageGroupID", item.id.toString()); listTaskGroups(); listTasks();}}
                                         className={`w-full min-h-10 ${item.id === parseInt(localStorage.getItem("selectedStageGroupID")!) ? "bg-yellow-100" : ""} items-center flex px-3 border-3 border-palette-color5 rounded-lg justify-between hover:shadow-[0px_0px_5px_#37515fff]`}
                                     >
                                         <div>{item.name}</div>
@@ -302,16 +310,19 @@ const Home = () => {
                                 ))
                                 }
                             </ul>
-
-                            <button onClick={() => {
-                                    setAddTaskGroupInput(!addTaskGroupInput);
-                                    if((document.getElementById("groupInput") as HTMLInputElement).value)
-                                        taskGroupAdd((document.getElementById("groupInput") as HTMLInputElement).value);
-                                }} 
-                                className="flex w-auto px-2 items-center  active:text-white rounded border-3 self-center bg-palette-color4 active:!bg-[#232c33] text-white border-palette-color4 hover:!bg-white hover:text-black hover:cursor-pointer"
-                            >
-                            Добавить
-                            </button>
+                            { role === "client" ?
+                                <></>
+                                :
+                                <button onClick={() => {
+                                        setAddTaskGroupInput(!addTaskGroupInput);
+                                        if((document.getElementById("groupInput") as HTMLInputElement).value)
+                                            taskGroupAdd((document.getElementById("groupInput") as HTMLInputElement).value);
+                                    }} 
+                                    className="flex w-auto px-2 items-center  active:text-white rounded border-3 self-center bg-palette-color4 active:!bg-[#232c33] text-white border-palette-color4 hover:!bg-white hover:text-black hover:cursor-pointer"
+                                >
+                                Добавить
+                                </button>
+                            }
                         </section>
 
                         <section className="w-1/2 h-full">
@@ -325,49 +336,72 @@ const Home = () => {
                                 </h2>
                             </section>
 
-                            <ul className="flex flex-col self-start gap-3 ml-5">
-                                <li className="flex flex-row justify-between pr-5">
-                                    <section>
-                                        <input
-                                            type="checkbox"
-                                            id="check"
-                                            className="mr-2"
-                                        />
-                                        <label htmlFor="check">Заливка фундамента</label>
-                                    </section>
-                                    <div className="text-gray-500">19/20/2025</div>
-                                </li>
+                            <ul className="flex flex-col h-[30vh] self-start gap-3 ml-5 overflow-scroll">
+                                { tasksList?.map((item, index) => (
+                                        <li key={index} className="flex flex-row justify-between pr-5">
+                                            <section>
+                                                { role === "client" ?
+                                                <input type="checkbox" id="checked" checked={item.status} disabled className="mr-2"/>
+                                                :
+                                                <input
+                                                    type="checkbox"
+                                                    id="check"
+                                                    checked={item.status}
+                                                    onChange={async (e : React.ChangeEvent<HTMLInputElement>) => 
+                                                        {
+                                                            await axios.patch(
+                                                                `api/projects/${localStorage.getItem("selectedProjectID")}/stageGroups/${localStorage.getItem("selectedStageGroupID")}/stages/${item.id}`,
+                                                                {...item, status: e.target.value === "on"}
+                                                            )
+
+                                                            listTasks();
+                                                            console.log(tasksList);
+                                                        }}
+                                                    className="mr-2"
+                                                />
+                                                }
+                                                <label htmlFor="check">{item.name}</label>
+                                            </section>
+                                            <div className="text-gray-500">{`${unixDateStampToDate(item.startTime)} -> ${unixDateStampToDate(item.endTime)}`}</div>
+                                        </li>
+                                    ))
+                                }
                             </ul>
-                            <section className="flex flex-col gap-3 ml-5">
-                                <div className="w-full">
-                                    <input 
-                                        onKeyDown={(e : React.KeyboardEvent) => {
-                                            if(e.key === "Enter") {
+                            { role === "client" 
+                                ?
+                                <></>
+                                :
+                                <section className="flex flex-col gap-3 ml-5">
+                                    <div className="w-full">
+                                        <input 
+                                            onKeyDown={(e : React.KeyboardEvent) => {
+                                                if(e.key === "Enter") {
+                                                    addTask();
+                                                }
+                                            }}
+                                            type="text"
+                                            id="name"
+                                            onChange={handleTaskInput}
+                                            className="w-[70%]"
+                                        />
+                                        <input
+                                            type="date"
+                                            id="date"
+                                            onChange={handleTaskInput}
+                                        />
+                                    </div>
+                                    <div>
+                                        <button 
+                                            onClick={() => {
                                                 addTask();
-                                            }
-                                        }}
-                                        type="text"
-                                        id="name"
-                                        onChange={handleTaskInput}
-                                        className="w-[70%]"
-                                    />
-                                    <input
-                                        type="date"
-                                        id="date"
-                                        onChange={handleTaskInput}
-                                    />
-                                </div>
-                                <div>
-                                    <button 
-                                        onClick={() => {
-                                            addTask();
-                                        }}
-                                        className="w-full min-h-10 bg-palette-color4 text-white rounded-xl  hover:!bg-white hover:text-black border-3 border-palette-color4 hover:cursor-pointer active:!bg-[#232c33] active:text-white"
-                                    >
-                                    Добавить задачу
-                                    </button>
-                                </div>
-                            </section>
+                                            }}
+                                            className="w-full min-h-10 bg-palette-color4 text-white rounded-xl  hover:!bg-white hover:text-black border-3 border-palette-color4 hover:cursor-pointer active:!bg-[#232c33] active:text-white"
+                                        >
+                                        Добавить задачу
+                                        </button>
+                                    </div>
+                                </section>
+                            }
                         </section>
                     </div>
                     
@@ -377,39 +411,41 @@ const Home = () => {
                         </div>
                         <Calendar onChange={setDate} value={date}/>
                     </div>
-
-                    {/* Contact panel */}
-                    <div className="flex flex-row m-2 items-center rounded-lg border-3 border-palette-color5 text-left p-4">
-                        <div className="text-blue-950 font-bold">
-                            Связь с клиентом:
+                    { role === "client" ?
+                        <></>
+                        :
+                        <div className="flex flex-row m-2 items-center rounded-lg border-3 border-palette-color5 text-left p-4">
+                            <div className="text-blue-950 font-bold">
+                                Связь с клиентом:
+                            </div>
+                            <section className="ml-[30%] flex flex-row gap-20">
+                                <section className="flex flex-row ml-auto items-center">
+                                    <div id="number" className={`absolute ${showNumber ? "" : "pointer-events-none"} select-none text-center justify-self-center transition-opacity duration-300 ${showNumber ? "opacity-100" : "opacity-0"}`}>
+                                        {user?.phoneNumber}
+                                    </div>
+                                    <input
+                                        data-copy-to-clipboard-target="number"
+                                        onClick={() => numberCopy()}
+                                        type="button"
+                                        value="Показать номер"
+                                        className={`border-2 border-blue-950 p-2 rounded-xl transition-opacity duration-300 ${showNumber ? "opacity-0" : "opacity-100"}`}
+                                    />
+                                </section>
+                                <section className="flex flex-row items-center overflow-x-scroll">
+                                    <div id="email" className={`absolute ${showEMail ? "" : "pointer-events-none"} select-none text-center justify-self-center transition-opacity duration-300 ${showEMail ? "opacity-100" : "opacity-0"}`}>
+                                        {user?.email}
+                                    </div>
+                                    <input
+                                        data-copy-to-clipboard-target="email"
+                                        onClick={() => emailCopy()}
+                                        type="button"
+                                        value="Показать почту"
+                                        className={`border-2 border-blue-950 p-2 rounded-xl transition-opacity duration-300 ${showEMail ? "opacity-0" : "opacity-100"}`}
+                                    />
+                                </section>
+                            </section>
                         </div>
-                        <section className="ml-[30%] flex flex-row gap-20">
-                            <section className="flex flex-row ml-auto items-center">
-                                <div id="number" className={`absolute ${showNumber ? "" : "pointer-events-none"} select-none text-center justify-self-center transition-opacity duration-300 ${showNumber ? "opacity-100" : "opacity-0"}`}>
-                                    {user?.phoneNumber}
-                                </div>
-                                <input
-                                    data-copy-to-clipboard-target="number"
-                                    onClick={() => numberCopy()}
-                                    type="button"
-                                    value="Показать номер"
-                                    className={`border-2 border-blue-950 p-2 rounded-xl transition-opacity duration-300 ${showNumber ? "opacity-0" : "opacity-100"}`}
-                                />
-                            </section>
-                            <section className="flex flex-row items-center overflow-x-scroll">
-                                <div id="email" className={`absolute ${showEMail ? "" : "pointer-events-none"} select-none text-center justify-self-center transition-opacity duration-300 ${showEMail ? "opacity-100" : "opacity-0"}`}>
-                                    {user?.email}
-                                </div>
-                                <input
-                                    data-copy-to-clipboard-target="email"
-                                    onClick={() => emailCopy()}
-                                    type="button"
-                                    value="Показать почту"
-                                    className={`border-2 border-blue-950 p-2 rounded-xl transition-opacity duration-300 ${showEMail ? "opacity-0" : "opacity-100"}`}
-                                />
-                            </section>
-                        </section>
-                    </div>
+                    }
 
                     {/* Empty div */}
                     <div className="w-full h-5"></div>

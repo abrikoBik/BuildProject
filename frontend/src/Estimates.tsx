@@ -53,6 +53,10 @@ const EditableCell = ({ value, onSave, onChange, textStyle, inputStyle }: Editab
 };
 
 const Estimates = () => {
+
+    {/* TODO: remove role from localstorage */}
+    const role = localStorage.getItem("role");
+
     const [formData, setFormData] = useState<LineItem>({
         id: 0,
         name: '',
@@ -198,34 +202,40 @@ const Estimates = () => {
                                 <h1 className="text-[#1D3266] font-bold text-4xl">Сметы</h1>
                                 <div className="text-md font-light">{ `Текущая группа смет: ${localStorage.getItem("estimateGroup") ? localStorage.getItem("estimateGroup") : "не выбрана"}` }</div>
                             </div>
-                            {!estimateAddWindow ?
-                                <input onClick={() => setEstimateAddWindow(!estimateAddWindow)} type="button" value="Создать группу смет" className="w-60 h-15 hover:cursor-pointer text-center bg-palette-color4 pt-1 rounded-xl font-semibold text-xl text-white self-center ml-auto" />
+                            { role === "client" ?
+                                <></>
                                 :
-                                <section className="mr-5 ml-auto my-auto">
-                                    <input 
-                                        type="text"
-                                        id="estimateGroupName"
-                                        autoFocus
-                                        className="!border-3 mr-5"
-                                        onKeyDown={(e) => {
-                                            if(e.key == "Enter") {
-                                                setEstimateAddWindow(!estimateAddWindow);
-                                                addGroup(e.currentTarget.value);
-                                            }
-                                        }}
-                                    />
-
-                                    <label htmlFor="estimateGroupName" className="!text-black">
-                                        <button 
-                                            onClick={() => {
-                                                setEstimateAddWindow(!estimateAddWindow);
-                                                addGroup((document.getElementById("estimateGroupName") as HTMLInputElement).value);
-                                            }} 
-                                            className="bg-palette-color4 text-white rounded-lg p-1 px-2">
-                                                Добавить группу
-                                        </button>
-                                    </label>
-                                </section>
+                                <>
+                                {!estimateAddWindow ?
+                                    <input onClick={() => setEstimateAddWindow(!estimateAddWindow)} type="button" value="Создать группу смет" className="w-60 h-15 hover:cursor-pointer text-center bg-palette-color4 pt-1 rounded-xl font-semibold text-xl text-white self-center ml-auto" />
+                                    :
+                                    <section className="mr-5 ml-auto my-auto">
+                                        <input 
+                                            type="text"
+                                            id="estimateGroupName"
+                                            autoFocus
+                                            className="!border-3 mr-5"
+                                            onKeyDown={(e) => {
+                                                if(e.key == "Enter") {
+                                                    setEstimateAddWindow(!estimateAddWindow);
+                                                    addGroup(e.currentTarget.value);
+                                                }
+                                            }}
+                                        />
+    
+                                        <label htmlFor="estimateGroupName" className="!text-black">
+                                            <button 
+                                                onClick={() => {
+                                                    setEstimateAddWindow(!estimateAddWindow);
+                                                    addGroup((document.getElementById("estimateGroupName") as HTMLInputElement).value);
+                                                }} 
+                                                className="bg-palette-color4 text-white rounded-lg p-1 px-2">
+                                                    Добавить группу
+                                            </button>
+                                        </label>
+                                    </section>
+                                }
+                                </>
                             }
                         </section>
 
@@ -250,25 +260,34 @@ const Estimates = () => {
                                                     <EditableCell value={(item.cost).toString()} textStyle="text-center w-[16%] h-[40px] border-2 border-white hover:border-black"  inputStyle="!w-[15%] border-2 border-palette-color4 mb-2 text-black text-center"/>
                                                     <div className="text-center w-[16%]">{item.count * item.cost} р</div>
                                                 </section>
-                                                <span onClick={() => handleEstimateDelete(item.id)} className="asbolute right-4 material-symbols-outlined select-none hover:text-red-700">
-                                                    close
-                                                </span>
+                                                { role === "client" ?
+                                                    <></>
+                                                    :
+                                                    <span onClick={() => handleEstimateDelete(item.id)} className="asbolute right-4 material-symbols-outlined select-none hover:text-red-700">
+                                                        close
+                                                    </span>
+                                                }
                                             </li>
                                         ))
                                         :
                                         <>
                                         </>
                                     }
-                                    <form className="flex flex-col items-center w-full">
-                                        <section className="flex flex-row justify-between w-full px-[2%] mb-5">
-                                            <input id="name" type="text" onChange={handleInput} className="!w-[15%] border-2 border-palette-color4 mb-2 text-black"/>
-                                            <input id="unit" type="text" onChange={handleInput} className="!w-[15%] border-2 border-palette-color4 mb-2"/>
-                                            <input id="count" onChange={handleInput} type="text" className="!w-[15%] border-2 border-palette-color4 mb-2"/>
-                                            <input id="cost" onChange={handleInput} type="text" className="!w-[15%] border-2 border-palette-color4 mb-2"/>
-                                            <div className="self-center w-[15%] text-center" id="cost">{formData.count * formData.cost} р</div>
-                                        </section>
-                                        <input onClick={handleAppending} type="button" value="Добавить строку" className="w-40 h-10 min-h-10 hover:cursor-pointer bg-palette-color4 text-white rounded-lg"/>
-                                    </form>
+                                    { role === "client" 
+                                        ?   
+                                        <></>
+                                        :
+                                        <form className="flex flex-col items-center w-full">
+                                            <section className="flex flex-row justify-between w-full px-[2%] mb-5">
+                                                <input id="name" type="text" onChange={handleInput} className="!w-[15%] border-2 border-palette-color4 mb-2 text-black"/>
+                                                <input id="unit" type="text" onChange={handleInput} className="!w-[15%] border-2 border-palette-color4 mb-2"/>
+                                                <input id="count" onChange={handleInput} type="text" className="!w-[15%] border-2 border-palette-color4 mb-2"/>
+                                                <input id="cost" onChange={handleInput} type="text" className="!w-[15%] border-2 border-palette-color4 mb-2"/>
+                                                <div className="self-center w-[15%] text-center" id="cost">{formData.count * formData.cost} р</div>
+                                            </section>
+                                            <input onClick={handleAppending} type="button" value="Добавить строку" className="w-40 h-10 min-h-10 hover:cursor-pointer bg-palette-color4 text-white rounded-lg"/>
+                                        </form>
+                                    }
                                 </ul>
                             </section>
                             <ul className="flex flex-row bold-child relative items-center z-0 rounded-b-xl mt-[-40px] w-full h-10 border-2 border-x-0 border-b-0 border-palette-color4 px-[2%]">

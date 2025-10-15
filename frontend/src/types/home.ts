@@ -8,3 +8,11 @@ export interface TaskRequest {
     endTime: number;
     name: string;
 }
+
+export interface Task {
+    id: number;
+    name: string;
+    startTime: number;
+    endTime: number;
+    status: boolean;
+}
