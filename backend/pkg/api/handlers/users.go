@@ -33,7 +33,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
-	response := models.UserResponse{User: &user, CreatedAt: user.CreatedAt.String()}
+	response := models.UserResponse{User: &user}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lGetUser.Error(err)
 		return
@@ -112,7 +112,7 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	lPatchUser.Info("%s (id%d) patched", user.Name, user.ID)
-	response := models.UserResponse{User: &user, CreatedAt: user.CreatedAt.String()}
+	response := models.UserResponse{User: &user}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lPatchUser.Error(err)
 		return
@@ -139,8 +139,8 @@ func ListProjects(w http.ResponseWriter, r *http.Request) {
 	for _, p := range user.Projects {
 		toAppend := models.ProjectResponse{
 			Project:   &p,
-			StartTime: util.MarshalTime(p.StartTime),
-			EndTime:   util.MarshalTime(p.EndTime),
+			StartTime: p.StartTime.Time.Unix(),
+			EndTime:   p.EndTime.Time.Unix(),
 			ID:        p.ID,
 		}
 		response = append(response, toAppend)

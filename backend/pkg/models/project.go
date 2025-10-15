@@ -31,10 +31,9 @@ type ProjectRequest struct {
 
 type ProjectResponse struct {
 	*Project
-	StartTime int64  `json:"startTime" groups:"public,list" gorm:"not null"`
-	EndTime   int64  `json:"endTime" groups:"public,list" gorm:"not null"`
-	CreatedAt string `json:"createdAt" groups:"public"`
-	ID        uint   `json:"id" groups:"register,list"`
+	StartTime int64 `json:"startTime" groups:"public,list" gorm:"not null"`
+	EndTime   int64 `json:"endTime" groups:"public,list" gorm:"not null"`
+	ID        uint  `json:"id" groups:"register,list"`
 }
 
 func (project *Project) Get(db *gorm.DB, id uint, preloads ...string) error {
@@ -102,25 +101,5 @@ func (project *Project) Patch(db *gorm.DB, request ProjectRequest) error {
 	if request.EndTime != 0 {
 		project.EndTime = util.UnmarshalTime(request.EndTime)
 	}
-	return db.Save(&project).Error
-}
-
-func (project *Project) AddWorker(db *gorm.DB, worker Worker) error {
-	project.Workers = append(project.Workers, worker)
-	return db.Save(&project).Error
-}
-
-func (project *Project) AddAttachment(db *gorm.DB, attachment Attachment) error {
-	project.Attachments = append(project.Attachments, attachment)
-	return db.Save(&project).Error
-}
-
-func (project *Project) AddStageGroup(db *gorm.DB, group StageGroup) error {
-	project.StageGroups = append(project.StageGroups, group)
-	return db.Save(&project).Error
-}
-
-func (project *Project) AddEstimateGroup(db *gorm.DB, group EstimateGroup) error {
-	project.EstimateGroups = append(project.EstimateGroups, group)
 	return db.Save(&project).Error
 }

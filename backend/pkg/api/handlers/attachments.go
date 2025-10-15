@@ -37,7 +37,6 @@ func GetAttachment(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.AttachmentNotFound, http.StatusNotFound)
 		return
 	}
-
 	attachmentPath := filepath.Join(consts.AttachmentPath, attachment.UUID.String())
 	f, err := os.Open(attachmentPath)
 	if err != nil {
@@ -52,7 +51,6 @@ func GetAttachment(w http.ResponseWriter, r *http.Request) {
 		lGetAttachment.Error(err)
 		return
 	}
-
 	w.WriteHeader(http.StatusOK)
 	lGetAttachment.Info("%s returned", attachment.UUID.String())
 }
@@ -69,31 +67,25 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
 		return
 	}
-
-	util.Check(r.ParseMultipartForm(consts.MaxAttachmentSize))
+	if r.ParseMultipartForm(consts.MaxAttachmentSize) != nil {
+		lCreateAttachment.Error(err)
+		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
+		return
+	}
 	file, header, err := r.FormFile(consts.AttachmentMultipartKey)
 	if err != nil {
 		lCreateAttachment.Error(err)
 		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
 		return
 	}
-	defer util.Check(file.Close())
+	defer file.Close()
 	var attachment models.Attachment
 	if err := attachment.Create(db.Database, projectID, file, header); err != nil {
 		lCreateAttachment.Error(err)
 		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
 		return
 	}
-
-	// TODO: project.AddAttachment
-	project.Attachments = append(project.Attachments, attachment)
-	if err := db.Database.Save(&project).Error; err != nil {
-		lCreateAttachment.Error(err)
-		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
-		return
-	}
 	lCreateAttachment.Info("id%d saved", project.ID)
-
 	attachmentUUID := attachment.UUID.String()
 	lCreateAttachment.Info("%s created", attachmentUUID)
 	response := models.AttachmentResponse{UUID: attachmentUUID}

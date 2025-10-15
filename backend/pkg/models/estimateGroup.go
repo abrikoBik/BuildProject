@@ -1,10 +1,7 @@
 package models
 
 import (
-	"errors"
-	"mp1/pkg/l10n"
 	"mp1/pkg/util"
-	"slices"
 
 	"gorm.io/gorm"
 )
@@ -37,7 +34,7 @@ func (group *EstimateGroup) Create(db *gorm.DB, request EstimateGroupRequest) er
 	}
 	group.Name = request.Name
 	group.ProjectID = project.ID
-	return errors.Join(db.Create(&group).Error, project.AddEstimateGroup(db, *group))
+	return db.Create(&group).Error
 }
 
 func (group *EstimateGroup) Patch(db *gorm.DB, request EstimateGroupRequest) error {
@@ -54,19 +51,6 @@ func (group *EstimateGroup) Delete(db *gorm.DB) error {
 		}
 	}
 	return db.Delete(&group).Error
-}
-
-func (group *EstimateGroup) AddEstimate(db *gorm.DB, estimate Estimate) error {
-	group.Estimates = append(group.Estimates, estimate)
-	return db.Save(&group).Error
-}
-
-func (group *EstimateGroup) RemoveEstimate(db *gorm.DB, index int) error {
-	if index < 0 || index >= len(group.Estimates) {
-		return l10n.OutOfBoundsError
-	}
-	group.Estimates = slices.Delete(group.Estimates, index, index+1)
-	return db.Save(&group).Error
 }
 
 func (group *EstimateGroup) CalculateCost() (totalCost float64) {

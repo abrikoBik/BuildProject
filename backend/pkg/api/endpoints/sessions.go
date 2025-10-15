@@ -10,6 +10,5 @@ import (
 func AddSessions(r chi.Router, jwtKey []byte) {
 	r.Route("/sessions", func(r chi.Router) {
 		r.With(middleware.JSONResponse).Post("/", handlers.CreateSession)
-		r.Delete("/", handlers.DeleteSession)
 	})
 }

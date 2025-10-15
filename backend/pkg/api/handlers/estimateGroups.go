@@ -48,7 +48,7 @@ func GetEstimateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	lGetEstimateGroup.Info("id%d returned", project.ID)
+	lGetEstimateGroup.Info("id%d returned", estimateGroup.ID)
 }
 
 func CreateEstimateGroup(w http.ResponseWriter, r *http.Request) {
@@ -62,13 +62,7 @@ func CreateEstimateGroup(w http.ResponseWriter, r *http.Request) {
 	if !jsonDecode(w, r, &request) {
 		return
 	}
-	var project models.Project
-	// TODO: is this preload really needed?
-	if project.Get(db.Database, projectID, "EstimateGroups.Estimates") != nil {
-		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
-		return
-	}
-	request.ProjectID = project.ID
+	request.ProjectID = projectID
 	var group models.EstimateGroup
 	if group.Create(db.Database, request) != nil {
 		lCreateEstimateGroup.Error(err)
@@ -139,15 +133,20 @@ func DeleteEstimateGroup(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListEstimates(w http.ResponseWriter, r *http.Request) {
-	// TODO: also check if project exists? (might not be needed)
-	id, err := middleware.GetID(middleware.EstimateGroupID, r.Context())
-	if err != nil {
+	projectID, err1 := middleware.GetID(middleware.ProjectID, r.Context())
+	estimateGroupID, err2 := middleware.GetID(middleware.EstimateGroupID, r.Context())
+	if err := errors.Join(err1, err2); err != nil {
 		lListEstimates.Error(err)
 		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
 		return
 	}
+	var project models.Project
+	if errors.Is(project.Get(db.Database, projectID), gorm.ErrRecordNotFound) {
+		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
+		return
+	}
 	var estimateGroup models.EstimateGroup
-	if estimateGroup.Get(db.Database, id, "Estimates") != nil {
+	if estimateGroup.Get(db.Database, estimateGroupID, "Estimates") != nil {
 		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
 		return
 	}
@@ -167,4 +166,5 @@ func ListEstimates(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+	lListEstimates.Info("%d estimate(s) returned", len(estimateGroup.Estimates))
 }

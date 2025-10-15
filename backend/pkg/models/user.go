@@ -34,8 +34,7 @@ type UserRequest struct {
 
 type UserResponse struct {
 	*User
-	CreatedAt string `json:"registeredAt" groups:"public"`
-	ID        uint   `json:"id" groups:"register"`
+	ID uint `json:"id" groups:"register"`
 }
 
 func (user *User) Get(db *gorm.DB, id uint, preloads ...string) error {

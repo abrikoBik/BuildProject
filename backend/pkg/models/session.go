@@ -47,9 +47,12 @@ func (session *Session) Create(db *gorm.DB, request SessionRequest, jwtKey []byt
 	}
 	session.UserID = user.ID
 	session.Token = token
-	result := db.Create(&session)
-	if result.Error != nil {
-		return result.Error
+	if err = db.Create(&session).Error; err != nil {
+		return err
 	}
 	return nil
+}
+
+func (session *Session) Delete(db *gorm.DB) error {
+	return db.Delete(session).Error
 }

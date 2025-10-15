@@ -37,8 +37,8 @@ func GetStage(w http.ResponseWriter, r *http.Request) {
 	}
 	response := models.StageResponse{
 		Stage:     &stage,
-		StartTime: util.MarshalTime(stage.StartTime),
-		EndTime:   util.MarshalTime(stage.EndTime),
+		StartTime: stage.StartTime.Time.Unix(),
+		EndTime:   stage.EndTime.Time.Unix(),
 	}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lGetStageGroup.Error(err)

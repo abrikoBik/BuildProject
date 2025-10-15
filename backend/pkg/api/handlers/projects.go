@@ -37,9 +37,8 @@ func GetProject(w http.ResponseWriter, r *http.Request) {
 	}
 	response := models.ProjectResponse{
 		Project:   &project,
-		StartTime: util.MarshalTime(project.StartTime),
-		EndTime:   util.MarshalTime(project.EndTime),
-		CreatedAt: project.CreatedAt.String(),
+		StartTime: project.StartTime.Time.Unix(),
+		EndTime:   project.EndTime.Time.Unix(),
 	}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lGetProject.Error(err)
@@ -54,11 +53,6 @@ func CreateProject(w http.ResponseWriter, r *http.Request) {
 	if !jsonDecode(w, r, &request) {
 		return
 	}
-	var user models.User
-	if user.Get(db.Database, request.UserID, "Projects") != nil {
-		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
-		return
-	}
 	var project models.Project
 	if err := project.Create(db.Database, request); err != nil {
 		lCreateProject.Error(err)
@@ -66,12 +60,6 @@ func CreateProject(w http.ResponseWriter, r *http.Request) {
 		default:
 			http.Error(w, l10n.GenericProject, http.StatusInternalServerError)
 		}
-	}
-	// TODO: user.AddProject
-	user.Projects = append(user.Projects, project)
-	if err := db.Database.Save(user).Error; err != nil {
-		lCreateProject.Error(err)
-		http.Error(w, l10n.GenericUser, http.StatusInternalServerError)
 	}
 	lCreateProject.Info("%s (id%d) created", project.Name, project.ID)
 	response := models.ProjectResponse{ID: project.ID}
@@ -109,9 +97,8 @@ func PatchProject(w http.ResponseWriter, r *http.Request) {
 	lPatchProject.Info("%s (id%d) patched", project.Name, project.ID)
 	response := models.ProjectResponse{
 		Project:   &project,
-		StartTime: util.MarshalTime(project.StartTime),
-		EndTime:   util.MarshalTime(project.EndTime),
-		CreatedAt: project.CreatedAt.String(),
+		StartTime: project.StartTime.Time.Unix(),
+		EndTime:   project.EndTime.Time.Unix(),
 	}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lPatchProject.Error(err)
