@@ -49,7 +49,7 @@ func (stage *Stage) Patch(db *gorm.DB, request StageRequest) error {
 	if len(request.Name) > 0 {
 		stage.Name = request.Name
 	}
-	if request.Status {
+	if request.Status != stage.Status {
 		stage.Status = request.Status
 	}
 	if request.StartTime != 0 {
