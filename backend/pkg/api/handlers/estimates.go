@@ -71,7 +71,6 @@ func CreateEstimate(w http.ResponseWriter, r *http.Request) {
 	}
 	lCreateEstimate.Debug("estimate", estimate)
 	lCreateEstimate.Info("%s (id%d) created", estimate.Name, estimate.ID)
-	// TODO: fix id = 0
 	response := models.EstimateResponse{ID: estimate.ID}
 	if err := jsonEncode(w, response, "register"); err != nil {
 		lCreateEstimate.Error(err)

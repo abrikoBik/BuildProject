@@ -103,9 +103,3 @@ func (project *Project) Patch(db *gorm.DB, request ProjectRequest) error {
 	}
 	return db.Save(&project).Error
 }
-
-// TODO: remove?
-func (project *Project) AddWorker(db *gorm.DB, worker Worker) error {
-	project.Workers = append(project.Workers, worker)
-	return db.Save(&project).Error
-}
