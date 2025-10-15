@@ -53,11 +53,6 @@ func CreateProject(w http.ResponseWriter, r *http.Request) {
 	if !jsonDecode(w, r, &request) {
 		return
 	}
-	// var user models.User
-	// if user.Get(db.Database, request.UserID, "Projects") != nil {
-	// 	http.Error(w, l10n.UserNotFound, http.StatusNotFound)
-	// 	return
-	// }
 	var project models.Project
 	if err := project.Create(db.Database, request); err != nil {
 		lCreateProject.Error(err)
@@ -66,11 +61,6 @@ func CreateProject(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, l10n.GenericProject, http.StatusInternalServerError)
 		}
 	}
-	// if err := user.AddProject(db.Database, project); err != nil {
-	// 	lCreateProject.Error(err)
-	// 	http.Error(w, l10n.GenericUser, http.StatusInternalServerError)
-	// 	return
-	// }
 	lCreateProject.Info("%s (id%d) created", project.Name, project.ID)
 	response := models.ProjectResponse{ID: project.ID}
 	if err := jsonEncode(w, response, "register"); err != nil {

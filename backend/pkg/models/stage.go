@@ -1,7 +1,6 @@
 package models
 
 import (
-	"log"
 	"mp1/pkg/util"
 
 	"github.com/lib/pq"
@@ -41,7 +40,6 @@ func (stage *Stage) Create(db *gorm.DB, request StageRequest) error {
 	stage.Description = request.Description
 	stage.StartTime = util.UnmarshalTime(request.StartTime)
 	stage.EndTime = util.UnmarshalTime(request.EndTime)
-	log.Println(stage, request)
 	return db.Create(&stage).Error
 }
 

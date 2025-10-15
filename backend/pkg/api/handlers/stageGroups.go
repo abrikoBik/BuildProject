@@ -40,10 +40,11 @@ func GetStageGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	lGetStageGroup.Debug("stageGroup", stageGroup)
+	// start, end := stageGroup.CalculateTimes(db.Database)
 	response := models.StageGroupResponse{
 		StageGroup: &stageGroup,
-		StartTime:  util.MarshalTime(stageGroup.StartTime),
-		EndTime:    util.MarshalTime(stageGroup.EndTime),
+		// StartTime:  util.MarshalTime(start),
+		// EndTime:    util.MarshalTime(end),
 	}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lGetStageGroup.Error(err)
