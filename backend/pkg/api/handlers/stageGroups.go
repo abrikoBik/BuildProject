@@ -153,7 +153,7 @@ func ListStages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sort.Slice(stageGroup.Stages, func(i, j int) bool {
-		return stageGroup.Stages[i].UpdatedAt.UnixMilli() > stageGroup.Stages[j].UpdatedAt.UnixMilli()
+		return stageGroup.Stages[i].UpdatedAt.Unix() > stageGroup.Stages[j].UpdatedAt.Unix()
 	})
 	var response []models.StageResponse
 	for _, e := range stageGroup.Stages {

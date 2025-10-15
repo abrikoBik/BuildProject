@@ -139,7 +139,7 @@ func ListAttachments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sort.Slice(project.Attachments, func(i, j int) bool {
-		return project.Attachments[i].CreatedAt.UnixMilli() > project.Attachments[j].CreatedAt.UnixMilli()
+		return project.Attachments[i].CreatedAt.Unix() > project.Attachments[j].CreatedAt.Unix()
 	})
 	var response []models.AttachmentResponse
 	for _, a := range project.Attachments {
@@ -169,7 +169,7 @@ func ListEstimateGroups(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sort.Slice(project.EstimateGroups, func(i, j int) bool {
-		return project.EstimateGroups[i].CreatedAt.UnixMilli() > project.EstimateGroups[j].CreatedAt.UnixMilli()
+		return project.EstimateGroups[i].CreatedAt.Unix() > project.EstimateGroups[j].CreatedAt.Unix()
 	})
 	var response []models.EstimateGroupResponse
 	for _, g := range project.EstimateGroups {
@@ -200,7 +200,7 @@ func ListStageGroups(w http.ResponseWriter, r *http.Request) {
 	}
 	lListStageGroups.Debug("project.StageGroups", project.StageGroups)
 	sort.Slice(project.StageGroups, func(i, j int) bool {
-		return project.StageGroups[i].CreatedAt.UnixMilli() > project.StageGroups[j].CreatedAt.UnixMilli()
+		return project.StageGroups[i].CreatedAt.Unix() > project.StageGroups[j].CreatedAt.Unix()
 	})
 	var response []models.StageGroupResponse
 	for _, g := range project.StageGroups {
