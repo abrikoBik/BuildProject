@@ -23,11 +23,11 @@ http://localhost {
 	}	
 	respond @options 204
 	reverse_proxy @not-options frontend:5173 {
-		# header_up Host {upstream_hostport}
-  #       header_up -X-Forwarded-Host
-  #       header_up -X-forwarded-For
-  #       header_up -X-forwarded-Proto
-  #       header_down -Access-Control-Allow-Origin
+		header_up Host {upstream_hostport}
+        header_up -X-Forwarded-Host
+        header_up -X-forwarded-For
+        header_up -X-forwarded-Proto
+        header_down -Access-Control-Allow-Origin
 	}
 	import cors
 }
