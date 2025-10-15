@@ -188,10 +188,14 @@ const Home = () => {
                 ...taskData, 
                 name: e.target.value,
             })
-        } else {
+        } else if (e.target.id === "startDate") {
             setTaskData({
                 ...taskData, 
-                startTime: Math.floor((new Date()).getTime() / 1000),
+                startTime: Math.floor((new Date(e.target.value)).getTime() / 1000)
+            })
+        } else {
+            setTaskData({
+                ...taskData,
                 endTime: Math.floor((new Date(e.target.value)).getTime() / 1000)
             })
         }
@@ -212,8 +216,8 @@ const Home = () => {
     }
 
     const unixDateStampToDate = (unixTimeStamp : number) => {
-        const date = new Date(unixTimeStamp * 1000);
-        return `${date.getDay()}/${date.getMonth()}/${date.getFullYear()}`;
+        let date = new Date(unixTimeStamp * 1000);
+        return `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`;
     }
 
     const { width } = useWindowSize();
@@ -382,11 +386,16 @@ const Home = () => {
                                             type="text"
                                             id="name"
                                             onChange={handleTaskInput}
-                                            className="w-[70%]"
+                                            className="w-[45%]"
                                         />
                                         <input
                                             type="date"
-                                            id="date"
+                                            id="startDate"
+                                            onChange={handleTaskInput}
+                                        />
+                                        <input
+                                            type="date"
+                                            id="endDate"
                                             onChange={handleTaskInput}
                                         />
                                     </div>
