@@ -37,16 +37,11 @@ func (stage *Stage) Get(db *gorm.DB, id uint, preloads ...string) error {
 
 func (stage *Stage) Create(db *gorm.DB, request StageRequest) error {
 	stage.StageGroupID = request.StageGroupID
-	// group, err := stage.GetGroup(db)
-	// if err != nil {
-	// 	return err
-	// }
 	stage.Name = request.Name
 	stage.Description = request.Description
 	stage.StartTime = util.UnmarshalTime(request.StartTime)
 	stage.EndTime = util.UnmarshalTime(request.EndTime)
 	log.Println(stage, request)
-	// return errors.Join(db.Create(&stage).Error, group.CalculateTimes(db), db.Save(&group).Error)
 	return db.Create(&stage).Error
 }
 
@@ -67,11 +62,6 @@ func (stage *Stage) Patch(db *gorm.DB, request StageRequest) error {
 	if request.EndTime != 0 {
 		stage.EndTime = util.UnmarshalTime(request.EndTime)
 	}
-	return db.Save(&stage).Error
-}
-
-func (stage *Stage) Finish(db *gorm.DB) error {
-	stage.Status = true
 	return db.Save(&stage).Error
 }
 

@@ -104,22 +104,8 @@ func (project *Project) Patch(db *gorm.DB, request ProjectRequest) error {
 	return db.Save(&project).Error
 }
 
+// TODO: remove?
 func (project *Project) AddWorker(db *gorm.DB, worker Worker) error {
 	project.Workers = append(project.Workers, worker)
-	return db.Save(&project).Error
-}
-
-func (project *Project) AddAttachment(db *gorm.DB, attachment Attachment) error {
-	project.Attachments = append(project.Attachments, attachment)
-	return db.Save(&project).Error
-}
-
-func (project *Project) AddStageGroup(db *gorm.DB, group StageGroup) error {
-	project.StageGroups = append(project.StageGroups, group)
-	return db.Save(&project).Error
-}
-
-func (project *Project) AddEstimateGroup(db *gorm.DB, group EstimateGroup) error {
-	project.EstimateGroups = append(project.EstimateGroups, group)
 	return db.Save(&project).Error
 }

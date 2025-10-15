@@ -82,11 +82,6 @@ func (user *User) Patch(db *gorm.DB, request UserRequest) (err error) {
 	return db.Save(&user).Error
 }
 
-func (user *User) AddProject(db *gorm.DB, project Project) error {
-	user.Projects = append(user.Projects, project)
-	return db.Save(&user).Error
-}
-
 func (user *User) PreparePassword(password string) (err error) {
 	if user.Salt, err = util.RandomBytes(16); err != nil {
 		return

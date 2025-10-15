@@ -36,7 +36,8 @@ func (estimate *Estimate) Create(db *gorm.DB, request EstimateRequest) error {
 	estimate.Cost = request.Cost
 	estimate.Count = request.Count
 	estimate.Unit = request.Unit
-	return estimateGroup.AddEstimate(db, *estimate)
+	// return estimateGroup.AddEstimate(db, *estimate)
+	return db.Create(&estimate).Error
 }
 
 func (estimate *Estimate) Patch(db *gorm.DB, request EstimateRequest) error {
@@ -55,7 +56,6 @@ func (estimate *Estimate) Patch(db *gorm.DB, request EstimateRequest) error {
 	return db.Save(&estimate).Error
 }
 
-// TODO: remove? EstimateGroup.RemoveEstimate might supersede this
 func (estimate *Estimate) Delete(db *gorm.DB) error {
 	return db.Delete(&estimate).Error
 }

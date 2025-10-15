@@ -87,11 +87,11 @@ func CreateAttachment(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
 		return
 	}
-	if err := project.AddAttachment(db.Database, attachment); err != nil {
-		lCreateAttachment.Error(err)
-		http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
-		return
-	}
+	// if err := project.AddAttachment(db.Database, attachment); err != nil {
+	// 	lCreateAttachment.Error(err)
+	// 	http.Error(w, l10n.GenericAttachment, http.StatusInternalServerError)
+	// 	return
+	// }
 	lCreateAttachment.Info("id%d saved", project.ID)
 	attachmentUUID := attachment.UUID.String()
 	lCreateAttachment.Info("%s created", attachmentUUID)
