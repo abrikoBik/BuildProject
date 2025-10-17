@@ -88,17 +88,6 @@ const Login = () => {
             <div className="flex-1 flex flex-col items-center justify-center p-8 max-w-[50vw] max-lg:max-w-full">
                 <header className="flex w-1/2 max-lg:w-full absolute top-0 left-0 p-4">
                     <img src={Logo} alt="logo" className="h-8" />
-                    <nav className="flex items-center justify-center w-full gap-5 ml-[-4vw]">
-                        <Link
-                            to="/"
-                            className="text-lg text-palette-color5 hover:cursor-pointer transition-colors"
-                        >
-                            Главная
-                        </Link>
-                        <a className="text-lg text-palette-color5 hover:cursor-pointer transition-colors">
-                            О нас
-                        </a>
-                    </nav>
                 </header>
 
                 <form

@@ -201,6 +201,18 @@ const Home = () => {
         }
     }
 
+    const deleteTask = async (id : number) => {
+        try {
+            await axios.delete(
+                `api/projects/${localStorage.getItem("selectedProjectID")}/stageGroups/${localStorage.getItem("selectedStageGroupID")}/stages/${id}`
+            )
+
+            listTasks();
+        } catch (e : unknown) {
+            console.log(e);
+        }
+    }
+
     const deleteTaskGroup = async (id : number) => {
         try {
             const taskGroup = await axios.delete(
@@ -216,7 +228,7 @@ const Home = () => {
     }
 
     const unixDateStampToDate = (unixTimeStamp : number) => {
-        let date = new Date(unixTimeStamp * 1000);
+        const date = new Date(unixTimeStamp * 1000);
         return `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`;
     }
 
@@ -355,7 +367,7 @@ const Home = () => {
                                                         {
                                                             await axios.patch(
                                                                 `api/projects/${localStorage.getItem("selectedProjectID")}/stageGroups/${localStorage.getItem("selectedStageGroupID")}/stages/${item.id}`,
-                                                                {...item, status: e.target.value === "on"}
+                                                                {...item, status: !item.status}
                                                             )
 
                                                             listTasks();
@@ -366,7 +378,13 @@ const Home = () => {
                                                 }
                                                 <label htmlFor="check">{item.name}</label>
                                             </section>
-                                            <div className="text-gray-500">{`${unixDateStampToDate(item.startTime)} -> ${unixDateStampToDate(item.endTime)}`}</div>
+                                            <div className="text-gray-500">
+                                                {`${unixDateStampToDate(item.startTime)} -> ${unixDateStampToDate(item.endTime)}`}
+                                                <span onClick={() => deleteTask(item.id)}className="material-symbols-outlined hover:text-red-700 select-none">
+                                                    close
+                                                </span>
+                                            </div>
+                                            
                                         </li>
                                     ))
                                 }
