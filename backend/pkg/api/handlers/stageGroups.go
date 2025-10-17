@@ -40,9 +40,7 @@ func GetStageGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	start, end := stageGroup.CalculateTimes(db.Database)
-	lGetStageGroup.Debug("stageGroup", stageGroup, "start", start, "end", end)
 	total, done := stageGroup.CalculateStages(db.Database)
-	lGetStageGroup.Debug("stageGroup", stageGroup, "start", start, "end", end)
 	response := models.StageGroupResponse{
 		StageGroup:      &stageGroup,
 		StartTime:       start.Unix(),
