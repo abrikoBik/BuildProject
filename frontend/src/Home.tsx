@@ -363,7 +363,7 @@ const Home = () => {
                                                     type="checkbox"
                                                     id="check"
                                                     checked={item.status}
-                                                    onChange={async (e : React.ChangeEvent<HTMLInputElement>) => 
+                                                    onChange={async () => 
                                                         {
                                                             await axios.patch(
                                                                 `api/projects/${localStorage.getItem("selectedProjectID")}/stageGroups/${localStorage.getItem("selectedStageGroupID")}/stages/${item.id}`,
