@@ -22,9 +22,11 @@ type StageGroupRequest struct {
 
 type StageGroupResponse struct {
 	*StageGroup
-	StartTime int64 `json:"startTime" groups:"public"`
-	EndTime   int64 `json:"endTime" groups:"public"`
-	ID        uint  `json:"id" groups:"register,list"`
+	StartTime       int64 `json:"startTime" groups:"public"`
+	EndTime         int64 `json:"endTime" groups:"public"`
+	TotalStages     int   `json:"totalStages" groups:"public"`
+	CompletedStages int   `json:"completedStages" groups:"public"`
+	ID              uint  `json:"id" groups:"register,list"`
 }
 
 func (group *StageGroup) Get(db *gorm.DB, id uint, preloads ...string) error {
@@ -57,7 +59,7 @@ func (group *StageGroup) Delete(db *gorm.DB) error {
 	return db.Delete(&group).Error
 }
 
-func (group *StageGroup) CalculateTimes(db *gorm.DB) (start time.Time, end time.Time) {
+func (group StageGroup) CalculateTimes(db *gorm.DB) (start time.Time, end time.Time) {
 	if len(group.Stages) == 0 {
 		return
 	}
@@ -71,5 +73,15 @@ func (group *StageGroup) CalculateTimes(db *gorm.DB) (start time.Time, end time.
 	})
 	log.Println(group.Stages[0])
 	end = group.Stages[0].EndTime.Time
+	return
+}
+
+func (group StageGroup) CalculateStages(db *gorm.DB) (total, done int) {
+	total = len(group.Stages)
+	for _, s := range group.Stages {
+		if s.Status {
+			done += 1
+		}
+	}
 	return
 }

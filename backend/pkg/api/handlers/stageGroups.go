@@ -41,10 +41,14 @@ func GetStageGroup(w http.ResponseWriter, r *http.Request) {
 	}
 	start, end := stageGroup.CalculateTimes(db.Database)
 	lGetStageGroup.Debug("stageGroup", stageGroup, "start", start, "end", end)
+	total, done := stageGroup.CalculateStages(db.Database)
+	lGetStageGroup.Debug("stageGroup", stageGroup, "start", start, "end", end)
 	response := models.StageGroupResponse{
-		StageGroup: &stageGroup,
-		StartTime:  start.Unix(),
-		EndTime:    end.Unix(),
+		StageGroup:      &stageGroup,
+		StartTime:       start.Unix(),
+		EndTime:         end.Unix(),
+		TotalStages:     total,
+		CompletedStages: done,
 	}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lGetStageGroup.Error(err)
