@@ -17,7 +17,7 @@ type Project struct {
 	StartTime      pq.NullTime `gorm:"not null"`
 	EndTime        pq.NullTime `gorm:"not null"`
 	UserID         uint        `json:"userID" groups:"public" gorm:"not null"`
-	Workers        []Worker    `gorm:"many2many:project_workers"`
+	Workers        []*Worker   `gorm:"many2many:project_workers"`
 	Attachments    []Attachment
 	StageGroups    []StageGroup
 	EstimateGroups []EstimateGroup

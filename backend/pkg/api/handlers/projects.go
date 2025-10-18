@@ -13,6 +13,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// TODO: organize all functions
 var (
 	lGetProject             = util.CreateLogger("api:GetProject")
 	lCreateProject          = util.CreateLogger("api:CreateProject")
@@ -21,6 +22,9 @@ var (
 	lListProjectAttachments = util.CreateLogger("api:ListProjectAttachments")
 	lListEstimateGroups     = util.CreateLogger("api:ListEstimateGroups")
 	lListStageGroups        = util.CreateLogger("api:ListStageGroups")
+	lListWorkers            = util.CreateLogger("api:ListWorkers")
+	lAddWorker              = util.CreateLogger("api:AddWorker")
+	lRemoveWorker           = util.CreateLogger("api:RemoveWorker")
 )
 
 func GetProject(w http.ResponseWriter, r *http.Request) {
@@ -214,5 +218,93 @@ func ListStageGroups(w http.ResponseWriter, r *http.Request) {
 		lListStageGroups.Error(err)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func ListWorkers(w http.ResponseWriter, r *http.Request) {
+	id, err := middleware.GetID(middleware.ProjectID, r.Context())
+	if err != nil {
+		lListWorkers.Error(err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
+	}
+	var project models.Project
+	if project.Get(db.Database, id, "Workers.User") != nil {
+		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
+		return
+	}
+	lListWorkers.Debug("project.Workers", project.Workers)
+	sort.Slice(project.Workers, func(i, j int) bool {
+		return project.Workers[i].CreatedAt.UnixMilli() > project.Workers[j].CreatedAt.UnixMilli()
+	})
+	var response []models.WorkerResponse
+	for _, w := range project.Workers {
+		toAppend := models.WorkerResponse{
+			Worker: w,
+			Name:   w.User.Name,
+			ID:     w.ID,
+		}
+		response = append(response, toAppend)
+	}
+	if err := jsonEncode(w, response, "list"); err != nil {
+		lListWorkers.Error(err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func AddWorker(w http.ResponseWriter, r *http.Request) {
+	projectID, err1 := middleware.GetID(middleware.ProjectID, r.Context())
+	workerID, err2 := middleware.GetID(middleware.WorkerID, r.Context())
+	if err := errors.Join(err1, err2); err != nil {
+		lAddWorker.Error(err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
+	}
+	var project models.Project
+	if project.Get(db.Database, projectID, "Workers") != nil {
+		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
+		return
+	}
+	var worker models.Worker
+	if worker.Get(db.Database, workerID, "Projects") != nil {
+		http.Error(w, l10n.WorkerNotFound, http.StatusNotFound)
+		return
+	}
+	project.Workers = append(project.Workers, &worker)
+	if err := db.Database.Save(project).Error; err != nil {
+		lAddWorker.Error(err)
+		http.Error(w, l10n.GenericWorker, http.StatusInternalServerError)
+	}
+	lAddWorker.Info("added id%d to %d", worker.ID, project.ID)
+	w.WriteHeader(http.StatusOK)
+}
+
+func RemoveWorker(w http.ResponseWriter, r *http.Request) {
+	projectID, err1 := middleware.GetID(middleware.ProjectID, r.Context())
+	workerID, err2 := middleware.GetID(middleware.WorkerID, r.Context())
+	if err := errors.Join(err1, err2); err != nil {
+		lRemoveWorker.Error(err)
+		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
+		return
+	}
+	var project models.Project
+	if project.Get(db.Database, projectID, "Workers") != nil {
+		http.Error(w, l10n.ProjectNotFound, http.StatusNotFound)
+		return
+	}
+	var worker models.Worker
+	if worker.Get(db.Database, workerID, "Projects") != nil {
+		http.Error(w, l10n.WorkerNotFound, http.StatusNotFound)
+		return
+	}
+	lRemoveWorker.Debug("project.Workers", project.Workers)
+	if err := db.Database.Model(&project).Association("Workers").Delete(&worker); err != nil {
+		lRemoveWorker.Error(err)
+		http.Error(w, l10n.GenericWorker, http.StatusInternalServerError)
+		return
+	}
+	lRemoveWorker.Debug("project.Workers", project.Workers)
+	lRemoveWorker.Info("removed id%d from %d", worker.ID, project.ID)
 	w.WriteHeader(http.StatusOK)
 }
