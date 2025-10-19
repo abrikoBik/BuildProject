@@ -7,8 +7,10 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func AddWorker(r chi.Router, jwtKey []byte) {
-	r.With(middleware.JSONResponse).Post("/", handlers.CreateWorker)
-	r.With(middleware.JSONResponse).Patch("/", handlers.PatchWorker)
-	r.With(middleware.JSONResponse).Get("/", handlers.GetWorker)
+func AddUserWorker(r chi.Router, jwtKey []byte) {
+	r.Route("/worker", func(r chi.Router) {
+		r.With(middleware.JSONResponse).Get("/", handlers.GetWorker)
+		r.With(middleware.JSONResponse).Post("/", handlers.CreateWorker)
+		r.With(middleware.JSONResponse).Patch("/", handlers.PatchWorker)
+	})
 }

@@ -18,6 +18,7 @@ func AddProjects(r chi.Router, jwtKey []byte) {
 			AddStageGroups(r, jwtKey)
 			AddEstimateGroups(r, jwtKey)
 			AddAttachments(r, jwtKey)
+			AddProjectWorkers(r, jwtKey)
 		})
 	})
 }

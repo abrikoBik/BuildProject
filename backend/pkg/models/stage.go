@@ -11,9 +11,10 @@ type Stage struct {
 	gorm.Model
 	Name         string `json:"name" groups:"public,list" gorm:"not null"`
 	Status       bool   `json:"status" groups:"public,list" gorm:"not null;default:false"`
-	StageGroupID uint   `gorm:"not null"`
 	StartTime    pq.NullTime
 	EndTime      pq.NullTime
+	StageGroupID uint       `gorm:"not null"`
+	StageGroup   StageGroup `gorm:"foreignKey:StageGroupID;not null"`
 }
 
 type StageRequest struct {
@@ -59,9 +60,4 @@ func (stage *Stage) Patch(db *gorm.DB, request StageRequest) error {
 		stage.EndTime = util.UnmarshalTime(request.EndTime)
 	}
 	return db.Save(&stage).Error
-}
-
-func (stage Stage) GetGroup(db *gorm.DB) (group *StageGroup, err error) {
-	err = group.Get(db, stage.StageGroupID)
-	return
 }

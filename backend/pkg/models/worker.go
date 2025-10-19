@@ -1,7 +1,6 @@
 package models
 
 import (
-	"errors"
 	"mp1/pkg/l10n"
 	"mp1/pkg/util"
 
@@ -10,10 +9,10 @@ import (
 
 type Worker struct {
 	gorm.Model
-	Role   string  `json:"role" groups:"public,list" gorm:"not null"`
-	User   User    `gorm:"foreignKey:UserID;not null"`
-	UserID uint    `json:"userID" groups:"list" gorm:"not null"`
-	Stages []Stage `gorm:"many2many:stage_workers"`
+	Role     string     `json:"role" groups:"public,list" gorm:"not null"`
+	User     User       `gorm:"foreignKey:UserID;not null"`
+	UserID   uint       `json:"userID" groups:"list" gorm:"not null"`
+	Projects []*Project `gorm:"many2many:project_workers"`
 }
 
 type WorkerRequest struct {
@@ -22,7 +21,8 @@ type WorkerRequest struct {
 
 type WorkerResponse struct {
 	*Worker
-	ID uint `json:"id" groups:"register,list"`
+	Name string `json:"name" groups:"list"`
+	ID   uint   `json:"id" groups:"register,public,list"`
 }
 
 func (worker *Worker) Get(db *gorm.DB, id uint, preloads ...string) error {
@@ -33,17 +33,9 @@ func (worker *Worker) Create(db *gorm.DB, request WorkerRequest) error {
 	if len(request.Role) == 0 {
 		return l10n.InvalidRoleError
 	}
-	var user User
-	if err := user.Get(db, request.UserID, "Worker"); err != nil {
-		return err
-	}
-	if user.Worker != nil {
-		return l10n.WorkerExistsError
-	}
 	worker.Role = request.Role
-	worker.User = user
-	worker.UserID = user.ID
-	return errors.Join(db.Create(&worker).Error, db.Save(&user).Error)
+	worker.UserID = request.UserID
+	return db.Create(&worker).Error
 }
 
 func (worker *Worker) Patch(db *gorm.DB, request WorkerRequest) error {

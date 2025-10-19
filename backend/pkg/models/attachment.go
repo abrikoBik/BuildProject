@@ -19,6 +19,7 @@ type Attachment struct {
 	// Size in bytes.
 	Size      int64     `json:"size" groups:"public" gorm:"not null"`
 	UUID      uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();not null"`
+	Project   Project   `gorm:"foreignKey:ProjectID;not null"`
 	ProjectID uint      `gorm:"not null"`
 	Checksum  []byte    `gorm:"not null"`
 }

@@ -6,11 +6,12 @@ import (
 
 type Estimate struct {
 	gorm.Model
-	Name            string  `json:"name" groups:"public,list" gorm:"not null"`
-	Cost            float64 `json:"cost" groups:"public,list" gorm:"not null"`
-	Count           uint    `json:"count" groups:"public,list" gorm:"not null"`
-	Unit            string  `json:"unit" groups:"public,list" gorm:"not null"`
-	EstimateGroupID uint    `gorm:"not null"`
+	Name            string        `json:"name" groups:"public,list" gorm:"not null"`
+	Cost            float64       `json:"cost" groups:"public,list" gorm:"not null"`
+	Count           uint          `json:"count" groups:"public,list" gorm:"not null"`
+	Unit            string        `json:"unit" groups:"public,list" gorm:"not null"`
+	EstimateGroup   EstimateGroup `gorm:"foreignKey:EstimateGroupID;not null"`
+	EstimateGroupID uint          `gorm:"not null"`
 }
 
 type EstimateRequest struct {
@@ -27,16 +28,11 @@ func (estimate *Estimate) Get(db *gorm.DB, id uint) error {
 }
 
 func (estimate *Estimate) Create(db *gorm.DB, request EstimateRequest) error {
-	var estimateGroup EstimateGroup
-	if err := estimateGroup.Get(db, request.EstimateGroupID, "Estimates"); err != nil {
-		return err
-	}
 	estimate.EstimateGroupID = request.EstimateGroupID
 	estimate.Name = request.Name
 	estimate.Cost = request.Cost
 	estimate.Count = request.Count
 	estimate.Unit = request.Unit
-	// return estimateGroup.AddEstimate(db, *estimate)
 	return db.Create(&estimate).Error
 }
 

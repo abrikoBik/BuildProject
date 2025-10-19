@@ -14,11 +14,19 @@ func AddUsers(r chi.Router, jwtKey []byte) {
 			r.Use(middleware.ParseID(middleware.UserID, "userID"))
 			r.With(middleware.JSONResponse).Get("/", handlers.GetUser)
 			r.With(middleware.JSONResponse).Get("/projects", handlers.ListProjects)
-			r.Patch("/", handlers.PatchUser)
-			// r.With(middleware.ValidateToken(jwtKey)).Patch("/", handlers.PatchUser)
-			r.Route("/worker", func(r chi.Router) {
-				AddWorker(r, jwtKey)
-			})
+			r.With(middleware.JSONResponse).Patch("/", handlers.PatchUser)
+			AddUserWorker(r, jwtKey)
+		})
+	})
+}
+
+func AddProjectWorkers(r chi.Router, jwtKey []byte) {
+	r.Route("/workers", func(r chi.Router) {
+		r.With(middleware.JSONResponse).Get("/", handlers.ListWorkers)
+		r.Route("/{workerID}", func(r chi.Router) {
+			r.Use(middleware.ParseID(middleware.WorkerID, "workerID"))
+			r.Put("/", handlers.AddWorker)
+			r.Delete("/", handlers.RemoveWorker)
 		})
 	})
 }

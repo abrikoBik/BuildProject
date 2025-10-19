@@ -1,11 +1,11 @@
 package models
 
 import (
-	"mp1/pkg/l10n"
 	"mp1/pkg/util"
 
 	"github.com/lib/pq"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type Project struct {
@@ -16,8 +16,9 @@ type Project struct {
 	Longitude      float64     `json:"longitude" groups:"public" gorm:"not null"`
 	StartTime      pq.NullTime `gorm:"not null"`
 	EndTime        pq.NullTime `gorm:"not null"`
+	User           User        `gorm:"foreignKey:UserID;not null"`
 	UserID         uint        `json:"userID" groups:"public" gorm:"not null"`
-	Workers        []Worker    `gorm:"many2many:project_workers"`
+	Workers        []*Worker   `gorm:"many2many:project_workers"`
 	Attachments    []Attachment
 	StageGroups    []StageGroup
 	EstimateGroups []EstimateGroup
@@ -25,14 +26,14 @@ type Project struct {
 
 type ProjectRequest struct {
 	*Project
-	StartTime int64 `json:"startTime" groups:"public" gorm:"not null"`
-	EndTime   int64 `json:"endTime" groups:"public" gorm:"not null"`
+	StartTime int64 `json:"startTime"`
+	EndTime   int64 `json:"endTime"`
 }
 
 type ProjectResponse struct {
 	*Project
-	StartTime int64 `json:"startTime" groups:"public,list" gorm:"not null"`
-	EndTime   int64 `json:"endTime" groups:"public,list" gorm:"not null"`
+	StartTime int64 `json:"startTime" groups:"public,list"`
+	EndTime   int64 `json:"endTime" groups:"public,list"`
 	ID        uint  `json:"id" groups:"register,list"`
 }
 
@@ -41,45 +42,26 @@ func (project *Project) Get(db *gorm.DB, id uint, preloads ...string) error {
 }
 
 func (project *Project) Create(db *gorm.DB, request ProjectRequest) error {
-	var user User
-	if err := user.Get(db, request.UserID, "Projects"); err != nil {
-		return l10n.UserNotFoundError
-	}
-	project.UserID = user.ID
+	project.UserID = request.UserID
 	project.Name = request.Name
 	project.Description = request.Description
 	project.Latitude = request.Latitude
 	project.Longitude = request.Longitude
 	project.StartTime = util.UnmarshalTime(request.StartTime)
 	project.EndTime = util.UnmarshalTime(request.EndTime)
-	project.StageGroups = make([]StageGroup, 0)
-	project.Attachments = make([]Attachment, 0)
-	project.EstimateGroups = make([]EstimateGroup, 0)
 	return db.Create(&project).Error
 }
 
 func (project *Project) Delete(db *gorm.DB) error {
-	for _, group := range project.StageGroups {
-		if err := group.Delete(db); err != nil {
-			return err
-		}
-	}
-	for _, attachment := range project.Attachments {
-		if err := attachment.Delete(db); err != nil {
-			return err
-		}
-	}
-	for _, sg := range project.StageGroups {
-		if err := sg.Delete(db); err != nil {
-			return err
-		}
-	}
-	for _, eg := range project.EstimateGroups {
-		if err := eg.Delete(db); err != nil {
-			return err
-		}
-	}
 	return db.Delete(&project).Error
+}
+
+func (project *Project) AfterDelete(db *gorm.DB) error {
+	return db.Clauses(clause.Returning{}).Where("project_id = ?", project.ID).
+		Delete(&Attachment{}).
+		Delete(&StageGroup{}).
+		Delete(&EstimateGroup{}).
+		Error
 }
 
 func (project *Project) Patch(db *gorm.DB, request ProjectRequest) error {
