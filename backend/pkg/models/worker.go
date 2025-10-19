@@ -13,7 +13,6 @@ type Worker struct {
 	Role     string     `json:"role" groups:"public,list" gorm:"not null"`
 	User     User       `gorm:"foreignKey:UserID;not null"`
 	UserID   uint       `json:"userID" groups:"list" gorm:"not null"`
-	Stages   []Stage    `gorm:"many2many:stage_workers"`
 	Projects []*Project `gorm:"many2many:project_workers"`
 }
 
