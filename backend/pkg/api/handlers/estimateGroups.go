@@ -121,7 +121,7 @@ func DeleteEstimateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var estimateGroup models.EstimateGroup
-	if errors.Is(estimateGroup.Get(db.Database, estimateGroupID, "Estimates"), gorm.ErrRecordNotFound) {
+	if errors.Is(estimateGroup.Get(db.Database, estimateGroupID), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.EstimateGroupNotFound, http.StatusNotFound)
 	}
 	if err := estimateGroup.Delete(db.Database); err != nil {

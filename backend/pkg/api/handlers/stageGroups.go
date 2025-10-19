@@ -125,7 +125,7 @@ func DeleteStageGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var stageGroup models.StageGroup
-	if errors.Is(stageGroup.Get(db.Database, stageGroupID, "Stages"), gorm.ErrRecordNotFound) {
+	if errors.Is(stageGroup.Get(db.Database, stageGroupID), gorm.ErrRecordNotFound) {
 		http.Error(w, l10n.StageGroupNotFound, http.StatusNotFound)
 	}
 	if err := stageGroup.Delete(db.Database); err != nil {

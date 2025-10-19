@@ -11,9 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
-	lCreateSession = util.CreateLogger("api:CreateSession")
-)
+var lCreateSession = util.CreateLogger("api:CreateSession")
 
 func CreateSession(w http.ResponseWriter, r *http.Request) {
 	var request models.SessionRequest

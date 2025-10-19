@@ -35,7 +35,7 @@ func GetWorker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var worker models.Worker
-	if worker.Get(db.Database, user.Worker.ID) != nil {
+	if err := worker.Get(db.Database, user.Worker.ID); err != nil {
 		lGetWorker.Error(err)
 		http.Error(w, l10n.GenericWorker, http.StatusInternalServerError)
 		return
@@ -56,17 +56,12 @@ func CreateWorker(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
 		return
 	}
-	var user models.User
-	if errors.Is(user.Get(db.Database, userID, "Worker"), gorm.ErrRecordNotFound) {
-		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
-		return
-	}
-	var worker models.Worker
-	request := models.WorkerRequest{Worker: &worker}
-	request.UserID = userID
+	var request models.WorkerRequest
 	if !jsonDecode(w, r, &request) {
 		return
 	}
+	request.UserID = userID
+	var worker models.Worker
 	if err := worker.Create(db.Database, request); err != nil {
 		lCreateWorker.Error(err)
 		switch err {
@@ -83,12 +78,6 @@ func CreateWorker(w http.ResponseWriter, r *http.Request) {
 		default:
 			http.Error(w, l10n.RegisterError, http.StatusInternalServerError)
 		}
-		return
-	}
-	user.Worker = &worker
-	if err := db.Database.Save(&user).Error; err != nil {
-		lCreateWorker.Error(err)
-		http.Error(w, l10n.GenericUser, http.StatusInternalServerError)
 		return
 	}
 	lCreateWorker.Info("id%d registered", worker.ID)
@@ -112,16 +101,14 @@ func PatchWorker(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
-	if !verifyUser(user, w, r) {
+	var request models.WorkerRequest
+	if !jsonDecode(w, r, &request) {
 		return
 	}
 	var worker models.Worker
-	if db.Database.Where("user_id = ?", userID).Take(&worker).Error != nil {
-		http.Error(w, l10n.WorkerNotFound, http.StatusNotFound)
-		return
-	}
-	var request models.WorkerRequest
-	if !jsonDecode(w, r, &request) {
+	if err := worker.Get(db.Database, user.Worker.ID); err != nil {
+		lPatchWorker.Error(err)
+		http.Error(w, l10n.GenericWorker, http.StatusInternalServerError)
 		return
 	}
 	if err := worker.Patch(db.Database, request); err != nil {
@@ -130,7 +117,7 @@ func PatchWorker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	lPatchWorker.Info("%s (id%d) patched", user.Name, worker.ID)
-	response := models.WorkerResponse{Worker: &worker}
+	response := models.WorkerResponse{Worker: &worker, ID: worker.ID}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lPatchWorker.Error(err)
 		return
