@@ -13,18 +13,19 @@ import (
 	"gorm.io/gorm"
 )
 
-// TODO: organize all functions
 var (
-	lGetProject             = util.CreateLogger("api:GetProject")
-	lCreateProject          = util.CreateLogger("api:CreateProject")
-	lPatchProject           = util.CreateLogger("api:PatchProject")
-	lDeleteProject          = util.CreateLogger("api:DeleteProject")
-	lListProjectAttachments = util.CreateLogger("api:ListProjectAttachments")
-	lListEstimateGroups     = util.CreateLogger("api:ListEstimateGroups")
-	lListStageGroups        = util.CreateLogger("api:ListStageGroups")
-	lListWorkers            = util.CreateLogger("api:ListWorkers")
-	lAddWorker              = util.CreateLogger("api:AddWorker")
-	lRemoveWorker           = util.CreateLogger("api:RemoveWorker")
+	lGetProject    = util.CreateLogger("api:GetProject")
+	lCreateProject = util.CreateLogger("api:CreateProject")
+	lPatchProject  = util.CreateLogger("api:PatchProject")
+	lDeleteProject = util.CreateLogger("api:DeleteProject")
+
+	lListAttachments    = util.CreateLogger("api:ListAttachments")
+	lListEstimateGroups = util.CreateLogger("api:ListEstimateGroups")
+	lListStageGroups    = util.CreateLogger("api:ListStageGroups")
+	lListWorkers        = util.CreateLogger("api:ListWorkers")
+
+	lAddWorker    = util.CreateLogger("api:AddWorker")
+	lRemoveWorker = util.CreateLogger("api:RemoveWorker")
 )
 
 func GetProject(w http.ResponseWriter, r *http.Request) {
@@ -133,7 +134,7 @@ func DeleteProject(w http.ResponseWriter, r *http.Request) {
 func ListAttachments(w http.ResponseWriter, r *http.Request) {
 	id, err := middleware.GetID(middleware.ProjectID, r.Context())
 	if err != nil {
-		lListProjectAttachments.Error(err)
+		lListAttachments.Error(err)
 		http.Error(w, l10n.ContextID, http.StatusInternalServerError)
 		return
 	}
@@ -154,7 +155,7 @@ func ListAttachments(w http.ResponseWriter, r *http.Request) {
 		response = append(response, toAppend)
 	}
 	if err := jsonEncode(w, response, "list"); err != nil {
-		lListProjectAttachments.Error(err)
+		lListAttachments.Error(err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
