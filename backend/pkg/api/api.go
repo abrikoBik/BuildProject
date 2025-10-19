@@ -30,7 +30,7 @@ func Init(hostname string, port uint) *http.Server {
 	r.Use(
 		cors.Handler(cors.Options{
 			AllowedOrigins:   []string{"https://*", "http://*"},
-			AllowedMethods:   []string{"GET", "POST", "PATCH", "DELETE"},
+			AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
 			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 			AllowCredentials: true,
 			MaxAge:           86400,
@@ -44,6 +44,7 @@ func Init(hostname string, port uint) *http.Server {
 		middleware.AddHeaders,
 	)
 
+	endpoints.AddDebug(r)
 	endpoints.AddSessions(r, jwtKey)
 	endpoints.AddUsers(r, jwtKey)
 	endpoints.AddProjects(r, jwtKey)
