@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type StageGroup struct {
@@ -52,12 +53,11 @@ func (group *StageGroup) Patch(db *gorm.DB, request StageGroupRequest) error {
 }
 
 func (group *StageGroup) Delete(db *gorm.DB) error {
-	for _, stage := range group.Stages {
-		if err := stage.Delete(db); err != nil {
-			return err
-		}
-	}
 	return db.Delete(&group).Error
+}
+
+func (group *StageGroup) AfterDelete(db *gorm.DB) error {
+	return db.Clauses(clause.Returning{}).Where("stage_group_id = ?", group.ID).Delete(&Stage{}).Error
 }
 
 func (group StageGroup) CalculateTimes(db *gorm.DB) (start time.Time, end time.Time) {

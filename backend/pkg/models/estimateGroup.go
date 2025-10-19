@@ -4,6 +4,7 @@ import (
 	"mp1/pkg/util"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type EstimateGroup struct {
@@ -42,12 +43,11 @@ func (group *EstimateGroup) Patch(db *gorm.DB, request EstimateGroupRequest) err
 }
 
 func (group *EstimateGroup) Delete(db *gorm.DB) error {
-	for _, estimate := range group.Estimates {
-		if err := estimate.Delete(db); err != nil {
-			return err
-		}
-	}
 	return db.Delete(&group).Error
+}
+
+func (group *EstimateGroup) AfterDelete(db *gorm.DB) error {
+	return db.Clauses(clause.Returning{}).Where("estimate_group_id = ?", group.ID).Delete(&Estimate{}).Error
 }
 
 func (group *EstimateGroup) CalculateCost() (totalCost float64) {
