@@ -16,6 +16,7 @@ type Project struct {
 	Longitude      float64     `json:"longitude" groups:"public" gorm:"not null"`
 	StartTime      pq.NullTime `gorm:"not null"`
 	EndTime        pq.NullTime `gorm:"not null"`
+	User           User        `gorm:"foreignKey:UserID;not null"`
 	UserID         uint        `json:"userID" groups:"public" gorm:"not null"`
 	Workers        []*Worker   `gorm:"many2many:project_workers"`
 	Attachments    []Attachment

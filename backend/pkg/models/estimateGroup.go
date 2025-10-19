@@ -8,8 +8,9 @@ import (
 
 type EstimateGroup struct {
 	gorm.Model
-	Name      string `json:"name" groups:"public,list" gorm:"not null"`
-	ProjectID uint   `gorm:"not null"`
+	Name      string  `json:"name" groups:"public,list" gorm:"not null"`
+	Project   Project `gorm:"foreignKey:ProjectID;not null"`
+	ProjectID uint    `gorm:"not null"`
 	Estimates []Estimate
 }
 
@@ -28,12 +29,8 @@ func (group *EstimateGroup) Get(db *gorm.DB, id uint, preloads ...string) error 
 }
 
 func (group *EstimateGroup) Create(db *gorm.DB, request EstimateGroupRequest) error {
-	var project Project
-	if err := project.Get(db, request.ProjectID, "EstimateGroups.Estimates"); err != nil {
-		return err
-	}
+	group.ProjectID = request.ProjectID
 	group.Name = request.Name
-	group.ProjectID = project.ID
 	return db.Create(&group).Error
 }
 

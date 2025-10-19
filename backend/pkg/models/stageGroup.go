@@ -11,8 +11,9 @@ import (
 
 type StageGroup struct {
 	gorm.Model
-	Name      string `json:"name" groups:"public,list" gorm:"not null"`
-	ProjectID uint   `gorm:"not null"`
+	Name      string  `json:"name" groups:"public,list" gorm:"not null"`
+	Project   Project `gorm:"foreignKey:ProjectID;not null"`
+	ProjectID uint    `gorm:"not null"`
 	Stages    []Stage
 }
 

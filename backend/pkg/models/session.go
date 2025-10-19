@@ -10,6 +10,7 @@ import (
 type Session struct {
 	gorm.Model
 	Token  string `json:"token" groups:"public" gorm:"not null"`
+	User   User   `gorm:"foreignKey:UserID;not null"`
 	UserID uint   `json:"userID" groups:"public" gorm:"not null"`
 }
 

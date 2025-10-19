@@ -40,7 +40,7 @@ func GetWorker(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, l10n.GenericWorker, http.StatusInternalServerError)
 		return
 	}
-	response := models.WorkerResponse{Worker: &worker}
+	response := models.WorkerResponse{Worker: &worker, ID: worker.ID}
 	if err := jsonEncode(w, response, "public"); err != nil {
 		lGetWorker.Error(err)
 		return
