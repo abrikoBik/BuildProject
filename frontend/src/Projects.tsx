@@ -164,6 +164,8 @@ const Projects = () => {
 
             setLatitude(lat);
             setLongitude(lon);
+            
+            setUserRequest({...userRequest, latitude: lat, longitude: lon});
 
             console.log(`Address is ${AddressString}, lat: ${lat}, lon: ${lon}`);
 
@@ -304,6 +306,19 @@ const Projects = () => {
                                         <div className="overflow-auto">
                                             {item.description}
                                         </div>
+                                        <div>{item.latitude} and {item.longitude}</div>
+                                        <Map
+                                            provider={osm}
+                                            height={200}
+                                            defaultCenter={[47.2153657, 38.9285216]}
+                                            center={[item.latitude, item.longitude]} 
+                                            defaultZoom={15}
+                                        >
+                                            <Marker
+                                                width={50}
+                                                anchor={[item.latitude, item.longitude]} 
+                                            />
+                                        </Map>
                                         <button onClick={() => selectProject(item.id)} className={`${maximizedProjects![index] ? "mt-auto" : ""} bg-palette-color4 p-1 px-2 rounded-xl text-white z-50 hover:cursor-pointer`}>Перейти к проекту</button>
                                         </>
                                          :

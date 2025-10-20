@@ -2,44 +2,36 @@ import { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import PushNotification from "./PushNotication";
 import { useWindowSize } from "@uidotdev/usehooks";
-import Calendar from "react-calendar";
 import axios from "axios";
 
 import { ProjectRequest } from "./types/projects";
 import { UserResponse } from "./types/user";
-import { TaskGroup, TaskRequest, Task } from "./types/home";
+import { TaskGroup, TaskRequest, TaskGet } from "./types/home";
+import { Gantt, Task, ViewMode } from '@rsagiev/gantt-task-react-19';
+import "@rsagiev/gantt-task-react-19/dist/index.css";
 
-import GanttChart from "./Gantt";
 import { Chart } from "react-google-charts";
 import Header from "./Header";
-
-type ValuePiece = Date | null;
-
-type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 const Home = () => {
 
     {/* TODO: remove role from localstorage */}
     const role = localStorage.getItem("role");
 
-    const data = [
-        ["xyi", "xyi"],
-        ["Work", 9],
-        ["Eat", 2],
-        ["Commute", 2],
-        ["Watch TV", 2],
-        ["Sleep", 7],
-    ];
+    const [pieChartData, setPieChartData] = useState([
+        ["GroupName", "Count"],
+        ["Не выполнено", 1]
+    ]);
 
     const options = {
         pieHole: 0.6,
         legend: 'none',
-        pieSliceText: 'none'
+        pieSliceText: 'none',
+        slices: {0: {color: '#C5C9D3'}}, 
+        colors: ["#37515f"],
     };
     
     const [selectedProject, setSelectedProject] = useState<ProjectRequest>()
-
-    const [date, setDate] = useState<Value>(new Date());
 
     const [user, setUser] = useState<UserResponse>();
     const [showSidebar, setSidebar] = useState(true);
@@ -56,9 +48,20 @@ const Home = () => {
         name: "",
     });
 
-    const [tasksList, setTasksList] = useState<Task[]>()
+    const [tasksList, setTasksList] = useState<TaskGet[]>()
 
     const [pushNotificationText, setPushNotificationText] = useState("");
+
+    const [ganttTasks, setGanttTasks] = useState<Task[]>([
+        {
+            start: new Date(2020, 1, 1),
+            end: new Date(2020, 1, 2),
+            name: 'No data',
+            id: 'undefined',
+            type:'task',
+            progress: 45,
+        }
+    ]);
 
     const toggleSidebar = () => {
         setSidebar(!showSidebar);
@@ -131,6 +134,7 @@ const Home = () => {
 
             console.log(taskGroup.status, taskGroup.data);
             listTaskGroups();
+            handlePieChartChange();
 
         } catch (e : unknown) {
             console.log(e);
@@ -151,7 +155,7 @@ const Home = () => {
 
     const listTasks = async () => {
         try {
-            const tasks = await axios.get<Task[]>(
+            const tasks = await axios.get<TaskGet[]>(
                 `api/projects/${localStorage.getItem("selectedProjectID")}/stageGroups/${localStorage.getItem("selectedStageGroupID")}/stages`
             )
 
@@ -176,6 +180,7 @@ const Home = () => {
             console.log(tasks.data);
             console.log(taskData);
             listTasks();
+            handlePieChartChange();
         } catch (e : unknown) {
             console.log(e);
         }
@@ -206,8 +211,10 @@ const Home = () => {
             await axios.delete(
                 `api/projects/${localStorage.getItem("selectedProjectID")}/stageGroups/${localStorage.getItem("selectedStageGroupID")}/stages/${id}`
             )
-
+            
             listTasks();
+            handlePieChartChange();
+
         } catch (e : unknown) {
             console.log(e);
         }
@@ -222,10 +229,60 @@ const Home = () => {
             console.log(taskGroup.status);
             listTaskGroups();
             listTasks();
+            handlePieChartChange();
         } catch (e : unknown) {
             console.log(e);
         }
     }
+
+    const handlePieChartChange = async () => {
+    try {
+        const taskGroups = await axios.get(
+            `api/projects/${localStorage.getItem("selectedProjectID")}/stageGroups/`
+        );
+
+        let uncompletedTasks = 0;
+        const newPieChartData = [];
+        const newGanttData : Task[] = [];
+        newPieChartData.push(["GroupName", "Count"]);
+        newPieChartData.push(["Не выполнено", 0]);
+
+        await Promise.all(
+            taskGroups.data.map(async (item: { id: number }) => {
+                try {
+                    const group = await axios.get(
+                        `api/projects/${localStorage.getItem("selectedProjectID")}/stageGroups/${item.id}`
+                    );
+                    
+                    uncompletedTasks += group.data.totalStages - group.data.completedStages;
+                    newPieChartData.push([group.data.name, group.data.completedStages]);
+                    console.log(group.data.totalStages)
+                    if(group.data.totalStages > 0) {
+                        newGanttData.push({
+                            start: new Date(group.data.startTime * 1000),
+                            end:   new Date(group.data.endTime * 1000),
+                            name:  group.data.name,
+                            id:    group.data.id,
+                            type: 'task',
+                            progress: (group.data.completedStages/group.data.totalStages) * 100
+                        })
+                    }
+                } catch (e: unknown) {
+                    console.error(e);
+                }
+            })
+        );
+
+        console.log(uncompletedTasks);
+        newPieChartData[1] = ["Не выполнено", uncompletedTasks];
+        setPieChartData(newPieChartData);
+        setGanttTasks(newGanttData);
+
+    } catch (e: unknown) {
+        console.warn("Can't get task group");
+        console.error(e);
+    }
+}
 
     const unixDateStampToDate = (unixTimeStamp : number) => {
         const date = new Date(unixTimeStamp * 1000);
@@ -243,6 +300,7 @@ const Home = () => {
         getProject();
         listTaskGroups();
         listTasks();
+        handlePieChartChange();
         console.log(role);
     }, [])
 
@@ -272,13 +330,13 @@ const Home = () => {
                                 {user?.name}
                             </div>
 
-                            <div>Выполняется</div>
+                            <div>{pieChartData[1][1] == 0 ? "Завершен" : "Выполняется"}</div>
                         </section>
                         
                         <section className="ml-auto self-end transition-all">
                             <Chart
                               chartType="PieChart"
-                              data={data}
+                              data={pieChartData}
                               options={options}
                               width={"300px"}
                               height={"300px"}
@@ -316,7 +374,7 @@ const Home = () => {
                                     <li 
                                         key={index}
                                         onClick={() => {localStorage.setItem("selectedStageGroupID", item.id.toString()); listTaskGroups(); listTasks();}}
-                                        className={`w-full min-h-10 ${item.id === parseInt(localStorage.getItem("selectedStageGroupID")!) ? "bg-yellow-100" : ""} items-center flex px-3 border-3 border-palette-color5 rounded-lg justify-between hover:shadow-[0px_0px_5px_#37515fff]`}
+                                        className={`w-full min-h-10 ${item.id === parseInt(localStorage.getItem("selectedStageGroupID")!) ? "bg-[#C5C9D3]" : ""} items-center flex px-3 border-3 border-palette-color5 rounded-lg justify-between hover:shadow-[0px_0px_5px_#37515fff]`}
                                     >
                                         <div>{item.name}</div>
                                         <span onClick={() => deleteTaskGroup(item.id)} className="material-symbols-outlined hover:text-red-700 select-none hover:cursor-pointer">
@@ -370,6 +428,7 @@ const Home = () => {
                                                                 {...item, status: !item.status}
                                                             )
 
+                                                            handlePieChartChange();
                                                             listTasks();
                                                             console.log(tasksList);
                                                         }}
@@ -432,12 +491,24 @@ const Home = () => {
                         </section>
                     </div>
                     
-                    <div className="flex-row w-[98.5%] rounded-lg max-w-full overflow-x-auto border-3 m-2 border-palette-color5 flex items-center">
-                        <div className="flex flex-row w-[75%]">
-                            <GanttChart />
+                    {ganttTasks && ganttTasks[0] ?
+                        <div className="flex-row w-[98.5%] rounded-lg max-w-full overflow-x-auto border-3 m-2 border-palette-color5 flex items-center">
+                            <div className="flex flex-row w-full">
+                                
+                                    <div className="w-full h-full">
+                        
+                                            <Gantt
+                                                tasks={ganttTasks!}
+                                                viewMode={ViewMode.Week}
+                                                locale='rus'
+                                                listCellWidth=''
+                                            />
+                                    </div>
+                            </div>
                         </div>
-                        <Calendar onChange={setDate} value={date}/>
-                    </div>
+                        :
+                        <></>
+                    }
                     { role === "client" ?
                         <></>
                         :

@@ -2,10 +2,10 @@ import Header from './Header';
 import Sidebar from './Sidebar';
 import { useEffect, useState } from 'react';
 import PushNotification from './PushNotication';
-import { LineItem, EditableCellProps, EstimateGroup } from './types/estimates';
+import { LineItem, EstimateGroup } from './types/estimates';
 import axios from 'axios';
 
-const EditableCell = ({ value, onSave, onChange, textStyle, inputStyle }: EditableCellProps) => {
+/*const EditableCell = ({ value, onSave, onChange, textStyle, inputStyle }: EditableCellProps) => {
     const [isEdit, setEdit] = useState(false);
     const [curValue, setValue] = useState(value);
 
@@ -50,7 +50,7 @@ const EditableCell = ({ value, onSave, onChange, textStyle, inputStyle }: Editab
             )}
         </>
     );
-};
+};*/
 
 const Estimates = () => {
 
@@ -80,6 +80,10 @@ const Estimates = () => {
     }
 
     const handleAppending = async () => {
+        if(!localStorage.getItem("selectedEstimateGroup")) {
+            pushNotification("Группа смет не выбрана!");
+            return;
+        }
         try {
             const estimate = await axios.post(
                 `/api/projects/${localStorage.getItem("selectedProjectID")}/estimateGroups/${localStorage.getItem("selectedEstimateGroup")}/estimates`,
@@ -94,7 +98,6 @@ const Estimates = () => {
             console.log(estimate);
             listEstimates();
             getTotalCost();
-            document.location.reload();
             pushNotification("Добавлена смета")
         } catch (e : unknown) {
             console.log(e);
@@ -129,6 +132,21 @@ const Estimates = () => {
 
             console.log(estimateGroups.data)
             setEstimateGroupsList(estimateGroups.data);
+        } catch (e : unknown) {
+            console.error(e);
+        }
+    }
+
+    const deleteGroup = async (id : number) => {
+        try {
+            await axios.delete(
+                `api/projects/${localStorage.getItem("selectedProjectID")}/estimateGroups/${id}`
+            );
+            listGroups();
+            listEstimates();
+            setLineArray(null!);
+            localStorage.removeItem("selectedEstimateGroup");
+            localStorage.removeItem("estimateGroup");
         } catch (e : unknown) {
             console.error(e);
         }
@@ -255,10 +273,10 @@ const Estimates = () => {
                                             <li key={index} className="flex flex-row">
                                                 <section className="flex flex-row w-full px-[2%] mb-5 justify-between">
                                                     {/* TODO: fix sizes */}
-                                                    <EditableCell value={item.name ? item.name : "-"} textStyle="text-center w-[16%] h-[40px] border-2 border-white hover:border-black" inputStyle="!w-[15%] border-2 border-palette-color4 mb-2 text-black text-center" />
-                                                    <EditableCell value={item.unit ? item.unit : "-"} textStyle="text-center w-[16%] h-[40px] border-2 border-white hover:border-black"  inputStyle="!w-[15%] border-2 border-palette-color4 mb-2 text-black text-center"/>
-                                                    <EditableCell value={(item.count).toString()} textStyle="text-center w-[16%] h-[40px] border-2 border-white hover:border-black"  inputStyle="!w-[15%] border-2 border-palette-color4 mb-2 text-black text-center"/>
-                                                    <EditableCell value={(item.cost).toString()} textStyle="text-center w-[16%] h-[40px] border-2 border-white hover:border-black"  inputStyle="!w-[15%] border-2 border-palette-color4 mb-2 text-black text-center"/>
+                                                    <div className="text-center w-[16%] h-[40px] border-2 border-white">{item.name ? item.name : "-"}</div>
+                                                    <div className="text-center w-[16%] h-[40px] border-2 border-white">{item.unit ? item.unit : "-"}</div>
+                                                    <div className="text-center w-[16%] h-[40px] border-2 border-white">{item.count}</div>
+                                                    <div className="text-center w-[16%] h-[40px] border-2 border-white">{item.cost}</div>
                                                     <div className="text-center w-[16%]">{item.count * item.cost} р</div>
                                                 </section>
                                                 { role === "client" ?
@@ -311,9 +329,12 @@ const Estimates = () => {
                                         getTotalCost();
                                         listEstimates();
                                     }}
-                                    className={`flex flex-row h-18 border-3 justify-center rounded-xl p-3 hover:shadow-[0px_0px_5px_#37515fff] border-palette-color4 ${parseInt(localStorage.getItem("selectedEstimateGroup")!) === item.id ? "bg-yellow-100" : ""}`}
+                                    className={`flex flex-row h-18 border-3 justify-center rounded-xl p-3 hover:shadow-[0px_0px_5px_#37515fff] border-palette-color4 ${parseInt(localStorage.getItem("selectedEstimateGroup")!) === item.id ? "bg-[#C5C9D3]" : ""}`}
                                     >
                                         <h5 className="self-center">{item.name}</h5>                                    
+                                        <span onClick={() => deleteGroup(item.id)} className="material-symbols-outlined absolute right-10 translate-y-[35%] hover:text-red-700">
+                                            close
+                                        </span>
                                     </div>
                                 </li>
                             ))

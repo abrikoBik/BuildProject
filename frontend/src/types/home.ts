@@ -9,7 +9,7 @@ export interface TaskRequest {
     name: string;
 }
 
-export interface Task {
+export interface TaskGet {
     id: number;
     name: string;
     startTime: number;
