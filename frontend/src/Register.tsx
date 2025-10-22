@@ -54,6 +54,7 @@ const Register = () => {
             }
 
             alert("Регистрация прошла успешно!");
+            document.location.href = "/login";
             console.log(data);
         } catch (err: unknown) {
             errors.axiosError(err);

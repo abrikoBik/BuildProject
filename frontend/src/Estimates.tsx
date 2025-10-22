@@ -54,9 +54,6 @@ import axios from 'axios';
 
 const Estimates = () => {
 
-    {/* TODO: remove role from localstorage */}
-    const role = localStorage.getItem("role");
-
     const [formData, setFormData] = useState<LineItem>({
         id: 0,
         name: '',
@@ -74,6 +71,21 @@ const Estimates = () => {
     const [estimateGroupsList, setEstimateGroupsList] = useState<EstimateGroup[]>();
 
     const [totalCost, setTotalCost] = useState(0);
+
+    const [userRole, setUserRole] = useState<string>();
+
+    const getUserRole = async () => {
+        try {
+            const roleRequest = await axios.get(
+                `/api/users/${localStorage.getItem("userID")}/worker`
+            );
+
+            setUserRole(roleRequest.data.role);
+        } catch (e : unknown) {
+            setUserRole("client");
+            console.log(e);
+        }
+    } 
 
     const pushNotification = (text : string) => {
         setPushNotificationText(text);
@@ -204,6 +216,7 @@ const Estimates = () => {
         listEstimates();
         listGroups();
         getTotalCost();
+        getUserRole();
     }, [])
 
     return (
@@ -221,7 +234,7 @@ const Estimates = () => {
                                 <h1 className="text-[#1D3266] font-bold text-4xl">Сметы</h1>
                                 <div className="text-md font-light">{ `Текущая группа смет: ${localStorage.getItem("estimateGroup") ? localStorage.getItem("estimateGroup") : "не выбрана"}` }</div>
                             </div>
-                            { role === "client" ?
+                            { userRole === "client" ?
                                 <></>
                                 :
                                 <>
@@ -279,7 +292,7 @@ const Estimates = () => {
                                                     <div className="text-center w-[16%] h-[40px] border-2 border-white">{item.cost}</div>
                                                     <div className="text-center w-[16%]">{item.count * item.cost} р</div>
                                                 </section>
-                                                { role === "client" ?
+                                                { userRole === "client" ?
                                                     <></>
                                                     :
                                                     <span onClick={() => handleEstimateDelete(item.id)} className="asbolute right-4 material-symbols-outlined select-none hover:text-red-700">
@@ -292,7 +305,7 @@ const Estimates = () => {
                                         <>
                                         </>
                                     }
-                                    { role === "client" 
+                                    { userRole === "client" 
                                         ?   
                                         <></>
                                         :

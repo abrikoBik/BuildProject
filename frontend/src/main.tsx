@@ -22,13 +22,7 @@ createRoot(document.getElementById("root")!).render(
                     <Route path="/estimates" element={<Estimates />} />
                     <Route path="/blueprints" element={<Blueprints />} />
                     <Route path="/projects" element={<Projects />}/>
-                    {
-                        localStorage.getItem("role") === "admin" 
-                        ?
-                        <Route path="/panel" element={<ManagerPanel />}/>
-                        :
-                        <></> 
-                    }
+                    <Route path="/panel" element={<ManagerPanel />}/>
                 </Routes>
             </Router>
         </CookiesProvider>

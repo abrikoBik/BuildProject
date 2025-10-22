@@ -15,8 +15,20 @@ import Header from "./Header";
 
 const Home = () => {
 
-    {/* TODO: remove role from localstorage */}
-    const role = localStorage.getItem("role");
+    const [userRole, setUserRole] = useState("");
+
+    const getUserRole = async () => {
+        try {
+            const roleRequest = await axios.get(
+                `/api/users/${localStorage.getItem("userID")}/worker`
+            );
+
+            setUserRole(roleRequest.data.role);
+        } catch (e : unknown) {
+            console.log(e);
+            setUserRole("client");
+        }
+    } 
 
     const [pieChartData, setPieChartData] = useState([
         ["GroupName", "Count"],
@@ -159,6 +171,7 @@ const Home = () => {
                 `api/projects/${localStorage.getItem("selectedProjectID")}/stageGroups/${localStorage.getItem("selectedStageGroupID")}/stages`
             )
 
+            console.log(tasks.data);
             setTasksList(tasks.data);
         } catch (e : unknown) {
             console.log(e);
@@ -176,6 +189,11 @@ const Home = () => {
                     }
                 }
             )
+
+            if(taskData.endTime === 0 || taskData.startTime === 0 || taskData.name === "") {
+                pushNotification("Поля нельзя оставлять пустыми!");
+                return;
+            }
 
             console.log(tasks.data);
             console.log(taskData);
@@ -227,6 +245,7 @@ const Home = () => {
             )
 
             console.log(taskGroup.status);
+            localStorage.removeItem("selectedTaskGroupID");
             listTaskGroups();
             listTasks();
             handlePieChartChange();
@@ -301,7 +320,7 @@ const Home = () => {
         listTaskGroups();
         listTasks();
         handlePieChartChange();
-        console.log(role);
+        getUserRole();
     }, [])
 
     return (
@@ -324,10 +343,6 @@ const Home = () => {
                         <section className="justify-self-start text-left ml-5">
                             <div className="text-blue-950 font-bold text-3xl mb-5">
                                 {selectedProject?.name}
-                            </div>
-
-                            <div className="mb-5">
-                                {user?.name}
                             </div>
 
                             <div>{pieChartData[1][1] == 0 ? "Завершен" : "Выполняется"}</div>
@@ -384,7 +399,7 @@ const Home = () => {
                                 ))
                                 }
                             </ul>
-                            { role === "client" ?
+                            { userRole === "client" ?
                                 <></>
                                 :
                                 <button onClick={() => {
@@ -411,10 +426,10 @@ const Home = () => {
                             </section>
 
                             <ul className="flex flex-col h-[30vh] self-start gap-3 ml-5 overflow-scroll">
-                                { tasksList?.map((item, index) => (
+                                { !localStorage.getItem("selectedTaskGroupID") ? tasksList?.map((item, index) => (
                                         <li key={index} className="flex flex-row justify-between pr-5">
                                             <section>
-                                                { role === "client" ?
+                                                { userRole === "client" ?
                                                 <input type="checkbox" id="checked" checked={item.status} disabled className="mr-2"/>
                                                 :
                                                 <input
@@ -446,9 +461,9 @@ const Home = () => {
                                             
                                         </li>
                                     ))
-                                }
+                                 : <></>}
                             </ul>
-                            { role === "client" 
+                            { userRole === "client" 
                                 ?
                                 <></>
                                 :
@@ -509,7 +524,7 @@ const Home = () => {
                         :
                         <></>
                     }
-                    { role === "client" ?
+                    { userRole === "client" ?
                         <></>
                         :
                         <div className="flex flex-row m-2 items-center rounded-lg border-3 border-palette-color5 text-left p-4">

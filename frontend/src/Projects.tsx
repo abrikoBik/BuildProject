@@ -11,8 +11,24 @@ import { osm } from 'pigeon-maps/providers'
 const Projects = () => {
     let userID = 0;
 
-    {/* TODO: remove role from localstorage */}
-    const role = localStorage.getItem("role");
+    const [userRole, setUserRole] = useState({
+        id: -1,
+        role: ""
+    });
+    const [clientID, setClientID] = useState<number>();
+
+    const getUserRole = async () => {
+        try {
+            const roleRequest = await axios.get(
+                `/api/users/${localStorage.getItem("userID")}/worker`
+            );
+
+            setUserRole(roleRequest.data);
+        } catch (e : unknown) {
+            setUserRole({id:-1, role:"client"});
+            console.log(e);
+        }
+    } 
 
     try {
         userID = JSON.parse(localStorage.getItem("user") as string).userID;
@@ -65,24 +81,26 @@ const Projects = () => {
         try {
             
             console.log(userRequest);
+            console.log("Client ID", clientID);
 
-            const { data, status } = await axios.post(
+            await axios.post(
                 '/api/projects',
-                userRequest,
+                {
+                    ...userRequest,
+                    userID: clientID
+                },
                 {
                     headers: {
                         "Content-Type": "application/json"
                     }
                 }
-            );
-
-            if(status != 200)
-            {
-                alert(status);
-                return;
-            }
-
-            console.log(data);
+            ).then(async (p) => {
+                    console.log(p.data)
+                    await axios.put(
+                        `/api/projects/${p.data.id}/workers/${userRole.id}`,
+                    )
+                }
+            )
 
             setShowPopUp(false);
 
@@ -180,6 +198,7 @@ const Projects = () => {
 
     useEffect(() => {
         listProjects();
+        getUserRole();
     }, [])
 
     return (
@@ -203,6 +222,14 @@ const Projects = () => {
                         </button>
 
                         <section className="flex flex-col w-full h-full p-5 gap-5">
+                            <div className="flex flex-row gap-2">
+                                <label htmlFor="id" className="!text-black">ID пользователя</label>
+                                <input 
+                                    onChange={(e) => setClientID(parseInt(e.currentTarget.value))}
+                                    id="id"
+                                    className="border-2 w-[70%] ml-auto"
+                                />
+                            </div>
                             <div className="flex flex-row gap-2">
                                 <label htmlFor="name" className="!text-black">Название проекта</label>
                                 <input 
@@ -306,7 +333,6 @@ const Projects = () => {
                                         <div className="overflow-auto">
                                             {item.description}
                                         </div>
-                                        <div>{item.latitude} and {item.longitude}</div>
                                         <Map
                                             provider={osm}
                                             height={200}
@@ -326,7 +352,7 @@ const Projects = () => {
                                         </>
                                     }
                                 </section>
-                                { role === "client" ?
+                                { userRole.role === "client" ?
                                     <></>
                                     :
                                     <button className="absolute right-8 flex justify-flex translate-y-[42%]" onClick={() => deleteProject(item.id)}>
@@ -338,7 +364,7 @@ const Projects = () => {
                             </li>
                             ))
                         }
-                        { role === "client" ?
+                        { userRole.role === "client" ?
                             <></>
                             :
                             <li key={0} className="flex flex-col w-full h-[5vh]">

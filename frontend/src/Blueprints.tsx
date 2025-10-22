@@ -66,9 +66,6 @@ import { useCookies } from 'react-cookie';
 
 const Blueprints = () => {
 
-    {/* TODO: remove role from localstorage */}
-    const role = localStorage.getItem("role");
-
     const fileInputRef = useRef<HTMLInputElement>(null);
     const token = useCookies(["access-token"])[0]["access-token"];
 
@@ -87,6 +84,21 @@ const Blueprints = () => {
     const [blueprintsArray, setBlueprintsArray] = useState<BlueprintProp[]>([
         
     ]);
+
+    const [userRole, setUserRole] = useState<string>();
+
+    const getUserRole = async () => {
+        try {
+            const roleRequest = await axios.get(
+                `/api/users/${localStorage.getItem("userID")}/worker`
+            );
+
+            setUserRole(roleRequest.data.role);
+        } catch (e : unknown) {
+            setUserRole("client");
+            console.log(e);
+        }
+    } 
 
     const handleZoom = (e: React.MouseEvent<HTMLButtonElement>) => {
         const card = e.currentTarget.closest(".flex.flex-col.border-2") as HTMLElement;
@@ -349,6 +361,7 @@ const Blueprints = () => {
 
     useEffect(() => {
         loadBlueprints();
+        getUserRole();
     }, [])
 
     return (
@@ -410,13 +423,11 @@ const Blueprints = () => {
                 <main className="w-[83%] ml-[17%] pr-5">
                     <h1 className="text-[#1D3266] text-4xl font-bold mt-5 ">Чертежи и планы</h1>
                     <div className="flex flex-row gap-10 mb-5">
-                        <h3 className="text-lg">Заказчик: Иванов И. С.</h3>
-                        <h3 className="text-lg">Объект: Московкая д. 68</h3>
                     </div>
 
                     <section className="w-full h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {/* Кнопка загрузки - занимает одну ячейку */}
-                        {role === "client" ?
+                        {userRole === "client" ?
                             <></>
                             :
                             <>
@@ -448,7 +459,7 @@ const Blueprints = () => {
                         {blueprintsArray != null ? blueprintsArray.map((item, index) => (
                             <div key={index} className="flex flex-col h-90 border-2 border-palette-color4 rounded-xl p-4 hover:shadow-md transition-shadow">
                                 <div className="w-full flex justify-end hover:cursor-pointer">
-                                    {role === "client" ?
+                                    {userRole === "client" ?
                                         <></>
                                         :
                                         <button onClick={() => deleteAttachment(item.uuid)} className="w-7 h-7 hover:bg-red-700 rounded-full bg-gray-300 opacity-75 -mb-10 z-50 flex items-center justify-center">
