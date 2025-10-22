@@ -273,8 +273,7 @@ func AddWorker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	project.Workers = append(project.Workers, &worker)
-	worker.User.Projects = append(worker.User.Projects, project)
-	if err := errors.Join(db.Database.Save(project).Error, db.Database.Save(&worker).Error); err != nil {
+	if err := db.Database.Save(project).Error; err != nil {
 		lAddWorker.Error(err)
 		http.Error(w, l10n.GenericWorker, http.StatusInternalServerError)
 	}
@@ -301,10 +300,7 @@ func RemoveWorker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	lRemoveWorker.Debug("project.Workers", project.Workers)
-	if err := errors.Join(
-		db.Database.Model(&project).Association("Workers").Delete(&worker),
-		db.Database.Model(&worker.User).Association("Projects").Delete(&project),
-	); err != nil {
+	if err := db.Database.Model(&project).Association("Workers").Delete(&worker); err != nil {
 		lRemoveWorker.Error(err)
 		http.Error(w, l10n.GenericWorker, http.StatusInternalServerError)
 		return

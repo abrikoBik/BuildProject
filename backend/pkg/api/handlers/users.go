@@ -128,7 +128,7 @@ func ListProjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var user models.User
-	if user.Get(db.Database, id, "Projects") != nil {
+	if user.Get(db.Database, id, "Projects", "Worker.Projects") != nil {
 		http.Error(w, l10n.UserNotFound, http.StatusNotFound)
 		return
 	}
@@ -139,6 +139,15 @@ func ListProjects(w http.ResponseWriter, r *http.Request) {
 	for _, p := range user.Projects {
 		toAppend := models.ProjectResponse{
 			Project:   &p,
+			StartTime: p.StartTime.Time.Unix(),
+			EndTime:   p.EndTime.Time.Unix(),
+			ID:        p.ID,
+		}
+		response = append(response, toAppend)
+	}
+	for _, p := range user.Worker.Projects {
+		toAppend := models.ProjectResponse{
+			Project:   p,
 			StartTime: p.StartTime.Time.Unix(),
 			EndTime:   p.EndTime.Time.Unix(),
 			ID:        p.ID,
