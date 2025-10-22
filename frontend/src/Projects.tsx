@@ -8,6 +8,11 @@ import axios from 'axios';
 import { Map, Marker } from 'pigeon-maps'
 import { osm } from 'pigeon-maps/providers'
 
+type coords = {
+    latitude: number,
+    longitude: number,
+}
+
 const Projects = () => {
     let userID = 0;
 
@@ -16,6 +21,8 @@ const Projects = () => {
         role: ""
     });
     const [clientID, setClientID] = useState<number>();
+
+    const [currentCoords, setCurrentCoords] = useState<coords>();
 
     const getUserRole = async () => {
         try {
@@ -87,7 +94,9 @@ const Projects = () => {
                 '/api/projects',
                 {
                     ...userRequest,
-                    userID: clientID
+                    userID: clientID,
+                    longitude: Longitude,
+                    latitude: Latitude
                 },
                 {
                     headers: {
@@ -147,6 +156,18 @@ const Projects = () => {
 
         } catch (err : unknown) {
             console.log(err);
+        }
+    }
+
+    const getCoords = async (id : number) => {
+        try {
+            const coords = await axios.get(
+                `/api/projects/${id}/`
+            )
+
+            setCurrentCoords(coords.data);
+        } catch (e : unknown) {
+            console.log(e);
         }
     }
 
@@ -318,6 +339,7 @@ const Projects = () => {
                                                 newMaximizedProjects[index] = !newMaximizedProjects[index];
                                                 return newMaximizedProjects;
                                             });
+                                            getCoords(item.id);
                                         }
                                     } 
                                     className={`flex items-center p-5 w-full rounded-xl overflow-hidden ${maximizedProjects![index] ? "max-h-[40vh] flex-col" : "h-[5vh] flex-row"} border-3 border-palette-color5 mb-2`}
@@ -337,12 +359,12 @@ const Projects = () => {
                                             provider={osm}
                                             height={200}
                                             defaultCenter={[47.2153657, 38.9285216]}
-                                            center={[item.latitude, item.longitude]} 
+                                            center={[currentCoords?.latitude as number, currentCoords?.longitude as number]} 
                                             defaultZoom={15}
                                         >
                                             <Marker
                                                 width={50}
-                                                anchor={[item.latitude, item.longitude]} 
+                                                anchor={[currentCoords?.latitude as number, currentCoords?.longitude as number]} 
                                             />
                                         </Map>
                                         <button onClick={() => selectProject(item.id)} className={`${maximizedProjects![index] ? "mt-auto" : ""} bg-palette-color4 p-1 px-2 rounded-xl text-white z-50 hover:cursor-pointer`}>Перейти к проекту</button>
