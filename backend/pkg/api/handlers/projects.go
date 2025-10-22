@@ -268,7 +268,7 @@ func AddWorker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var worker models.Worker
-	if worker.Get(db.Database, workerID) != nil {
+	if worker.Get(db.Database, workerID, "User.Projects") != nil {
 		http.Error(w, l10n.WorkerNotFound, http.StatusNotFound)
 		return
 	}
@@ -296,7 +296,7 @@ func RemoveWorker(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var worker models.Worker
-	if worker.Get(db.Database, workerID) != nil {
+	if worker.Get(db.Database, workerID, "User.Projects") != nil {
 		http.Error(w, l10n.WorkerNotFound, http.StatusNotFound)
 		return
 	}
