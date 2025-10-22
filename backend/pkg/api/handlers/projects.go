@@ -274,7 +274,7 @@ func AddWorker(w http.ResponseWriter, r *http.Request) {
 	}
 	project.Workers = append(project.Workers, &worker)
 	worker.User.Projects = append(worker.User.Projects, project)
-	if err := errors.Join(db.Database.Save(project).Error, db.Database.Save(worker).Error); err != nil {
+	if err := errors.Join(db.Database.Save(project).Error, db.Database.Save(&worker).Error); err != nil {
 		lAddWorker.Error(err)
 		http.Error(w, l10n.GenericWorker, http.StatusInternalServerError)
 	}
