@@ -392,9 +392,13 @@ const Home = () => {
                                         className={`w-full min-h-10 ${item.id === parseInt(localStorage.getItem("selectedStageGroupID")!) ? "bg-[#C5C9D3]" : ""} items-center flex px-3 border-3 border-palette-color5 rounded-lg justify-between hover:shadow-[0px_0px_5px_#37515fff]`}
                                     >
                                         <div>{item.name}</div>
-                                        <span onClick={() => deleteTaskGroup(item.id)} className="material-symbols-outlined hover:text-red-700 select-none hover:cursor-pointer">
-                                            close
-                                        </span>
+                                        {   userRole !== "client" ?
+                                            <span onClick={() => deleteTaskGroup(item.id)} className="material-symbols-outlined hover:text-red-700 select-none hover:cursor-pointer">
+                                                close
+                                            </span>
+                                            :
+                                            <></>
+                                        }
                                     </li>
                                 ))
                                 }
