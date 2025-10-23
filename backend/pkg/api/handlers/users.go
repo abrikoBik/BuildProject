@@ -145,14 +145,16 @@ func ListProjects(w http.ResponseWriter, r *http.Request) {
 		}
 		response = append(response, toAppend)
 	}
-	for _, p := range user.Worker.Projects {
-		toAppend := models.ProjectResponse{
-			Project:   p,
-			StartTime: p.StartTime.Time.Unix(),
-			EndTime:   p.EndTime.Time.Unix(),
-			ID:        p.ID,
+	if user.Worker != nil {
+		for _, p := range user.Worker.Projects {
+			toAppend := models.ProjectResponse{
+				Project:   p,
+				StartTime: p.StartTime.Time.Unix(),
+				EndTime:   p.EndTime.Time.Unix(),
+				ID:        p.ID,
+			}
+			response = append(response, toAppend)
 		}
-		response = append(response, toAppend)
 	}
 	if err := jsonEncode(w, response, "list"); err != nil {
 		lListProjects.Error(err)
