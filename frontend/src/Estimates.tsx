@@ -344,10 +344,14 @@ const Estimates = () => {
                                     }}
                                     className={`flex flex-row h-18 border-3 justify-center rounded-xl p-3 hover:shadow-[0px_0px_5px_#37515fff] border-palette-color4 ${parseInt(localStorage.getItem("selectedEstimateGroup")!) === item.id ? "bg-[#C5C9D3]" : ""}`}
                                     >
-                                        <h5 className="self-center">{item.name}</h5>                                    
-                                        <span onClick={() => deleteGroup(item.id)} className="material-symbols-outlined absolute right-10 translate-y-[35%] hover:text-red-700">
-                                            close
-                                        </span>
+                                        <h5 className="self-center">{item.name}</h5>
+                                        {   userRole !== "client" ?                                 
+                                            <span onClick={() => deleteGroup(item.id)} className="material-symbols-outlined absolute right-10 translate-y-[35%] hover:text-red-700">
+                                                close
+                                            </span>
+                                            :
+                                            <></>
+                                        }
                                     </div>
                                 </li>
                             ))
